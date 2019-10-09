@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://xv44586.github.io/"/>
-  <updated>2019-10-05T04:45:11.875Z</updated>
+  <updated>2019-10-09T01:33:03.756Z</updated>
   <id>https://xv44586.github.io/</id>
   
   <author>
@@ -17,24 +17,35 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>hello world</title>
+    <title>about</title>
     <link href="https://xv44586.github.io/2019/10/05/hello-world/"/>
     <id>https://xv44586.github.io/2019/10/05/hello-world/</id>
-    <published>2019-10-05T04:41:49.000Z</published>
-    <updated>2019-10-05T04:45:11.875Z</updated>
+    <published>2019-10-04T23:48:20.000Z</published>
+    <updated>2019-10-09T01:33:03.756Z</updated>
     
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script>]]></content>
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#about-blog">About Blog</a></li><li><a href="#wen-zhang-fen-lei">文章分类</a></li><li><a href="#about-author-chi-xu-geng-xin">About Author（持续更新)</a></li><li><a href="#ji-hua">计划</a></li></ul><!-- tocstop --></div><h1><span id="about-blog">About Blog</span><a href="#about-blog" class="header-anchor"></a></h1><p>主要是自己的日常阅读笔记及思考</p><h1><span id="wen-zhang-fen-lei">文章分类</span><a href="#wen-zhang-fen-lei" class="header-anchor"></a></h1><ol><li>PaperReading 主要是自己的阅读相关思考</li><li>Programming 主要是自己在编程过程中的demo或总结</li><li>Life 主要是自己日常生活的所思所想及碎碎念</li></ol><h1><span id="about-author-chi-xu-geng-xin">About Author（持续更新)</span><a href="#about-author-chi-xu-geng-xin" class="header-anchor"></a></h1><p><strong>职业</strong><br>Backend -&gt; BigData -&gt; Machine Learning -&gt; NLP<br><strong>生活尝试</strong><br>每周跑步二十公里以上    2019.09.25 -&gt; now</p><h1><span id="ji-hua">计划</span><a href="#ji-hua" class="header-anchor"></a></h1><p>Updating…</p>]]></content>
     
     <summary type="html">
     
       
       
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
+        &lt;div class=&quot;toc&quot;&gt;
+
+&lt;!-- toc --&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#about-blog&quot;&gt;About Blog&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#wen-zhang-fen-lei&quot;&gt;文章分类&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a hr
       
     
     </summary>
     
     
+      <category term="test" scheme="https://xv44586.github.io/categories/test/"/>
+    
+    
+      <category term="hello-world" scheme="https://xv44586.github.io/tags/hello-world/"/>
     
   </entry>
   
