@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://xv44586.github.io/"/>
-  <updated>2019-10-09T01:33:03.756Z</updated>
+  <updated>2019-10-10T15:12:37.718Z</updated>
   <id>https://xv44586.github.io/</id>
   
   <author>
@@ -17,35 +17,33 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>about</title>
-    <link href="https://xv44586.github.io/2019/10/05/hello-world/"/>
-    <id>https://xv44586.github.io/2019/10/05/hello-world/</id>
-    <published>2019-10-04T23:48:20.000Z</published>
-    <updated>2019-10-09T01:33:03.756Z</updated>
+    <title>hello-world</title>
+    <link href="https://xv44586.github.io/2019/10/10/hello-world/"/>
+    <id>https://xv44586.github.io/2019/10/10/hello-world/</id>
+    <published>2019-10-10T00:24:35.000Z</published>
+    <updated>2019-10-10T15:12:37.718Z</updated>
     
-    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#about-blog">About Blog</a></li><li><a href="#wen-zhang-fen-lei">文章分类</a></li><li><a href="#about-author-chi-xu-geng-xin">About Author（持续更新)</a></li><li><a href="#ji-hua">计划</a></li></ul><!-- tocstop --></div><h1><span id="about-blog">About Blog</span><a href="#about-blog" class="header-anchor"></a></h1><p>主要是自己的日常阅读笔记及思考</p><h1><span id="wen-zhang-fen-lei">文章分类</span><a href="#wen-zhang-fen-lei" class="header-anchor"></a></h1><ol><li>PaperReading 主要是自己的阅读相关思考</li><li>Programming 主要是自己在编程过程中的demo或总结</li><li>Life 主要是自己日常生活的所思所想及碎碎念</li></ol><h1><span id="about-author-chi-xu-geng-xin">About Author（持续更新)</span><a href="#about-author-chi-xu-geng-xin" class="header-anchor"></a></h1><p><strong>职业</strong><br>Backend -&gt; BigData -&gt; Machine Learning -&gt; NLP<br><strong>生活尝试</strong><br>每周跑步二十公里以上    2019.09.25 -&gt; now</p><h1><span id="ji-hua">计划</span><a href="#ji-hua" class="header-anchor"></a></h1><p>Updating…</p>]]></content>
+    <content type="html"><![CDATA[<p><strong>Hello World!</strong></p><div class="toc"><!-- toc --><ul><li><a href="#qi-yin">起因</a></li><li><a href="#xuan-xing">选型</a></li><li><a href="#chu-zhong">初衷</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="qi-yin">起因</span><a href="#qi-yin" class="header-anchor"></a></h1><p>日常的阅读思考需要常常总结记录，偶尔回过头来再看看，尤其近两年论文阅读的越来越多，自己的理解难免浅薄，也需要有一个其他人有可能参与<br>并能一起讨论的地方。之前一直使用印象笔记，但是这个更”personal”，需要一个更”public”的方式。</p><h1><span id="xuan-xing">选型</span><a href="#xuan-xing" class="header-anchor"></a></h1><p><strong>私建博客</strong></p><p>最初是在阿里云上私建博客，而后因为种种原因，一年后宣告失败 - -！（其实主要是因为思考少，也懒的写～～）为了避免在一个地方摔两次跟头，所以pass</p><p><strong>知乎/csdn/简书</strong></p><p>由于对csdn实在没好感，pass，知乎上创建了一个专栏，结果需要审核，等了几天（当时在职时应该给自己加点”戏”的233333），最后排除上述答案后，选C。<br>其实以上选项都有一个共同问题：网站出问题了，你的内容就出问题了。</p><p><strong>GitPage</strong></p><p>简书也不给力，比知乎审查更让人受不了，整个九月都无法正常使用（让我少更多少啊，阻止我进步！！），最后还是需要一个更稳定的，维护成本低的，<br>不需要”审核”的方案，所以选了Hexo + GitPage（主要是这个主题我喜欢～)，之前简书上的内容也会陆续迁移过来，简书就当作是临时草稿箱吧～<br>PS.原主题地址：<a href="https://github.com/Mrminfive/hexo-theme-skapp" target="_blank" rel="noopener">https://github.com/Mrminfive/hexo-theme-skapp</a></p><h1><span id="chu-zhong">初衷</span><a href="#chu-zhong" class="header-anchor"></a></h1><p>学习上，避免学习中只听不说，只看不写，只学不练的”浅层”学习，通过写的方式，督促自己多总结思考；生活上，记录日常的碎碎念，也记录下当时的一段时光。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于奥森</p>]]></content>
     
     <summary type="html">
     
       
       
-        &lt;div class=&quot;toc&quot;&gt;
+        &lt;p&gt;&lt;strong&gt;Hello World!&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&quot;toc&quot;&gt;
 
 &lt;!-- toc --&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;#about-blog&quot;&gt;About Blog&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#wen-zhang-fen-lei&quot;&gt;文章分类&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a hr
+&lt;li&gt;&lt;a href=&quot;#qi-yin&quot;&gt;起因&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#xuan-xing&quot;&gt;选型&lt;/a&gt;
       
     
     </summary>
     
     
-      <category term="test" scheme="https://xv44586.github.io/categories/test/"/>
+      <category term="life" scheme="https://xv44586.github.io/categories/life/"/>
     
-    
-      <category term="hello-world" scheme="https://xv44586.github.io/tags/hello-world/"/>
     
   </entry>
   
