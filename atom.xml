@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://xv44586.github.io/"/>
-  <updated>2019-10-10T15:12:37.718Z</updated>
+  <updated>2019-10-13T03:44:00.837Z</updated>
   <id>https://xv44586.github.io/</id>
   
   <author>
@@ -17,11 +17,80 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>python中实现单例模式</title>
+    <link href="https://xv44586.github.io/2019/10/13/singleton/"/>
+    <id>https://xv44586.github.io/2019/10/13/singleton/</id>
+    <published>2019-10-13T03:33:59.000Z</published>
+    <updated>2019-10-13T03:44:00.837Z</updated>
+    
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><!-- tocstop --></div><p>python中实现单例模式的方式大致有四种：<br>1.模块<br>2.改写类的<strong>new</strong>方法，控制实例生成<br>3.装饰器<br>4.元类</p><p>1.模块<br>python中的模块是天然的单例模式，并且是线程安全的，所有的模块只会在运行时加载一次。<br>所以，利用模块就可以实现一个线程安全的单例。如：</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># my singleton.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">My_singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">my_singleton = My_singleton()</span><br></pre></td></tr></table></figure><ol start="2"><li><strong>new</strong>方法<br>python中每个类在实例化对象时，首先会调用<strong>new</strong>方法创建一个实例，然后再调用<strong>init</strong>方法动态绑定其他属性.如：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    _instance = <span class="literal">None</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(cls, *args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> cls._instance:</span><br><span class="line">            cls._instance = super(Singleton, cls).__new__(cls, *args, **kw)  </span><br><span class="line">        <span class="keyword">return</span> cls._instance  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(Singleton)</span>:</span>  </span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure></li></ol><p>3.装饰器<br>装饰器可以动态的修改一个类或方法的表现，利用装饰器生成单例</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">singleton</span><span class="params">(cls)</span>:</span></span><br><span class="line">    instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @wraps(cls)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getinstance</span><span class="params">(*args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> instances:</span><br><span class="line">            instances[cls] = cls(*args, **kw)</span><br><span class="line">        <span class="keyword">return</span> instances[cls]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> getinstance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@singleton</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure><p>4.元类<br>元类可以控制其子类的类对象(<strong>new</strong>)及类实例对象(<strong>call</strong>)的创建。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(type)</span>:</span></span><br><span class="line">    _instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(cls, *args, **kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> cls._instances:</span><br><span class="line">            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> cls._instances[cls]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Python2</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    __metaclass__ = Singleton</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Python3</span></span><br><span class="line">    <span class="comment"># class MyClass(metaclass=Singleton):</span></span><br><span class="line">    <span class="comment">#    pass</span></span><br></pre></td></tr></table></figure><p>最著名的就是Django中的ORM，其model中就使用了元类来控制所有model的表现</p><p><strong>关于头图</strong></p><p>摄于内蒙古乌兰布统草原</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;div class=&quot;toc&quot;&gt;
+
+&lt;!-- toc --&gt;
+
+
+
+&lt;!-- tocstop --&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;python中实现单例模式的方式大致有四种：&lt;br&gt;1.模块&lt;br&gt;2.改写类的&lt;strong&gt;new&lt;/strong&gt;方法，控制实例生成&lt;br&gt;3.装
+      
+    
+    </summary>
+    
+    
+      <category term="Programing" scheme="https://xv44586.github.io/categories/Programing/"/>
+    
+    
+      <category term="Python" scheme="https://xv44586.github.io/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>逻辑回归与最大熵模型</title>
+    <link href="https://xv44586.github.io/2019/10/13/logistic/"/>
+    <id>https://xv44586.github.io/2019/10/13/logistic/</id>
+    <published>2019-10-13T01:50:58.000Z</published>
+    <updated>2019-10-13T03:29:18.353Z</updated>
+    
+    <content type="html"><![CDATA[<p><strong>最大熵是概论模型学习的一个准则。</strong></p><div class="toc"><!-- toc --><ul><li><a href="#luo-ji-hui-gui">逻辑回归</a><ul><li><a href="#luo-ji-hui-gui-fen-bu">逻辑回归分布：</a></li><li><a href="#er-xiang-luo-ji-hui-gui-mo-xing">二项逻辑回归模型：</a></li><li><a href="#luo-ji-hui-gui-mo-xing-te-dian">逻辑回归模型特点：</a></li></ul></li><li><a href="#zui-da-shang-mo-xing">最大熵模型</a><ul><li><a href="#shang">熵</a></li><li><a href="#zui-da-shang-mo-xing">最大熵模型：</a></li><li><a href="#mo-xing-xue-xi">模型学习：</a></li></ul></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="luo-ji-hui-gui">逻辑回归</span><a href="#luo-ji-hui-gui" class="header-anchor"></a></h1><h2><span id="luo-ji-hui-gui-fen-bu">逻辑回归分布：</span><a href="#luo-ji-hui-gui-fen-bu" class="header-anchor"></a></h2><p>对于连续随机变量X，X服从逻辑回归分布是指X具有以下分布函数和密度函数：<br><img src="/2019/10/13/logistic/func.jpeg" alt="分布函数与密度函数"></p><h2><span id="er-xiang-luo-ji-hui-gui-mo-xing">二项逻辑回归模型：</span><a href="#er-xiang-luo-ji-hui-gui-mo-xing" class="header-anchor"></a></h2><p>二项逻辑回归是一种分类模型，由条件概论分布P(Y|X)表示，其中Y取值为0或1，其条件概论分布为：<br><img src="/2019/10/13/logistic/regression.jpeg" alt="二项逻辑回归条件概率"><br>对于给定的输入x，可以求出P(Y=1|x)和 P(Y=0|x)，逻辑回归通过比较两个条件概率的大小，将x分到概率值大的类中。</p><h2><span id="luo-ji-hui-gui-mo-xing-te-dian">逻辑回归模型特点：</span><a href="#luo-ji-hui-gui-mo-xing-te-dian" class="header-anchor"></a></h2><p>一个事件的几率（odds）是指该事件发生与不发生的概率比值，如果事件发生的概率是p，则几率为p/(1-p)，其对数几率或logit函数是logit(p) = log(p/1-p)，对逻辑回归而言:<br>             $log(P(Y=1|x)/(1-P(Y=1|x)) = wx$<br>即输出Y=1的对数几率是x的线性函数。</p><h1><span id="zui-da-shang-mo-xing">最大熵模型</span><a href="#zui-da-shang-mo-xing" class="header-anchor"></a></h1><h2><span id="shang">熵</span><a href="#shang" class="header-anchor"></a></h2><p>假设离散随机变量X的概率分布是P(X),其熵为：<br><img src="/2019/10/13/logistic/entropy.jpeg" alt="熵"><br>熵满足下列不等式：<br>            $0&lt;=H(P)&lt;=log|X|$<br>其中|X|指X的取值个数，当且仅当X当分布是均匀分布时，右边等号成立，即均匀分布时，熵最大。<br>最大熵原理是概率模型学习的一个准则，其认为在学习概率模型时，熵最大的模型是最好的。直观地说，即在选择概率模型时，首先要满足已有的事实，在没有更多信息的情况下，那些不确定的部分是“等可能的”，“等可能”不容易操作，而熵则是一个可以优化的数值指标，通过最大化熵来表示等可能。<br>举例说明，当没有给任何多余信息时，我们猜测抛掷硬币时，每面朝上的概率都是0.5，仍骰子时，每面朝上的概率都是1/6，即没有额外信息时，认为都是等可能是“最合理”。假如有一枚骰子，扔出1和4的概率之和是1/2，则此时我们认为1和4朝上的概率是1/4，而其余四面朝上的概率是1/8，即首先要满足已知信息，没有额外信息时，均匀分布“最合理”。</p><h2><span id="zui-da-shang-mo-xing">最大熵模型：</span><a href="#zui-da-shang-mo-xing" class="header-anchor"></a></h2><p><img src="/2019/10/13/logistic/p_entropy.jpeg" alt="条件熵"><br>其中条件熵最大的模型称为最大熵模型</p><h2><span id="mo-xing-xue-xi">模型学习：</span><a href="#mo-xing-xue-xi" class="header-anchor"></a></h2><p>最大熵模型的学习可以形式化为约束最优化问题。通过引入拉格朗日乘子将约束最优化问题转化为无约束最优化的对偶问题。</p><p>PS：<br>西瓜书上认为对于任意单调可微函数g(),令<br>             $(y) = wx + b$<br>这样的模型称为广义线性模型，其中函数g为联系函数。对于二分类任务，其输出为0或1，而线性模型的输出为实数域，需要一个函数将实数域的输出转化到0/1值，最理想的函数是单位阶跃函数，即大于0输出1，小于0输出0，等于0输出0.5，但是该函数不连续，不能用作g(),所以使用sigmoid函数替代。<br>逻辑回归有很多优点，如直接对分类可能性进行建模，无需事先假设数据分布，不仅预测出类别，而是得到近似概率预测。</p><p>统计学习方法中给出逻辑回归分布函数，通过引入最大熵模型，求解模型；西瓜书中通过广义线性模型，将sigmoid函数作为连续函数g给出罗辑回归模型，并说明罗辑回归不需要事先假设数据分布。两者都没有明确说明为什么是sigmoid函数，而答案在<a href="http://www.win-vector.com/dfiles/LogisticRegressionMaxEnt.pdf" target="_blank" rel="noopener">http://www.win-vector.com/dfiles/LogisticRegressionMaxEnt.pdf</a> 可以看到，感兴趣的可以读读。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于奥森</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;&lt;strong&gt;最大熵是概论模型学习的一个准则。&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&quot;toc&quot;&gt;
+
+&lt;!-- toc --&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#luo-ji-hui-gui&quot;&gt;逻辑回归&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#luo-
+      
+    
+    </summary>
+    
+    
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
+    
+    
+      <category term="MachineLearning" scheme="https://xv44586.github.io/tags/MachineLearning/"/>
+    
+  </entry>
+  
+  <entry>
     <title>hello-world</title>
     <link href="https://xv44586.github.io/2019/10/10/hello-world/"/>
     <id>https://xv44586.github.io/2019/10/10/hello-world/</id>
     <published>2019-10-10T00:24:35.000Z</published>
-    <updated>2019-10-10T15:12:37.718Z</updated>
+    <updated>2019-10-13T03:22:11.048Z</updated>
     
     <content type="html"><![CDATA[<p><strong>Hello World!</strong></p><div class="toc"><!-- toc --><ul><li><a href="#qi-yin">起因</a></li><li><a href="#xuan-xing">选型</a></li><li><a href="#chu-zhong">初衷</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="qi-yin">起因</span><a href="#qi-yin" class="header-anchor"></a></h1><p>日常的阅读思考需要常常总结记录，偶尔回过头来再看看，尤其近两年论文阅读的越来越多，自己的理解难免浅薄，也需要有一个其他人有可能参与<br>并能一起讨论的地方。之前一直使用印象笔记，但是这个更”personal”，需要一个更”public”的方式。</p><h1><span id="xuan-xing">选型</span><a href="#xuan-xing" class="header-anchor"></a></h1><p><strong>私建博客</strong></p><p>最初是在阿里云上私建博客，而后因为种种原因，一年后宣告失败 - -！（其实主要是因为思考少，也懒的写～～）为了避免在一个地方摔两次跟头，所以pass</p><p><strong>知乎/csdn/简书</strong></p><p>由于对csdn实在没好感，pass，知乎上创建了一个专栏，结果需要审核，等了几天（当时在职时应该给自己加点”戏”的233333），最后排除上述答案后，选C。<br>其实以上选项都有一个共同问题：网站出问题了，你的内容就出问题了。</p><p><strong>GitPage</strong></p><p>简书也不给力，比知乎审查更让人受不了，整个九月都无法正常使用（让我少更多少啊，阻止我进步！！），最后还是需要一个更稳定的，维护成本低的，<br>不需要”审核”的方案，所以选了Hexo + GitPage（主要是这个主题我喜欢～)，之前简书上的内容也会陆续迁移过来，简书就当作是临时草稿箱吧～<br>PS.原主题地址：<a href="https://github.com/Mrminfive/hexo-theme-skapp" target="_blank" rel="noopener">https://github.com/Mrminfive/hexo-theme-skapp</a></p><h1><span id="chu-zhong">初衷</span><a href="#chu-zhong" class="header-anchor"></a></h1><p>学习上，避免学习中只听不说，只看不写，只学不练的”浅层”学习，通过写的方式，督促自己多总结思考；生活上，记录日常的碎碎念，也记录下当时的一段时光。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于奥森</p>]]></content>
     
@@ -42,7 +111,7 @@
     </summary>
     
     
-      <category term="life" scheme="https://xv44586.github.io/categories/life/"/>
+      <category term="Life" scheme="https://xv44586.github.io/categories/Life/"/>
     
     
   </entry>
