@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://xv44586.github.io/"/>
-  <updated>2019-10-13T03:44:00.837Z</updated>
+  <updated>2019-10-13T09:55:41.681Z</updated>
   <id>https://xv44586.github.io/</id>
   
   <author>
@@ -15,6 +15,141 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>神经网络语言模型(NNLM)</title>
+    <link href="https://xv44586.github.io/2019/10/13/nnlm/"/>
+    <id>https://xv44586.github.io/2019/10/13/nnlm/</id>
+    <published>2019-10-13T09:43:00.000Z</published>
+    <updated>2019-10-13T09:55:41.681Z</updated>
+    
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#tong-ji-yu-yan-mo-xing">统计语言模型</a></li><li><a href="#nnlm">NNLM</a><ul><li><a href="#why-it-works">why it works?</a></li><li><a href="#bing-xing">并行</a></li><li><a href="#out-of-vocabulary-word">out-of-vocabulary word</a></li><li><a href="#hou-xu-gong-zuo">后续工作</a></li></ul></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="tong-ji-yu-yan-mo-xing">统计语言模型</span><a href="#tong-ji-yu-yan-mo-xing" class="header-anchor"></a></h1><p>首先看一个例子：<br><strong>ztc/ 上下/ 齐/ 拼搏/ ，誓为/ 春战/ 做/ 贡献</strong><br>这句话呢通顺，意思明白，那如果换一下词的位置：<br><strong>上下/ 齐/ 拼搏/ ztc/ ，春站/ 做/ 贡献/ 誓为</strong><br>意思含糊了，但是大概意思还是能猜到，那如果在变换一下：<br><strong>拼搏/ 齐/ ztc/ 上下/ ，贡献/ 誓为/ 做/ 春战</strong><br>现在这句话已经不知所云了，如何判断这个由词序组成的序列是否符合文法、含义是否正确？</p><p><strong>统计语言模型：一个句子是否合理，就看他的可能性的大小，即他的概率大小。</strong></p><p>假设一个句子S，由一连串特定顺序的词W1, W2,…WT 组成，T是句子中词的个数，则S出现的概率P(S) = P(w1, w2,…wT)<br>利用条件概率公式展开：<br>$P(w1,w2,..wT) = P(w1)<em>P(w2|w1)*P(w3|w1,w2)</em>…*P(wT|w1,w2,..wT-1)$<br>即：<br><img src="/2019/10/13/nnlm/p.png" alt><br>当语料中词典大小为100,000，句子平均长度为5时，需要学习的参数大概100000 * 5 -1 个，为了降低计算复杂度，并考虑到词序列中离的更近的词通常在语义上也更相关，所以在计算时可以通过只使用前面n-1个词来近似计算，即n-grams：<br><img src="/2019/10/13/nnlm/ngram.png" alt></p><p>n-grams存在的问题：1.泛化时常常有训练语料中没有出现过的词序列；2.没有考虑词之间的相似性。</p><h1><span id="nnlm">NNLM</span><a href="#nnlm" class="header-anchor"></a></h1><p><img src="/2019/10/13/nnlm/arc.png" alt="Neural architecture"></p><ul><li>1.对词库里的每个词指定一个分布的词向量</li><li>2.定义联合概率（通过序列中词对应的词向量</li><li>3.学习词向量和概率函数的参数</li></ul><h2><span id="why-it-works">why it works?</span><a href="#why-it-works" class="header-anchor"></a></h2><p>如果我们已知 “走” 和 “跑” 是相似词，那很容易通过 ”猫在屋里跑“ 推出 “猫在屋里走“，因为相似的词会有相似的词向量，而且概率函数是特征的平滑函数，所以特征的微小变化，只会对概率值产生一个很小的影响。即：1.相似词在特征空间距离更接近；2.概率函数是一个相对平滑的函数，对特征值的变化不是非常敏感。<br>所以训练语料中句子的出现不光增加了自身的概率，也增加了他与周围句子的概率（句子向量空间）<br>目标：f(wt ,··· ,wt−n+1) = Pˆ(wt |w1,w2,..wt-1 )<br>约束：</p><ul><li><ol><li>$∑ |V| i=1 f(i,wt−1,··· ,wt−n+1) = 1$  </li></ol></li><li>2.$f&gt;0$</li></ul><p>通过得到的条件概率进行相乘，得到词序列的联合概率.<br>模型被分成二部分：<br>1.<strong>特征映射：通过映射矩阵 C∈R ∣V∣×m</strong><br>将输入的每个词映射为一个特征向量，C(i)∈Rm 表示词典中第 i 个词对应的特征向量，其中 m 表示特征向量的维度。<br>2.<strong>概率函数g</strong><br>通过context中词的词向量来映射下一个词的条件概率。g的输出是一个向量，其中第i个元素表示了字典中第i个词的概率。完整的模型表达如下：<br>       $f(i,wt−1,··· ,wt−n+1) = g(i,C(wt−1),··· ,C(wt−n+1))$<br>函数f由两个映射（g and c)组成，其中c由所有的上下文共享。<br>训练过程中的参数就由两个映射组成，设 g 对应参数为w，c映射的参数就是自身，则 θ=（c, w)<br>训练过程就是学习θ的最大似然：<br><img src="/2019/10/13/nnlm/l.ong" alt><br>其中R(θ) 是正则项。<br>模型中参数与字典大小V成线性关系，且与n（n-grams)成线性关系，不过可以通过共享结构降低参数数量，如延时神经网络或循环神经网络。<br>实验中，神经网络层只有一个隐层，有一个可选的词向量到输出的直连层，实际上就有两个隐层，一个共享的词向量C 层，该层没有激活函数，还有一个tanh激活函数的隐层；最后的输出层是一个softmax层，来保证所有结果的和为1：<br><img src="/2019/10/13/nnlm/pnew.png" alt></p><p>注意：第一层是没有非线性激活函数的，因为非线性激活函数会带来其他信息（联想神经网络中非线性激活函数），而正是这种直接的线性变换，才能让第一层的参数来作为词向量<br>用yi表示每个输出词的对数概率，则<br>$y = b+Wx+U tanh(d +Hx)$<br>其中x是词向量的拼接，x = (c(wt-1),c(wt-2),c(wt-n+1))</p><h2><span id="bing-xing">并行</span><a href="#bing-xing" class="header-anchor"></a></h2><p>参数与输入的窗口大小和字典的大小成线性，但是计算量却比n-grams 要大很多，首先n-grams中不需要每次都计算所有词的概率，只需要相关词频的线性组合，另外神经网络中主要瓶颈是输出层的激活计算。</p><h2><span id="out-of-vocabulary-word">out-of-vocabulary word</span><a href="#out-of-vocabulary-word" class="header-anchor"></a></h2><p>首先根据窗口上下文可能出现的词，进行加权求和初始化新词的词向量，然后将新词 j 加入字典，然后利用这部分数据集重新训练，进行retune.</p><h2><span id="hou-xu-gong-zuo">后续工作</span><a href="#hou-xu-gong-zuo" class="header-anchor"></a></h2><ul><li>1，分解网络到子网络，如使用词聚类，构建许多小的子网络可能更快更简单</li><li>2，用树结构来表达条件概率：神经网络作用在每一个节点上，每个节点代表根据上下问得到该词类的可能性，叶子节点代表词的可能性，这种结构可以将计算复杂度从|v| 降低到 log|v|</li><li>3，梯度传播时可以只在部分输出词上进行，如某些条件下最相似的（如三元模型）。如果用在语音识别，可以只计算听觉上相似的词。</li><li>4，引入先验知识，如语义信息和语法信息。通过在神经网络结构中共享更多的结构与参数，可以捕获长期的上下文信息，</li><li>5，如何解释神经网络得到的词向量</li><li>6，上述模型对每个单词分配一个在语义空间的点，所以无法解决一词多义问题。如何扩展当前模型，在语义空间中为词分配多个点来代表词的不同语义。</li></ul><p>作者提出的后续工作中，目前是很多人的研究方向，一些已经被证明有效。</p><ul><li>第一个，优化网络结构，提到了从数据方向，构建更多的子网络，还可以直接对网络结构本身进行优化，如word2vec，将神经网络层去掉；</li><li>第二个，由于计算瓶颈在计算output的概率（对每个词计算概率，需要softmax归一化）,所以提出可以通过树结构，来避免直接对所有词进行计算，如 Hierarchical Softmax</li><li>第三个也是在计算输出时，只通过一部分词来进行梯度传播，如负采样</li><li>第四个是通过共享结构，来捕获更多上下文信息，如GPT，Bert</li><li>第五个是如何解释，也是目前很多人的研究方向</li><li>第六个是一次多义的解决方法，如ELMO</li></ul><p>参考：<br><a href="http://www.iro.umontreal.ca/~vincentp/Publications/lm_jmlr.pdf" target="_blank" rel="noopener">http://www.iro.umontreal.ca/~vincentp/Publications/lm_jmlr.pdf</a></p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于望京soho</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;div class=&quot;toc&quot;&gt;
+
+&lt;!-- toc --&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#tong-ji-yu-yan-mo-xing&quot;&gt;统计语言模型&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#nnlm&quot;&gt;NNLM&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#w
+      
+    
+    </summary>
+    
+    
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
+    
+    
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Word2Vec之skip-gram</title>
+    <link href="https://xv44586.github.io/2019/10/13/skipgram/"/>
+    <id>https://xv44586.github.io/2019/10/13/skipgram/</id>
+    <published>2019-10-13T09:12:24.000Z</published>
+    <updated>2019-10-13T09:41:54.733Z</updated>
+    
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#word2vec">Word2Vec</a></li><li><a href="#fake-task">Fake Task</a></li><li><a href="#train">Train</a></li><li><a href="#shu-ru">输入</a></li><li><a href="#yin-ceng">隐层</a></li><li><a href="#shu-chu-ceng">输出层</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="word2vec">Word2Vec</span><a href="#word2vec" class="header-anchor"></a></h1><p><img src="/2019/10/13/skipgram/w2v.jpeg" alt="Word2Vec"><br>Word2vec 主要有两种形式，CBOW 和Skip-gram，其中CBOW是通过上下文context来预测当前位置词，SKip-gram则是通过当前词来预测上下文</p><h1><span id="fake-task">Fake Task</span><a href="#fake-task" class="header-anchor"></a></h1><p>word2vec 实际上分为两部分，1，建立模型，2，通过模型获取词的嵌入向量（隐层参数）。整个过程与自编码器的思想类似，即基于训练数据训练一个神经网络，模型训练好后，并不会用这个模型处理后续的任务，真正需要的是这个模型学到的参数，如隐层的权重矩阵，基于训练数据建模的过程叫“Fake Task”，意味着建模并不是我们最终的目的。</p><h1><span id="train">Train</span><a href="#train" class="header-anchor"></a></h1><p>如何训练我们的神经网络模型？假如我们有一个句子“ The dog barked at the mailman”:</p><ul><li>首先，我们选择句子中一个词作为我们的input word， 如 dog</li><li>然后，我们需要定义一个skip_window参数，来指定上下文的大小，即input word 一侧选取词的数量，假如skip_window=2,那将从dog出发向左右两个方向取最近的两个word，即（the, dog,barked,at)，此时的span = skip_window * 2 + 1 = 5<br>另一个需要定义的参数是num_skips，即从上下文中选取多少个word来作为output word，这个参数应该小于等于2 * skip_window，即最多将所有上下文都作为output，但是不能重复。如设置num_skips = 2,此时从上下文选取2个词作为output，如（the， barked），最终我们将得到两组训练数据（dog, the) (dog, barked)</li></ul><p>神经网络将基于这些训练数据输出一个概率分布，这个概率分布代表着在输入数据下，词典中每个词是output的概率。如拿数据（dog， barked）来训练，则模型将会告诉我们每个单词是’barked’的概率大小。<br>模型的输出概率代表着词典中每个单词有多大可能性跟input word同时出现。举个栗子，如果我们向神经网络模型中输入一个单词“Soviet“，那么最终模型的输出概率中，像“Union”， ”Russia“这种相关词的概率将远高于像”watermelon“，”kangaroo“非相关词的概率。因为”Union“，”Russia“在文本中更大可能在”Soviet“的窗口中出现。<br>我们将通过给神经网络输入文本中成对的单词来训练它完成上面所说的概率计算。下面的图中给出了一些我们的训练样本的例子。我们选定句子“The quick brown fox jumps over lazy dog”，设定我们的窗口大小为2（window_size = 2），也就是说我们仅选输入词前后各两个词和输入词进行组合。下图中，蓝色代表input word，方框内代表位于窗口内的单词。</p><p><img src="/2019/10/13/skipgram/train.png" alt><br>模型将会从每队单词出现的次数中习得统计结果，模型可能会得到更多的（’soviet’， ‘union’）样本对，而（soviet， dog）这样的组合看到的很少。因此，当模型训练完成后，给定一个单词 soviet，输出结果中union 或者russia会比dog有更高的概率。</p><h1><span id="shu-ru">输入</span><a href="#shu-ru" class="header-anchor"></a></h1><p>常用做法是用训练文档构建词汇表，然后再对单词进行0ne-hot编码。编码后的向量，形如dog = [0, 0, 1, 0, …0], 如果词汇表大小为10000， 那这个向量包含了10000的概率，即为当前词为输入的概率<br>下图是神经网络结构：</p><p><img src="/2019/10/13/skipgram/arc.png" alt><br>我们基于成对的单词来对神经网络进行训练， 训练样本是（input word， output word）这样的单词对，input word 和 output word都是one-hot编码的向量，最终的模型输出是一个概率分布。</p><h1><span id="yin-ceng">隐层</span><a href="#yin-ceng" class="header-anchor"></a></h1><p>如果我们想要用300个特征来表示一个词（即每个词是300维的向量），即隐层有300个神经元，隐层的权重为10000 * 300的矩阵，下图中的左右两个图代表了不同角度看隐层权重，左图中每列代表一个10000维的词向量与隐层单个神经元的连接权重，右图每行代表了一个单词的词向量。<br><img src="/2019/10/13/skipgram/weights.png" alt><br>我们最终的目标就是学习这个隐层权重矩阵。<br>输入被one-hot编码后，实际上只有一个位置不为0，所以这个向量相当稀疏，那如果我们将1<em>10000的向量与10000</em>300的矩阵相乘，相当消耗计算资源，为了高效计算，仅仅会选择矩阵中对应的向量中纬度为1的索引行<br><img src="/2019/10/13/skipgram/lookup.png" alt="lookup table"><br>即实际不会进行矩阵乘法计算，而是根据输入向量中不为0 的维度去索引。这样模型中的隐层权重矩阵便成了一个查找表（lookup table），输出就是输入单词的嵌入词向量</p><h1><span id="shu-chu-ceng">输出层</span><a href="#shu-chu-ceng" class="header-anchor"></a></h1><p>隐层的输出是一个1*300的向量，而输出层是一个softmax回归分类器，他的每个结点将会输出一个0-1之间的值（概率），而结点的概率之和为1.<br><img src="/2019/10/13/skipgram/softmax.png" alt><br>我们会发现Word2Vec模型是一个超级大的神经网络（权重矩阵规模非常大）。<br>举个栗子，我们拥有10000个单词的词汇表，我们如果想嵌入300维的词向量，那么我们的输入-隐层权重矩阵和隐层-输出层的权重矩阵都会有 10000 x 300 = 300万个权重，在如此庞大的神经网络中进行梯度下降是相当慢的。更糟糕的是，你需要大量的训练数据来调整这些权重并且避免过拟合。百万数量级的权重矩阵和亿万数量级的训练样本意味着训练这个模型将会是个灾难（太凶残了）。<br>Word2Vec的作者在它的第二篇论文中强调了这些问题，下面是作者在第二篇论文中的三个创新：</p><ul><li><ol><li>将常见的单词组合（word pairs）或者词组作为单个“words”来处理。</li></ol></li><li><ol start="2"><li>对高频次单词进行抽样来减少训练样本的个数。</li></ol></li><li><ol start="3"><li>对优化目标采用“negative sampling”方法，这样每个训练样本的训练只会更新一小部分的模型权重，从而降低计算负担。<br>事实证明，对常用词抽样并且对优化目标采用“negative sampling”不仅降低了训练过程中的计算负担，还提高了训练的词向量的质量。</li></ol></li></ul><p><strong>word pairs and phases</strong><br>一些单词组合的含义和拆开以后具有完全不同的意义，比如 New York，单独的New 和York无法表达这个词组的含义。因此，应该把New York作为一个单独的词组来生成其词向量。<br><strong>对高频词抽样</strong><br>对于高频词，如 the ，按上面的处理方式会有两个问题：</p><ul><li><ol><li>当我们得到成对的单词训练样本时，（dog， the）这样的样本并不会提供更多关于dog的语义信息，因为the 在每个单词的上下文几乎都会出现</li></ol></li><li><ol start="2"><li>由于the 这样的高频词出现的概率很大，因此为们将会有大量的（the ， 。。。）这样的训练样本，而这些样本的数量远远超过我们学习the这个单词所需的训练样本数。</li></ol></li></ul><p>如果直接删除掉这些高频词，会有两个问题:</p><ul><li>1.删除后，the这个单词永远也不会出现在我们的上下文窗口</li><li>2.训练样本会减少</li></ul><p>所以word2vec 采用抽样的方式来解决这种高频词问题。他的基本思想是：对于我们在训练原始文本中遇到的每一个单词，他们都有一定概率被我们从文本中删除掉，而这个被删除的概率与单词的频率有关。<br><img src="/2019/10/13/skipgram/del.png" alt><br>wi 是一个单词，Z(wi)是这个单词在所有预料中出现的频次。P(wi)是被保留的概率。</p><ul><li>当Z(wi) &lt;= 0.0026时,P(wi) = 1.0。当单词在语料中出现的频率小于0.0026时，它是100%被保留的，这意味着只有那些在语料中出现频率超过0.26%的单词才会被采样。</li><li>当Z(wi) = 0.00746 时，P(wi) = 0.5，意味着这一部分的单词有50%的概率被保留。</li><li>当Z(wi) = 1.0 时，P(wi) = 0.033，意味着这部分单词以3.3%的概率被保留</li></ul><p><strong>负采样</strong><br>训练一个神经网络意味着要输入训练样本并且不断的调整神经元的权重，不断提高对目标的准确预测。而vocabulary的大小决定了skip-gram神经网络将拥有大规模的权重矩阵，所有的这些权重需要通过我们数以亿计的样本来训练调整，非常消耗计算资源，并且实际中会非常慢。<br>负采样解决了这个问题，不同于原本每个训练样本更新所有权重，负采样每次让一个训练样本仅仅更新一部分权重，减小计算量。<br>对于训练样本（fox，quick），都是经过one-hot编码的，当vocabulary的大小为10000时，我们期望输出对应的quick单词的那个神经元的输出是1，其余9999个都是0，这9999个输出为0的神经元所对应的单词称为negative word<br>隐层-输出层拥有300<em>10000的权重，而负采样时，我们仅仅更新quick 和我们选择的其他5个negative word的结点对应的权重，共6个神经元，300</em> 6 = 1800 个权重，相当于只计算了0.06%的权重，计算效率大大提高。<br><img src="/2019/10/13/skipgram/sample.png" alt><br>其中f(wi)代表每个单词出现的频次，p(wi)代表被选中的概率。<br>负采样的C语言实现非常的有趣。unigram table有一个包含了一亿个元素的数组，这个数组是由词汇表中每个单词的索引号填充的，并且这个数组中有重复，也就是说有些单词会出现多次。那么每个单词的索引在这个数组中出现的次数该如何决定呢，由公式P(wi) * table_size，也就是说计算出的负采样概率*1亿=单词在表中出现的次数。<br>有了这张表以后，每次去我们进行负采样时，只需要在0-1亿范围内生成一个随机数，然后选择表中索引号为这个随机数的那个单词作为我们的negative word即可。一个单词的负采样概率越大，那么它在这个表中出现的次数就越多，它被选中的概率就越大。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于内蒙古乌兰布统</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;div class=&quot;toc&quot;&gt;
+
+&lt;!-- toc --&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#word2vec&quot;&gt;Word2Vec&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#fake-task&quot;&gt;Fake Task&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#tr
+      
+    
+    </summary>
+    
+    
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
+    
+    
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Python中的GIL</title>
+    <link href="https://xv44586.github.io/2019/10/13/gil/"/>
+    <id>https://xv44586.github.io/2019/10/13/gil/</id>
+    <published>2019-10-13T09:01:37.000Z</published>
+    <updated>2019-10-13T09:10:16.685Z</updated>
+    
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#gil-shi-shi-me">GIL是什么</a></li><li><a href="#gil-ji-zhi">GIL机制</a></li><li><a href="#dai-lai-de-wen-ti">带来的问题</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="gil-shi-shi-me">GIL是什么</span><a href="#gil-shi-shi-me" class="header-anchor"></a></h1><p>熟悉Python的人对GIL肯定都不陌生, 其全称是全局解释器锁(Global Interpreter Lock)。但是，很多人都误以为GIL是python的特性，所以，首先需要明确的一点是GIL并不是Python的特性，它是在实现Python解析器(CPython)时所引入的一个概念。而其他的实现版本如JPython就没有GIL。然而因为CPython是大部分环境下默认的Python执行环境。所以在很多人的概念里CPython就是Python，也就想当然的把GIL归结为Python语言的缺陷。所以这里要先明确一点：GIL并不是Python的特性，Python完全可以不依赖于GIL<br>那么CPython实现中的GIL又是什么呢？官方给出的解释：</p><blockquote><p>In CPython, the global interpreter lock, or GIL, is a mutex that protects access to Python objects, preventing multiple threads from executing Python bytecodes at once. This lock is necessary mainly because CPython’s memory management is not thread-safe. (However, since the GIL exists, other features have grown to depend on the guarantees that it enforces.)</p><p><a href="https://wiki.python.org/moin/GlobalInterpreterLock" target="_blank" rel="noopener">https://wiki.python.org/moin/GlobalInterpreterLock</a></p></blockquote><p>即原因是在CPython中的线程实际是操作系统的原生线程,而CPython的内存管理不是线程安全的，于是使用GIL这把大锁锁住其他线程,保证同一时刻只有一个线程可以解释执行字节码。</p><h1><span id="gil-ji-zhi">GIL机制</span><a href="#gil-ji-zhi" class="header-anchor"></a></h1><p>按照Python社区的想法，操作系统本身的线程调度已经非常成熟稳定了，没有必要自己搞一套。所以Python的线程就是C语言的一个pthread，并通过操作系统调度算法进行调度（例如linux是CFS）。为了让各个线程能够平均利用CPU时间，python会计算当前已执行的微代码数量ticks，达到一定阈值后就强制释放。而这时也会触发一次操作系统的线程调度（当然是否真正进行上下文切换由操作系统自主决定）。<br>Python释放GIL的时机之一:<br>有一个周期性计数的计数器,不断递减,保证Python线程可以在执行一段时间之后释放GIL<br>仔细分析就会发现问题,假如在解析执行字节码的过程中当前线程遇到了一个IO操作,却由于等待数据而被阻塞在该IO操作上,而从GIL的设计来看，GIL只能通过当前线程主动释放,其他线程才有可能获取。而当前<br>线程阻塞在IO操作上时,此时给其他线程运行的机会并没有什么问题,因为GIL只是用来同步线程执行字节码的,并非一般的互斥共享资源的互斥锁。在阻塞操作之前让出GIL,其他线程可以继续执行,而当前线程可以继续执行阻塞型的操作,当该阻塞型的操作完成之后,再次试图获取GIL,继续执行余下的字节码。<br>由此可以看出,Python释放GIL的第二个时机:<br>在IO操作等可能会引起阻塞的system call之前,可以暂时释放GIL,但在执行完毕后,必须重新获取GIL</p><h1><span id="dai-lai-de-wen-ti">带来的问题</span><a href="#dai-lai-de-wen-ti" class="header-anchor"></a></h1><p>1.CPU密集型代码(各种循环处理、计数等等)，在这种情况下，ticks计数很快就会达到阈值，然后触发GIL的释放与再竞争（多个线程来回切换当然是需要消耗资源的）<br>2.线程的释放与获取是没有间隙的，单核下没什么问题，多核情况下，当当前master线程释放GIL后，其他核心上的线程被唤醒，而此时大部分情况下当前线程又获取了GIL，而被唤醒的线程只能浪费cpu时间而无法运行，直到达到切换时间，切换为待调度状态，这样会造成线程颠簸(thrashing)，导致效率更低。<br><img src="/2019/10/13/gil/gil_war.png" alt="Multi GIL War"><br>因此，3开始做了一些优化，如将基于pcode调度改为分时调度；避免释放GIL的线程再次立即被调度等。</p><p><a href="http://www.dabeaz.com/GIL/" target="_blank" rel="noopener">http://www.dabeaz.com/GIL/</a><br><a href="http://cyrusin.github.io/2016/04/27/python-gil-implementaion/" target="_blank" rel="noopener">http://cyrusin.github.io/2016/04/27/python-gil-implementaion/</a><br><a href="https://zhuanlan.zhihu.com/p/20953544" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/20953544</a><br><a href="http://cenalulu.github.io/python/gil-in-python/" target="_blank" rel="noopener">http://cenalulu.github.io/python/gil-in-python/</a></p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于世园会</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;div class=&quot;toc&quot;&gt;
+
+&lt;!-- toc --&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#gil-shi-shi-me&quot;&gt;GIL是什么&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#gil-ji-zhi&quot;&gt;GIL机制&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#d
+      
+    
+    </summary>
+    
+    
+      <category term="Programing" scheme="https://xv44586.github.io/categories/Programing/"/>
+    
+    
+      <category term="Python" scheme="https://xv44586.github.io/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>python中的多线程</title>
+    <link href="https://xv44586.github.io/2019/10/13/multiThreads/"/>
+    <id>https://xv44586.github.io/2019/10/13/multiThreads/</id>
+    <published>2019-10-13T08:48:15.000Z</published>
+    <updated>2019-10-13T09:00:15.843Z</updated>
+    
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><!-- tocstop --></div><p>  最近在看Python的多线程，经常我们会听到老手说：“Python下多线程是鸡肋，推荐使用多进程！”，但是为什么这么说呢？<br>要知其然，更要知其所以然。所以有了下面的深入研究：<br>首先强调背景：<br><strong>1. GIL是什么？</strong><br>  GIL的全称是Global Interpreter Lock(全局解释器锁)，来源是python设计之初的考虑，为了数据安全所做的决定。</p><p><strong>2. 每个CPU在同一时间只能执行一个线程</strong><br>  在单核CPU下的多线程其实都只是并发，不是并行，并发和并行从宏观上来讲都是同时处理多路请求的概念。但并发和并行又有区别，并行是指两个或者多个事件在同一时刻发生；而并发是指两个或多个事件在同一时间间隔内发生。<br>在Python多线程下，每个线程的执行方式：<br>    <strong><strong>获取GIL</strong></strong><br>    <strong><strong>执行代码直到sleep或者是python虚拟机将其挂起。</strong></strong><br>    <strong><strong>释放GIL</strong></strong></p><p>  可见，某个线程想要执行，必须先拿到GIL，我们可以把GIL看作是“通行证”，并且在一个python进程中，GIL只有一个。拿不到通行证的线程，就不允许进入CPU执行。<br>在Python2.x里，GIL的释放逻辑是当前线程遇见IO操作或者ticks计数达到100（ticks可以看作是Python自身的一个计数器，专门作用于GIL，每次释放后归零，这个计数可以通过 sys.setcheckinterval 来调整），进行释放。而每次释放GIL锁，线程进行锁竞争、切换线程，会消耗资源。并且由于GIL锁存在，python里一个进程永远只能同时执行一个线程(拿到GIL的线程才能执行)，这就是为什么在多核CPU上，python的多线程效率并不高。那么是不是python的多线程就完全没用了呢？在这里我们进行分类讨论：</p><p>  <strong>CPU密集型</strong><br>  CPU密集型代码包括各种循环处理、计数等等，在这种情况下，由于计算工作多，ticks计数很快就会达到阈值，然后触发GIL的释放与再竞争（多个线程来回切换当然是需要消耗资源的），所以python下的多线程对CPU密集型代码并不友好。</p><p>  <strong>IO密集型</strong><br>  IO密集型代码包括文件处理、网络爬虫等，多线程能够有效提升效率(单线程下有IO操作会进行IO等待，造成不必要的时间浪费，而开启多线程能在线程A等待时，自动切换到线程B，可以不浪费CPU的资源，从而能提升程序执行效率)。所以python的多线程对IO密集型代码比较友好。<br>而在python3.x中，GIL不使用ticks计数，改为使用计时器（执行时间达到阈值后，当前线程释放GIL），这样对CPU密集型程序更加友好，但依然没有解决GIL导致的同一时间只能执行一个线程的问题，所以效率依然不尽如人意。<br>请注意：多核多线程比单核多线程更差，原因是单核下的多线程，每次释放GIL，唤醒的那个线程都能获取到GIL锁，所以能够无缝执行，但多核下，CPU0释放GIL后，其他CPU上的线程都会进行竞争，但GIL可能会马上又被CPU0拿到，导致其他几个CPU上被唤醒后的线程会醒着等待到切换时间后又进入待调度状态，这样会造成线程颠簸(thrashing)，导致效率更低。<br>回到最开始的问题：经常我们会听到老手说：“python下想要充分利用多核CPU，就用多进程”，原因是什么呢？<br>原因是：每个进程有各自独立的GIL，互不干扰，这样就可以真正意义上的并行执行，所以在python中，多进程的执行效率优于多线程(仅仅针对多核CPU而言)。<br>所以在这里说结论：多核下，想做并行提升效率，比较通用的方法是使用多进程，能够有效提高执行效率</p><p><strong>关于头图</strong><br>摄于首开广场</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;div class=&quot;toc&quot;&gt;
+
+&lt;!-- toc --&gt;
+
+
+
+&lt;!-- tocstop --&gt;
+
+&lt;/div&gt;
+
+&lt;p&gt;  最近在看Python的多线程，经常我们会听到老手说：“Python下多线程是鸡肋，推荐使用多进程！”，但是为什么这么说呢？&lt;br&gt;要知其然，更要知其
+      
+    
+    </summary>
+    
+    
+      <category term="Programing" scheme="https://xv44586.github.io/categories/Programing/"/>
+    
+    
+      <category term="Python" scheme="https://xv44586.github.io/tags/Python/"/>
+    
+  </entry>
   
   <entry>
     <title>python中实现单例模式</title>
