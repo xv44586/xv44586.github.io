@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://xv44586.github.io/"/>
-  <updated>2019-10-14T01:10:47.152Z</updated>
+  <updated>2019-10-16T02:28:15.329Z</updated>
   <id>https://xv44586.github.io/</id>
   
   <author>
@@ -15,6 +15,38 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Bagging为什么能降低过拟合</title>
+    <link href="https://xv44586.github.io/2019/10/16/bagging/"/>
+    <id>https://xv44586.github.io/2019/10/16/bagging/</id>
+    <published>2019-10-16T02:05:45.000Z</published>
+    <updated>2019-10-16T02:28:15.329Z</updated>
+    
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#pian-chai-yu-fang-chai">偏差与方差</a></li><li><a href="#jiang-di-mo-xing-guo-ni-he">降低模型过拟合</a><ul><li><a href="#ji-cheng-mo-xing">集成模型</a></li><li><a href="#bagging">Bagging</a></li><li><a href="#sui-ji-sen-lin">随机森林</a></li></ul></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="pian-chai-yu-fang-chai">偏差与方差</span><a href="#pian-chai-yu-fang-chai" class="header-anchor"></a></h1><p><strong>偏差 (bias)</strong><br><img src="/2019/10/16/bagging/fx.png" alt><br>即模型的期望预测与真实值之间的差异。</p><p><strong>方差 (variance)</strong><br><img src="/2019/10/156/bagging/var.png" alt><br>方差通常衡量模型对<strong>不同数据集</strong>的敏感程度，也可以认为是衡量模型的不稳定性。若方差大，则表示数据的微小变动就能导致学习出的模型产生较大差异，即对应的模型结构风险更高。</p><p>有了偏差和方差的定义，我们就能推导出模型的期望泛化误差：</p><p><img src="/2019/10/16/bagging/ed.png" alt><br>如果我们能在保持bias基本不变时，降低variance，则模型的期望泛化误差降低，从而降低模型过拟合风险。</p><h1><span id="jiang-di-mo-xing-guo-ni-he">降低模型过拟合</span><a href="#jiang-di-mo-xing-guo-ni-he" class="header-anchor"></a></h1><h2><span id="ji-cheng-mo-xing">集成模型</span><a href="#ji-cheng-mo-xing" class="header-anchor"></a></h2><p>假设我们现在有一个集成模型，其过程为从整体样本中进行采样，得到n份独立且与整体同分布的样本集，然后选择同样的模型进行训练，最后取平均。由于单个模型对应数据同分布，模型相同，则对应的bias和variance相同，而</p><p><img src="/2019/10/16/bagging/exi.png" alt></p><p>所以最终模型的bias与单模型的bias相同；另一方面，由于各个子模型独立，则</p><p><img src="/2019/10/16/bagging/varn.png" alt></p><p>此时可以显著降低模型的variance，根据模型泛化误差期望公式，此时的集成模型的期望泛化误差将小于单模型的期望泛化误差，从而降低了模型的过拟合。</p><h2><span id="bagging">Bagging</span><a href="#bagging" class="header-anchor"></a></h2><p>针对上述集成模型，当各个子模型相同时，</p><p><img src="/2019/10/16/bagging/varxi.png" alt><br>此时不会降低variance。</p><p>对应公式：设有n个随机变量，两两变量之间的相关性为𝜌，则方差为</p><p><img src="/2019/10/16/bagging/p.png" alt><br>Bagging对样本重采样，对每一重采样得到的子样本集训练一个模型，最后取平均。由于子样本集有相似性，同时也使用同种模型，则各个子模型有相似的bias和variance，由上面结论可知，此时的bias与单模型近似相同，所以bagging不能显著降低bias。（因此在选择模型时，需要选择bias小的模型）子模型介于相同与独立两个极端情况之间，所以对应variance会处于var(x) 与 var(x)/n之间，即通过降低上述公式中的第二项降低整体方差。<br>而根据模型期望泛化误差公式，由于方差的降低，也能带来最终模型的期望泛化误差的降低，从而降低过拟合。</p><h2><span id="sui-ji-sen-lin">随机森林</span><a href="#sui-ji-sen-lin" class="header-anchor"></a></h2><p>随机森林是一种常用的Bagging模型，其通过对样本进行有放回的采样，构造n个样本集，同时对特征列进行采样后进行模型训练，即同时降低上述公式中的两项，来降低方差，从而降低过拟合。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于杭州青芝坞</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;div class=&quot;toc&quot;&gt;
+
+&lt;!-- toc --&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#pian-chai-yu-fang-chai&quot;&gt;偏差与方差&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#jiang-di-mo-xing-guo-ni-he&quot;&gt;降低模型过拟合
+      
+    
+    </summary>
+    
+    
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
+    
+    
+      <category term="MachineLearning" scheme="https://xv44586.github.io/tags/MachineLearning/"/>
+    
+  </entry>
   
   <entry>
     <title>Xgboost原理</title>
