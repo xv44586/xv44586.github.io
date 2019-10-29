@@ -1,6 +1,6 @@
-https://xv44586.github.io/2019/10/26/simhash/
-https://xv44586.github.io/2019/10/22/cutwords/
-https://xv44586.github.io/2019/10/22/w2v-summary/
-https://xv44586.github.io/2019/10/21/deep-w2v/
-https://xv44586.github.io/2019/10/17/dropout/
-https://xv44586.github.io/2019/10/17/glove/
+http://xv44586.coding.me/2019/10/26/simhash/
+http://xv44586.coding.me/2019/10/22/cutwords/
+http://xv44586.coding.me/2019/10/22/w2v-summary/
+http://xv44586.coding.me/2019/10/21/deep-w2v/
+http://xv44586.coding.me/2019/10/17/dropout/
+http://xv44586.coding.me/2019/10/17/glove/
