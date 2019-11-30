@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://xv44586.github.io/"/>
-  <updated>2019-10-26T02:31:56.413Z</updated>
+  <updated>2019-11-30T07:15:58.387Z</updated>
   <id>https://xv44586.github.io/</id>
   
   <author>
@@ -15,6 +15,110 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>有趣的概率统计题</title>
+    <link href="https://xv44586.github.io/2019/11/30/statistics/"/>
+    <id>https://xv44586.github.io/2019/11/30/statistics/</id>
+    <published>2019-11-30T02:28:23.000Z</published>
+    <updated>2019-11-30T07:15:58.387Z</updated>
+    
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><p>昨晚下雪了，开心😄！</p><h1><span id="fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</span><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti" class="header-anchor"></a></h1><p>一段线段上，任意取两不重合的点，将这条线段切分成三段，问，这三条线段组成三角形点概率是多少？</p><p>现在我们将问题转化一下，假设原始线段长度为1，即$(0，1)$表示原始线段，此时，随机在$(0，1)$范围内选两个点a，b，组成$(0，a)$，$(a，b)$，$(b，1)$三个线段，<br>此时原始问题等价于现在的三个线段组成三角形的概率。<br>现在我们来考虑一下，三条线段分别为$A$， $B$，$C$，其中$A &gt;= B &gt;= C$,则A的长度必定在$[1/3, 1)$,而要组成三角形，则需要 $B + C &gt; A$,所以 B + C 的长度为$(1/2, 1)$,<br>而对应的A的长度也就在[1/3, 1/2)内，所以，最终能构成三角形的概率即为 $A_{triangle} / A_{all} = (1/2 - 1/3) / (1 - 1/3) = 1/4$</p><p>看似非常复杂的问题，从最基本的数学知识就能解答，还真是有趣！ </p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>2019年的第一场雪，摄于望京地铁站</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;div class=&quot;toc&quot;&gt;
+
+&lt;!-- toc --&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#fen-xiang-yi-ge-you-qu-de-gai-lu-ti&quot;&gt;分享一个有趣的概率题&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#guan-yu-tou-tu&quot;&gt;关
+      
+    
+    </summary>
+    
+    
+      <category term="Math" scheme="https://xv44586.github.io/categories/Math/"/>
+    
+    
+      <category term="Statistics" scheme="https://xv44586.github.io/tags/Statistics/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>带约束的领域词挖掘</title>
+    <link href="https://xv44586.github.io/2019/11/28/domain-words/"/>
+    <id>https://xv44586.github.io/2019/11/28/domain-words/</id>
+    <published>2019-11-28T07:31:41.000Z</published>
+    <updated>2019-11-30T14:06:34.519Z</updated>
+    
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#bei-jing">背景</a></li><li><a href="#fang-an">方案</a><ul><li><a href="#shi-yan">实验</a></li><li><a href="#shi-yan-jie-guo">实验结果</a></li></ul></li><li><a href="#zong-jie">总结</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="bei-jing">背景</span><a href="#bei-jing" class="header-anchor"></a></h1><p>分享一个最近做的项目方案，背景是当前的内容标签是最细粒度到一级大类，而产品希望出一些三级小类（当前最细分类）的标签，而且这些标签应该是有别于其他三级小类的。</p><h1><span id="fang-an">方案</span><a href="#fang-an" class="header-anchor"></a></h1><p>我将其看作是领域词挖掘任务，只是这个任务带有一些约束，及这些领域词是个性化的，与其他小类内的领域词是不同的。<br>所以，需要做的是抽词（新词发现）+领域词挖掘+个性化判断。<br>由于之前做过新词发现，主要参考<a href="http://www.matrix67.com/blog/archives/5044" target="_blank" rel="noopener">互联网时代的社会语言学：基于SNS的文本数据挖掘</a>,<br>对应的java实现<a href="https://github.com/xv44586/dict_build" target="_blank" rel="noopener">dict_build</a>。<br>除了无监督抽词外，matrix67的博文后面半部分也很有意思：通过对两份语料进行抽词，然后对词进行词频统计，通过对比词在两份语料内的词频差异，来发现“热词”。<br>回到现在的任务，个性化的词，必定在当前小类内相对于其他小类更“热”，我们可以将当前小类内的词与非当前小类进行对比，就能得到当前小类的“热词”，<br>有了热词，我们在判断这些“热词”是不是领域词，即可得到想要的结果。而实际上，由于一级大类之间的词已经有很大差异，所以，我们在抽当前小类“热词”时，不必对全量非当前小类语料进行统计，只需要对其一级大类内非当前小类语料进行统计对比，即可得到“热词”。<br>而对于领域词判断，由于我们已经有了一级大类的标签，我们可以利用这部分信息来进行领域词判断。<br>所以，最终的方案是先抽词，然后对词进行领域词判断，对词进行是否是“热词”判断，对领域词与热词进行求交运算，得到个性化的领域词。</p><h2><span id="shi-yan">实验</span><a href="#shi-yan" class="header-anchor"></a></h2><p>实际处理时，由于我们挖掘的“词”其实更像是一个短语，其长度也比词稍长，而“词”的组合上限是${CharCount}^{WordLength}$，而字符大概有12000+， 词平均长度假如是7，这个量也是相当大的。<br>所以抽词对内存要求很高，而且非常耗时（10h+).在思考如何优化抽词程序时，看到了<a href="https://kexue.fm/archives/6540" target="_blank" rel="noopener">分享一次专业领域词汇的无监督挖掘</a>，作者的思路与我的思路一样，不过不同的是，<br>作者在抽词时，并没有沿用matrix67的博文中根据凝合度与信息熵来进行是否成词判断，而且用信息熵是否低于某个阈值，来判断是否切开，即为两个词，这个思路还是非常巧妙的，这样，不光计算量减小了很多，而且不在需要设置超参数中ngram的值，<br>挖掘出的词也更符号“语义完整性”；而领域词判断，作者采用的是通过语料训练词向量，再由种子词来扩展领域词，也不失为一个好思路。</p><h2><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h2><p>从结果上看，效果还是很不错的。<br><img src="/2019/11/28/domain-words/words.png" alt="热词结果"><br>热词结果<br><img src="/2019/11/28/domain-words/keywords.png" alt="领域词结果"><br>领域词结果<br><img src="/2019/11/28/domain-words/result.png" alt="最终结果"><br>最终挖掘的个性化领域词</p><h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>机器学习中最重要的一个思路就是寻找差异，找到合理的差异往往是解决问题的关键。本次分享了一个通过对比差异来进行领域词挖掘的例子，希望给做类似任务的同学一些思路。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于奥森</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;div class=&quot;toc&quot;&gt;
+
+&lt;!-- toc --&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#bei-jing&quot;&gt;背景&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#fang-an&quot;&gt;方案&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#shi-yan&quot;&gt;实验&lt;/a&gt;&lt;/l
+      
+    
+    </summary>
+    
+    
+      <category term="Programming" scheme="https://xv44586.github.io/categories/Programming/"/>
+    
+    
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
+    
+      <category term="新词发现" scheme="https://xv44586.github.io/tags/%E6%96%B0%E8%AF%8D%E5%8F%91%E7%8E%B0/"/>
+    
+      <category term="领域词挖掘" scheme="https://xv44586.github.io/tags/%E9%A2%86%E5%9F%9F%E8%AF%8D%E6%8C%96%E6%8E%98/"/>
+    
+      <category term="信息熵" scheme="https://xv44586.github.io/tags/%E4%BF%A1%E6%81%AF%E7%86%B5/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>天猫双十一销售额相关思考</title>
+    <link href="https://xv44586.github.io/2019/11/24/tm-1111/"/>
+    <id>https://xv44586.github.io/2019/11/24/tm-1111/</id>
+    <published>2019-11-24T01:49:06.000Z</published>
+    <updated>2019-11-30T09:07:39.121Z</updated>
+    
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#qi-yin">起因</a></li><li><a href="#shi-yan">实验</a></li><li><a href="#shi-yan-xiao-jie">实验小结</a></li><li><a href="#shi-me-shi-guo-ni-he">什么是过拟合</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div># 起因最近双十一，各大电商平台造势，宣传自己当天平台销售额，而有个网友爆料天猫销售额造假，因为自己在几个月前就已经成功预测了今年双十一的销售额，并给出了自己的模型参数（公式）。![2019年11月12日网民认为尹立庆神推算的微博](/2019/11/24/tm-1111/wb.jpeg)# 实验首先，我们按照楼主的思路做一个的实验。<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> PolynomialFeatures</span><br><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt </span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">tm_2009_2019 =  [<span class="number">0.50</span>, <span class="number">9.36</span>, <span class="number">52.00</span>, <span class="number">191.00</span>, <span class="number">350.00</span>, <span class="number">571.00</span>, <span class="number">912.00</span>, <span class="number">1207.00</span>, <span class="number">1682.69</span>, <span class="number">2135.00</span>]</span><br><span class="line">year = list(range(<span class="number">2009</span>, <span class="number">2019</span>))</span><br><span class="line">year = list(map(<span class="keyword">lambda</span> x: x<span class="number">-2009</span>, year))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sse</span><span class="params">(y_pre, y_true)</span>:</span></span><br><span class="line">    se = (y_pre - y_true) ** <span class="number">2</span></span><br><span class="line">    <span class="keyword">return</span> se.sum()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ssr</span><span class="params">(y_pre, y_true)</span>:</span></span><br><span class="line">    sr = (y_pre - y_true.mean()) ** <span class="number">2</span></span><br><span class="line">    <span class="keyword">return</span> sr.sum()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">R</span><span class="params">(y_pre, y_true)</span>:</span></span><br><span class="line">    se = sse(y_pre, y_true) </span><br><span class="line">    sr = ssr(y_pre, y_true)</span><br><span class="line">    <span class="keyword">return</span> sr/(se+sr)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_model</span><span class="params">(x, y, degree=<span class="number">3</span>)</span>:</span></span><br><span class="line">    x = np.array(x).reshape(<span class="number">-1</span>,<span class="number">1</span>)</span><br><span class="line">    y = np.array(y).reshape(<span class="number">-1</span>,<span class="number">1</span>)</span><br><span class="line">    pf = PolynomialFeatures(degree=degree)</span><br><span class="line">    X = pf.fit_transform(x)</span><br><span class="line">    linear_reg = LinearRegression()</span><br><span class="line">    linear_reg.fit(X, y)</span><br><span class="line">    y_pre = linear_reg.predict(X)</span><br><span class="line">    print(<span class="string">'R is: '</span>, R(y_pre, y))</span><br><span class="line">    <span class="keyword">return</span> linear_reg, pf</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span><span class="params">(model, pf, test_x)</span>:</span></span><br><span class="line">    test_X = pf.transform(np.array(test_x).reshape(<span class="number">-1</span>,<span class="number">1</span>))</span><br><span class="line">    <span class="keyword">return</span> model.predict(test_X)</span><br></pre></td></tr></table></figure><p><img src="/2019/11/24/tm-1111/r0.png" alt="模型结果"><br>可以看到，此时的拟合优度R高达0.999，而预测今年的值为2689，确实也与今年的实际值2684基本吻合，所以网友认定自己成功的发现了天猫双十一的销售额”模型”。</p><p>接下来，我们做几个不一样的实验来看看其结果。<br><strong>实验1</strong><br>这次我们将数据修改一下：将第三年和倒数第三年的数据都减少10%，其他参数不变，看看模型效果。<br><img src="/2019/11/24/tm-1111/lower_9.png" alt="修改数据后模型结果"><br>拟合优度0.996，预测值为2642，与今年实际值也基本吻合。</p><p><strong>实验2</strong><br>这次我们不再使用全部数据，而只用2013-2018这六年的数据，其他不变，来看看我们的模型效果如何。<br><img src="/2019/11/24/tm-1111/r6.png" alt="六年数据模型结果"><br>拟合优度也高达0.997，而且预测值2672也与今年的实际值基本吻合。</p><p><strong>实验3</strong><br>这次我们不再使用三次，而换为二次线性方程来拟合，仍然使用原始的十年数据。<br><img src="/2019/11/24/tm-1111/degree_2.png" alt="修改模型参数后结果"><br>拟合优度0.999，预测值为2675，与今年的实际值也基本吻合。</p><h1><span id="shi-yan-xiao-jie">实验小结</span><a href="#shi-yan-xiao-jie" class="header-anchor"></a></h1><p>实验1与实验2说明，对样本做一定处理后，对模型最终的拟合影响不大，原因是在求解模型时，通常我们使用的loss是欧式距离（最小二乘估计），整体的loss是对所有样本拟合loss的和，<br>所以模型在拟合时会更”关注”值大的样本，而前几年的值与后几年相比差距一个数量级，所以不使用值很小的样本对模型影响不大。而实际建模时，对于样本范围跨度很大的特征，通常我们都需要平滑而不是直接使用原始值。<br>实验3我们使用了一个参数更小的模型，$f(x) = A + Bx + Cx^2$, 而原始模型使用三次拟合，$F(x) = A + bx + Cx^2 + Dx^3$, 两个模型明显是不同的，但是却都能拟合数据，这是因为这些模型都过拟合了，也就是对于一批离散点，<br>总是能找到一个函数F，可以非常好的拟合他，这也是冯诺伊曼的那个笑话：四个参数画大象，五个参数鼻子晃。</p><h1><span id="shi-me-shi-guo-ni-he">什么是过拟合</span><a href="#shi-me-shi-guo-ni-he" class="header-anchor"></a></h1><p>在这个问题上，一些网友说，这个模型肯定是有效的而不是过拟合，因为他”完美预测”了今年的真实值，模型如果只是单纯的在之前的数据上很好的拟合，而不能成功预测今年的真实值，这才是过拟合，现在模型成功预测了今年的值，<br>所以现在的模型是有效的，不存在过拟合。<br>为了说明这个问题，我们来简单讨论一下，什么是过拟合，是不是成功预测了就不存在过拟合。<br>首先，我们来简单说明一下，一个模型的误差分为两部分，一部分是因为模型对训练数据拟合的不好带来的误差，这部分我们称为偏差；而由于抽样过程中，抽出的训练样本与整体样本分布不同引起的误差，我们称为方差。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;div class=&quot;toc&quot;&gt;
+
+&lt;!-- toc --&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;#qi-yin&quot;&gt;起因&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#shi-yan&quot;&gt;实验&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#shi-yan-xiao-jie&quot;&gt;实
+      
+    
+    </summary>
+    
+    
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
+    
+    
+      <category term="机器学习" scheme="https://xv44586.github.io/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+  </entry>
   
   <entry>
     <title>文档查重之SimHash算法</title>
@@ -87,9 +191,9 @@
     <link href="https://xv44586.github.io/2019/10/22/w2v-summary/"/>
     <id>https://xv44586.github.io/2019/10/22/w2v-summary/</id>
     <published>2019-10-22T01:07:15.000Z</published>
-    <updated>2019-10-22T01:44:07.790Z</updated>
+    <updated>2019-11-27T01:44:41.318Z</updated>
     
-    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#yi-tong">异同</a><ul><li><a href="#xiang-tong-dian">相同点</a></li><li><a href="#bu-tong-dian">不同点</a></li></ul></li><li><a href="#xing-zhi">性质</a><ul><li><a href="#pmi-jiao-du">PMI角度</a></li><li><a href="#ke-jia-xing">可加性</a></li><li><a href="#mo-chang">模长</a></li><li><a href="#xiang-guan-xing">相关性</a></li></ul></li><li><a href="#ying-yong">应用</a><ul><li><a href="#liang-ge-ju-zi-de-xiang-guan-xing">两个句子的相关性</a></li><li><a href="#zhong-xin-ci-guan-jian-ci-ti-qu">中心词（关键词）提取</a></li><li><a href="#ju-xiang-liang">句向量</a></li></ul></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="yi-tong">异同</span><a href="#yi-tong" class="header-anchor"></a></h1><p>本文主要讨论Glove和word2vec两种模型对应词向量。</p><h2><span id="xiang-tong-dian">相同点</span><a href="#xiang-tong-dian" class="header-anchor"></a></h2><ul><li>两种模型都是在对词对的PMI做分解，所以他们具有相同的性质（向量可加性，点积，余弦距离，模长等）。</li><li>模型的基本形式都是向量的点积，且都有两套词向量空间（单词向量空间与上下文词向量空间）。</li></ul><h2><span id="bu-tong-dian">不同点</span><a href="#bu-tong-dian" class="header-anchor"></a></h2><ul><li>1.通常我们都是根据模型来推导其对应性质，而Glove是通过其性质来反推模型，这种方式还是给人眼前一亮的。</li><li>2.除Glove以外的词向量模型都是对条件概率$P(w|context)$进行建模，如word2vec的SkipGram对$P(w2|w1)$进行建模，但是这个信息是有缺点的，首先，他不是一个严格对称的模型，即P(w2|w1)  与 P(w1|w2) 并不一定相等，所以，在建模时需要把上下文与中心词向量区分开，不能放到同一个向量空间；其次，这个概率是有界的、归一化的量，所以在模型里需要用softmax等对结果进行归一化，这个也会造成优化上的困难。而Glove可以看作是对PMI进行建模，而PMI是比概率更对称也更重要的一个量。</li><li>3.如Glove论文中所述，就整体目标函数而言，可以看作是两种模型采用了不同的损失函数，其基本形式是一致的。</li><li>4.两种模型都是词袋模型（一元模型）。</li><li>5.对应词向量内积含义不同：<br><img src="/2019/10/22/w2v-summary/dot.png" alt="内积含义"></li></ul><h1><span id="xing-zhi">性质</span><a href="#xing-zhi" class="header-anchor"></a></h1><h2><span id="pmi-jiao-du">PMI角度</span><a href="#pmi-jiao-du" class="header-anchor"></a></h2><p>上文说了两种模型都是对词对的PMI做分解，所以我们在解释其性质时直接从PMI的角度来解释。<br>首先来看一下PMI<br><img src="/2019/10/22/w2v-summary/pmi.png" alt="PMI"><br>对于任意两个词序列Q和A，其中$Q=(q1,q2…qk)$, $A = (a1, a2…al)$，我们模型都是采用的词袋模型，即满足朴素假设：每个特征之间相互独立。<br><img src="/2019/10/22/w2v-summary/pqa.png" alt><br>带入朴素假设<br><img src="/2019/10/22/w2v-summary/naive.png" alt><br>用贝叶斯公式变换<br><img src="/2019/10/22/w2v-summary/change.png" alt><br>再用一次朴素假设<br><img src="/2019/10/22/w2v-summary/naive-change.png" alt></p><p>最后得到：<br><img src="/2019/10/22/w2v-summary/pmiqa.png" alt><br>即在朴素假设下，两个序列的互信息等于两个序列中各个项的互信息的总和。</p><h2><span id="ke-jia-xing">可加性</span><a href="#ke-jia-xing" class="header-anchor"></a></h2><p>在Glove和word2vec中，两个词之间的相关性是通过对应词向量的内积来表达的，即对于词Wi, Wj, 其相关性等于$&lt;Vi ,Vj&gt;$, 带入上面，即：<br><img src="/2019/10/22/w2v-summary/pmiin.png" alt><br>即两个词序列的相关性可以通过将两个序列内的词向量求和后再进行点积计算。<br>如我们求两个句子的相关度时，可以先将句子内的词对应的词向量进行求和，然后再进行相似性计算。</p><h2><span id="mo-chang">模长</span><a href="#mo-chang" class="header-anchor"></a></h2><p>词向量w的模长正比与其内积&lt;w,w&gt;，即正比PMI(w,w)，而在一个滑动窗口内，上下文中的词与中心词相等的概率极低，所以可以认为P(w,w) ~ P(w),推出<br><img src="/2019/10/22/w2v-summary/pww.png" alt><br>即，模长正比与词频的倒数，词频越高（停用词，虚词等），其对应的模长越短，这样就表面模长能在一定程度上代表词本身的重要性。<br>从模型学习的角度来看，词向量的内积等于其模长的乘积乘以余弦值，即<br><img src="/2019/10/22/w2v-summary/cos.png" alt><br>对于高频的几乎没有什么固定搭配的词，其所含语义也相对非常少，即这些词与其他任意词的互信息都非常低，约等于0，而为了让上式等于0，与其不停的调节两个向量的方向，不如让其中一个的模长像0靠近，这样经过多次迭代后，高频的语义少的词的模长就越来越短，逐渐接近0.<br>实验结果中，也能看到按模长排序后，前面的都是高频的语义含量极低的词。<br><img src="/2019/10/22/w2v-summary/sort.png" alt="模长排序结果"><br>可以看到，排在前面的都是高频的语义极少的词（’UNK’，’以及’,’三’，符号等)</p><h2><span id="xiang-guan-xing">相关性</span><a href="#xiang-guan-xing" class="header-anchor"></a></h2><p>两个词的互信息正比于词对应向量的内积，即两个词互信息越大，两个词成对出现的几率越高，其对应词向量的内积也就越大，因此，可以通过内积来对词的相关性进行排序。而上面也说了，模长代表了词的重要程度，如果我们不考虑词本身的重要程度，只考虑其词义，可以用向量范数将其归一化后在进行内积计算，这样更稳定.<br><img src="/2019/10/22/w2v-summary/cosij.png" alt><br>即词的相关性可以用词向量之间的余弦距离来计算，这样比只使用内积更稳定。<br>在统计上，互信息为0，则表面这两个词无关，对应到模型，即两个词的词向量的内积为0，而根据向量的知识，两个向量的内积为0，则表明两个向量相互垂直，即两个向量无关。两个词在统计上的无关正好对应其在词向量空间上的几何无关！</p><h1><span id="ying-yong">应用</span><a href="#ying-yong" class="header-anchor"></a></h1><h2><span id="liang-ge-ju-zi-de-xiang-guan-xing">两个句子的相关性</span><a href="#liang-ge-ju-zi-de-xiang-guan-xing" class="header-anchor"></a></h2><p>计算两个句子或短语之间的相关性时，我们可以借鉴上面PMI在朴素假设下的性质，将两个句子中的词向量进行求和，再计算两个结果向量之间的相关性，如点积或余弦。<br>而如果一个句子内的词向量的和与某一个词的词向量相关性非常高，可以认为这个句子与这个词表达了相同的语义，或者，在词向量空间内，词对应的向量在句子的聚类中心附近。</p><h2><span id="zhong-xin-ci-guan-jian-ci-ti-qu">中心词（关键词）提取</span><a href="#zhong-xin-ci-guan-jian-ci-ti-qu" class="header-anchor"></a></h2><p>所谓中心词（关键词），即能概况句子的意思，通过这些词，我就能大概猜到整个句子的整体内容。即这些词（相对句子内其他词）对整个句子的相关性更高。这样就能将问题转化成词与句子相关性排序问题。<br>通过语言模型的角度来看，语言模型本身就是一个通过上（下）文来预测下一个词概率的模型，即最大化$P(w1,w2,w3..|W)$.而关键词的含义是什么呢？用数学的方式表达就是：<br>对于$S=(w1,w2, w3..wk)$,求解%P(S|wk)$值最高的$wk$,其中$wk$属于$S$。这其实与语言模型的含义是一致的。<br>最终，将问题转化成词与句子之间的相关性排序问题，而上面提到求解两个句子相关性时，可以将句子对应词向量先求和再计算相关性，最后关键词提取就变成：<br>先将句子对应词向量求和，得到sen_vec，然后计算单个词与sen_vec的相关性，然后排序即可。<br><img src="/2019/10/22/w2v-summary/keywords.png" alt><br>可以看到结果还是相当不错的。</p><h2><span id="ju-xiang-liang">句向量</span><a href="#ju-xiang-liang" class="header-anchor"></a></h2><p>上面在做句子相关性时，都是为了将计算从O(n2)降低到O(n)而将句子内的词向量进行求和，然后再计算。其实也就是用词向量的求和来得到句向量，来作为句子在相同词向量空间的语义。其实这是一种简单又快捷的得到句向量的方式，在很多任务中都可以尝试使用。</p><p><strong>refer</strong><br><a href="https://papers.nips.cc/paper/5477-neural-word-embedding-as-implicit-matrix-factorization.pdf" target="_blank" rel="noopener">neural-word-embedding-as-implicit-matrix-factorization</a><br><a href="https://aclweb.org/anthology/P17-1007" target="_blank" rel="noopener">https://aclweb.org/anthology/P17-1007</a></p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于秦皇岛</p>]]></content>
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#yi-tong">异同</a><ul><li><a href="#xiang-tong-dian">相同点</a></li><li><a href="#bu-tong-dian">不同点</a></li></ul></li><li><a href="#xing-zhi">性质</a><ul><li><a href="#pmi-jiao-du">PMI角度</a></li><li><a href="#ke-jia-xing">可加性</a></li><li><a href="#mo-chang">模长</a></li><li><a href="#xiang-guan-xing">相关性</a></li></ul></li><li><a href="#ying-yong">应用</a><ul><li><a href="#liang-ge-ju-zi-de-xiang-guan-xing">两个句子的相关性</a></li><li><a href="#zhong-xin-ci-guan-jian-ci-ti-qu">中心词（关键词）提取</a></li><li><a href="#ju-xiang-liang">句向量</a></li></ul></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="yi-tong">异同</span><a href="#yi-tong" class="header-anchor"></a></h1><p>本文主要讨论Glove和word2vec两种模型对应词向量。</p><h2><span id="xiang-tong-dian">相同点</span><a href="#xiang-tong-dian" class="header-anchor"></a></h2><ul><li>两种模型都是在对词对的PMI做分解，所以他们具有相同的性质（向量可加性，点积，余弦距离，模长等）。</li><li>模型的基本形式都是向量的点积，且都有两套词向量空间（单词向量空间与上下文词向量空间）。</li></ul><h2><span id="bu-tong-dian">不同点</span><a href="#bu-tong-dian" class="header-anchor"></a></h2><ul><li>1.通常我们都是根据模型来推导其对应性质，而Glove是通过其性质来反推模型，这种方式还是给人眼前一亮的。</li><li>2.除Glove以外的词向量模型都是对条件概率$P(w|context)$进行建模，如word2vec的SkipGram对$P(w2|w1)$进行建模，但是这个信息是有缺点的，首先，他不是一个严格对称的模型，即P(w2|w1)  与 P(w1|w2) 并不一定相等，所以，在建模时需要把上下文与中心词向量区分开，不能放到同一个向量空间；其次，这个概率是有界的、归一化的量，所以在模型里需要用softmax等对结果进行归一化，这个也会造成优化上的困难。而Glove可以看作是对PMI进行建模，而PMI是比概率更对称也更重要的一个量。</li><li>3.如Glove论文中所述，就整体目标函数而言，可以看作是两种模型采用了不同的损失函数，其基本形式是一致的。</li><li>4.两种模型都是词袋模型（一元模型）。</li><li>5.对应词向量内积含义不同：<br><img src="/2019/10/22/w2v-summary/dot.png" alt="内积含义"></li></ul><h1><span id="xing-zhi">性质</span><a href="#xing-zhi" class="header-anchor"></a></h1><h2><span id="pmi-jiao-du">PMI角度</span><a href="#pmi-jiao-du" class="header-anchor"></a></h2><p>上文说了两种模型都是对词对的PMI做分解，所以我们在解释其性质时直接从PMI的角度来解释。<br>首先来看一下PMI<br><img src="/2019/10/22/w2v-summary/pmi.png" alt="PMI"><br>对于任意两个词序列Q和A，其中$Q=(q1,q2…qk)$, $A = (a1, a2…al)$，我们模型都是采用的词袋模型，即满足朴素假设：每个特征之间相互独立。<br><img src="/2019/10/22/w2v-summary/pqa.png" alt><br>带入朴素假设<br><img src="/2019/10/22/w2v-summary/naive.png" alt><br>用贝叶斯公式变换<br><img src="/2019/10/22/w2v-summary/change.png" alt><br>再用一次朴素假设<br><img src="/2019/10/22/w2v-summary/naive-change.png" alt></p><p>最后得到：<br><img src="/2019/10/22/w2v-summary/pmiqa.png" alt><br>即在朴素假设下，两个序列的互信息等于两个序列中各个项的互信息的总和。</p><h2><span id="ke-jia-xing">可加性</span><a href="#ke-jia-xing" class="header-anchor"></a></h2><p>在Glove和word2vec中，两个词之间的相关性是通过对应词向量的内积来表达的，即对于词Wi, Wj, 其相关性等于$&lt;Vi ,Vj&gt;$, 带入上面，即：<br><img src="/2019/10/22/w2v-summary/pmiin.png" alt><br>即两个词序列的相关性可以通过将两个序列内的词向量求和后再进行点积计算。<br>如我们求两个句子的相关度时，可以先将句子内的词对应的词向量进行求和，然后再进行相似性计算。</p><h2><span id="mo-chang">模长</span><a href="#mo-chang" class="header-anchor"></a></h2><p>词向量w的模长正比与其内积&lt;w,w&gt;，即正比PMI(w,w)，而在一个滑动窗口内，上下文中的词与中心词相等的概率极低，所以可以认为P(w,w) ~ P(w),推出<br><img src="/2019/10/22/w2v-summary/pww.png" alt><br>即，模长正比与词频的倒数，词频越高（停用词，虚词等），其对应的模长越短，这样就表面模长能在一定程度上代表词本身的重要性。<br>从模型学习的角度来看，词向量的内积等于其模长的乘积乘以余弦值，即<br><img src="/2019/10/22/w2v-summary/cos.png" alt><br>对于高频的几乎没有什么固定搭配的词，其所含语义也相对非常少，即这些词与其他任意词的互信息都非常低，约等于0，而为了让上式等于0，与其不停的调节两个向量的方向，不如让其中一个的模长像0靠近，这样经过多次迭代后，高频的语义少的词的模长就越来越短，逐渐接近0.<br>实验结果中，也能看到按模长排序后，前面的都是高频的语义含量极低的词。<br><img src="/2019/10/22/w2v-summary/sort.png" alt="模长排序结果"><br>可以看到，排在前面的都是高频的语义极少的词（’UNK’，’以及’,’三’，符号等)</p><h2><span id="xiang-guan-xing">相关性</span><a href="#xiang-guan-xing" class="header-anchor"></a></h2><p>两个词的互信息正比于词对应向量的内积，即两个词互信息越大，两个词成对出现的几率越高，其对应词向量的内积也就越大，因此，可以通过内积来对词的相关性进行排序。而上面也说了，模长代表了词的重要程度，如果我们不考虑词本身的重要程度，只考虑其词义，可以用向量范数将其归一化后在进行内积计算，这样更稳定.<br><img src="/2019/10/22/w2v-summary/cosij.png" alt><br>即词的相关性可以用词向量之间的余弦距离来计算，这样比只使用内积更稳定。<br>在统计上，互信息为0，则表面这两个词无关，对应到模型，即两个词的词向量的内积为0，而根据向量的知识，两个向量的内积为0，则表明两个向量相互垂直，即两个向量无关。两个词在统计上的无关正好对应其在词向量空间上的几何无关！</p><h1><span id="ying-yong">应用</span><a href="#ying-yong" class="header-anchor"></a></h1><h2><span id="liang-ge-ju-zi-de-xiang-guan-xing">两个句子的相关性</span><a href="#liang-ge-ju-zi-de-xiang-guan-xing" class="header-anchor"></a></h2><p>计算两个句子或短语之间的相关性时，我们可以借鉴上面PMI在朴素假设下的性质，将两个句子中的词向量进行求和，再计算两个结果向量之间的相关性，如点积或余弦。<br>而如果一个句子内的词向量的和与某一个词的词向量相关性非常高，可以认为这个句子与这个词表达了相同的语义，或者，在词向量空间内，词对应的向量在句子的聚类中心附近。</p><h2><span id="zhong-xin-ci-guan-jian-ci-ti-qu">中心词（关键词）提取</span><a href="#zhong-xin-ci-guan-jian-ci-ti-qu" class="header-anchor"></a></h2><p>所谓中心词（关键词），即能概况句子的意思，通过这些词，我就能大概猜到整个句子的整体内容。即这些词（相对句子内其他词）对整个句子的相关性更高。这样就能将问题转化成词与句子相关性排序问题。<br>通过语言模型的角度来看，语言模型本身就是一个通过上（下）文来预测下一个词概率的模型，即最大化$P(w1,w2,w3..|W)$.而关键词的含义是什么呢？用数学的方式表达就是：<br>对于$S=(w1,w2, w3..wk)$,求解%P(S|wk)$值最高的$wk$,其中$wk$属于$S$。这其实与语言模型的含义是一致的。<br>最终，将问题转化成词与句子之间的相关性排序问题，而上面提到求解两个句子相关性时，可以将句子对应词向量先求和再计算相关性，最后关键词提取就变成：<br>先将句子对应词向量求和，得到sen_vec，然后计算单个词与sen_vec的相关性，然后排序即可。<br><img src="/2019/10/22/w2v-summary/keywords.png" alt><br>可以看到结果还是相当不错的。</p><h2><span id="ju-xiang-liang">句向量</span><a href="#ju-xiang-liang" class="header-anchor"></a></h2><p>上面在做句子相关性时，都是为了将计算从$O(n^2)$降低到O(n)而将句子内的词向量进行求和，然后再计算。其实也就是用词向量的求和来得到句向量，来作为句子在相同词向量空间的语义。其实这是一种简单又快捷的得到句向量的方式，在很多任务中都可以尝试使用。</p><p><strong>refer</strong><br><a href="https://papers.nips.cc/paper/5477-neural-word-embedding-as-implicit-matrix-factorization.pdf" target="_blank" rel="noopener">neural-word-embedding-as-implicit-matrix-factorization</a><br><a href="https://aclweb.org/anthology/P17-1007" target="_blank" rel="noopener">https://aclweb.org/anthology/P17-1007</a></p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于秦皇岛</p>]]></content>
     
     <summary type="html">
     
