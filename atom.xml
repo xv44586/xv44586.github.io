@@ -5,9 +5,9 @@
   <subtitle>小蛋子</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://xv44586.coding.me/"/>
+  <link href="https://xv44586.github.io/"/>
   <updated>2019-12-13T13:29:33.341Z</updated>
-  <id>http://xv44586.coding.me/</id>
+  <id>https://xv44586.github.io/</id>
   
   <author>
     <name>[object Object]</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>分享一个有趣的游戏</title>
-    <link href="http://xv44586.coding.me/2019/12/09/longton/"/>
-    <id>http://xv44586.coding.me/2019/12/09/longton/</id>
+    <link href="https://xv44586.github.io/2019/12/09/longton/"/>
+    <id>https://xv44586.github.io/2019/12/09/longton/</id>
     <published>2019-12-09T14:35:44.000Z</published>
     <updated>2019-12-13T13:29:33.341Z</updated>
     
@@ -46,17 +46,17 @@
     </summary>
     
     
-      <category term="Math" scheme="http://xv44586.coding.me/categories/Math/"/>
+      <category term="Math" scheme="https://xv44586.github.io/categories/Math/"/>
     
     
-      <category term="Game" scheme="http://xv44586.coding.me/tags/Game/"/>
+      <category term="Game" scheme="https://xv44586.github.io/tags/Game/"/>
     
   </entry>
   
   <entry>
     <title>有趣的概率统计题</title>
-    <link href="http://xv44586.coding.me/2019/11/30/statistics/"/>
-    <id>http://xv44586.coding.me/2019/11/30/statistics/</id>
+    <link href="https://xv44586.github.io/2019/11/30/statistics/"/>
+    <id>https://xv44586.github.io/2019/11/30/statistics/</id>
     <published>2019-11-30T02:28:23.000Z</published>
     <updated>2019-11-30T07:15:58.387Z</updated>
     
@@ -78,17 +78,17 @@
     </summary>
     
     
-      <category term="Math" scheme="http://xv44586.coding.me/categories/Math/"/>
+      <category term="Math" scheme="https://xv44586.github.io/categories/Math/"/>
     
     
-      <category term="Statistics" scheme="http://xv44586.coding.me/tags/Statistics/"/>
+      <category term="Statistics" scheme="https://xv44586.github.io/tags/Statistics/"/>
     
   </entry>
   
   <entry>
     <title>带约束的领域词挖掘</title>
-    <link href="http://xv44586.coding.me/2019/11/28/domain-words/"/>
-    <id>http://xv44586.coding.me/2019/11/28/domain-words/</id>
+    <link href="https://xv44586.github.io/2019/11/28/domain-words/"/>
+    <id>https://xv44586.github.io/2019/11/28/domain-words/</id>
     <published>2019-11-28T07:31:41.000Z</published>
     <updated>2019-12-04T01:47:13.812Z</updated>
     
@@ -111,23 +111,23 @@
     </summary>
     
     
-      <category term="Programming" scheme="http://xv44586.coding.me/categories/Programming/"/>
+      <category term="Programming" scheme="https://xv44586.github.io/categories/Programming/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
-      <category term="新词发现" scheme="http://xv44586.coding.me/tags/%E6%96%B0%E8%AF%8D%E5%8F%91%E7%8E%B0/"/>
+      <category term="新词发现" scheme="https://xv44586.github.io/tags/%E6%96%B0%E8%AF%8D%E5%8F%91%E7%8E%B0/"/>
     
-      <category term="领域词挖掘" scheme="http://xv44586.coding.me/tags/%E9%A2%86%E5%9F%9F%E8%AF%8D%E6%8C%96%E6%8E%98/"/>
+      <category term="领域词挖掘" scheme="https://xv44586.github.io/tags/%E9%A2%86%E5%9F%9F%E8%AF%8D%E6%8C%96%E6%8E%98/"/>
     
-      <category term="信息熵" scheme="http://xv44586.coding.me/tags/%E4%BF%A1%E6%81%AF%E7%86%B5/"/>
+      <category term="信息熵" scheme="https://xv44586.github.io/tags/%E4%BF%A1%E6%81%AF%E7%86%B5/"/>
     
   </entry>
   
   <entry>
     <title>天猫双十一销售额相关思考</title>
-    <link href="http://xv44586.coding.me/2019/11/24/tm-1111/"/>
-    <id>http://xv44586.coding.me/2019/11/24/tm-1111/</id>
+    <link href="https://xv44586.github.io/2019/11/24/tm-1111/"/>
+    <id>https://xv44586.github.io/2019/11/24/tm-1111/</id>
     <published>2019-11-24T01:49:06.000Z</published>
     <updated>2019-12-13T13:36:39.118Z</updated>
     
@@ -150,17 +150,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="机器学习" scheme="http://xv44586.coding.me/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+      <category term="机器学习" scheme="https://xv44586.github.io/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
     
   </entry>
   
   <entry>
     <title>文档查重之SimHash算法</title>
-    <link href="http://xv44586.coding.me/2019/10/26/simhash/"/>
-    <id>http://xv44586.coding.me/2019/10/26/simhash/</id>
+    <link href="https://xv44586.github.io/2019/10/26/simhash/"/>
+    <id>https://xv44586.github.io/2019/10/26/simhash/</id>
     <published>2019-10-26T02:13:06.000Z</published>
     <updated>2019-10-26T02:31:56.413Z</updated>
     
@@ -184,17 +184,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
   </entry>
   
   <entry>
     <title>分词算法综述</title>
-    <link href="http://xv44586.coding.me/2019/10/22/cutwords/"/>
-    <id>http://xv44586.coding.me/2019/10/22/cutwords/</id>
+    <link href="https://xv44586.github.io/2019/10/22/cutwords/"/>
+    <id>https://xv44586.github.io/2019/10/22/cutwords/</id>
     <published>2019-10-22T14:06:05.000Z</published>
     <updated>2019-10-23T00:57:58.725Z</updated>
     
@@ -216,17 +216,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
   </entry>
   
   <entry>
     <title>词向量总结</title>
-    <link href="http://xv44586.coding.me/2019/10/22/w2v-summary/"/>
-    <id>http://xv44586.coding.me/2019/10/22/w2v-summary/</id>
+    <link href="https://xv44586.github.io/2019/10/22/w2v-summary/"/>
+    <id>https://xv44586.github.io/2019/10/22/w2v-summary/</id>
     <published>2019-10-22T01:07:15.000Z</published>
     <updated>2019-11-27T01:44:41.318Z</updated>
     
@@ -249,19 +249,19 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
-      <category term="Thinking" scheme="http://xv44586.coding.me/tags/Thinking/"/>
+      <category term="Thinking" scheme="https://xv44586.github.io/tags/Thinking/"/>
     
   </entry>
   
   <entry>
     <title>深入谈谈word2vec</title>
-    <link href="http://xv44586.coding.me/2019/10/21/deep-w2v/"/>
-    <id>http://xv44586.coding.me/2019/10/21/deep-w2v/</id>
+    <link href="https://xv44586.github.io/2019/10/21/deep-w2v/"/>
+    <id>https://xv44586.github.io/2019/10/21/deep-w2v/</id>
     <published>2019-10-21T01:02:56.000Z</published>
     <updated>2019-10-22T01:24:14.513Z</updated>
     
@@ -284,21 +284,21 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
   </entry>
   
   <entry>
     <title>Dropout--深度神经网络中的Bagging</title>
-    <link href="http://xv44586.coding.me/2019/10/17/dropout/"/>
-    <id>http://xv44586.coding.me/2019/10/17/dropout/</id>
+    <link href="https://xv44586.github.io/2019/10/17/dropout/"/>
+    <id>https://xv44586.github.io/2019/10/17/dropout/</id>
     <published>2019-10-17T14:28:12.000Z</published>
     <updated>2019-10-17T15:01:46.580Z</updated>
     
-    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</a></li><li><a href="#dropout">Dropout</a></li><li><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</a></li><li><a href="#updating">updating…</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</span><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti" class="header-anchor"></a></h1><p>深度神经网络由于其巨大的参数量，可以很方便的拟合非常复杂的非线性关系，同时，巨大的参数量也给模型带来了过拟合的问题。为了解决这个问题，也有人提出了早停和加入正则项等手段。而在传统机器学习中，除了这些手段，还有一种手段来解决这个问题，即bagging（参考我之前的文章<a href="https://xv44586.github.io/2019/10/16/bagging/" target="_blank" rel="noopener">Bagging为什么能降低过拟合</a>），最典型的就是随机森林：对样本和特征进行抽样，训练多个模型，然后进行集成（投票/求平均）。那如何将这种思路引入到深度神经网络中呢？<br>首先,由于训练单个深度神经网络就已经非常耗时，通常样本量也不够多，不适合采样，所以像随机森林一样抽样训练多个模型的方案不可取。<br>剩下的思路就是用“一个”模型来模拟多个sub-model，那如何来模拟呢？</p><h1><span id="dropout">Dropout</span><a href="#dropout" class="header-anchor"></a></h1><p>对于深度神经网络，其最重要的部分就是其隐藏单元（神经元），对于一个有n个神经元的层，我们可以通过设置神经元是否激活，来模拟$2^n$ 种结构，即sub-model，而在evaluate阶段，我们将这些所有的sub-mdoel的结果进行求平均。那对于现在的结构，不可能对 $2^n$中结构都去做计算然后再求平均，一种近似的做法是用当前这“一个”模型来近似模拟：设置所有神经元都处于激活状态，同时，对每个神经元的输出乘以其激活概率keep_prob.这就是Dropout的背后思想。<br><img src="/2019/10/17/dropout/dropout.png" alt="Dropout"><br>简单总结Dropout的具体做法：训练阶段，在前向传播的时候，让某个神经元的激活值以一定的概率p停止工作；预测阶段，对每个神经元的输出乘以1-p (keep_prob)。<br>接下来思考一下，为什么这么做work:首先，训练阶段部分神经元失活，对应的结果是部分features不参与计算，本质上是对features进行采样；其次，从整个训练过程中看，每次训练（batch-data),都对应不同的失活神经元（sub-model)，对应的每个sub-model在单个epoch内，都是在对样本进行无放回的抽样，本质上是在bagging。最后，在预测阶段，为什么可以用“一个”完整的模型来模拟sub-model的求平均过程呢？从sub-model的角度看，每个sub-model被training的概率为(1-p), 而神经元对所有sub-model是共享的，唯一的区别是是否激活，所以归一到每个神经元上，单个神经元被training（激活）的概率为(1-p),而sub-model的总数是$2^n$，每个神经元求平均的过程即Out_i * (1-p) * $2^n$/ $2^n$ = Out_i * (1 -p).<br>具体实现时，我们的目的是在训练阶段对神经元进行随机（概率p)失活,而在test和evaluate时，对神经元的输出乘以(1-p),所以在实现时，可以采用一个trick：dropout时，对样本进行mask的同时，将其除以(1-p),这样就可以一次计算完成所有逻辑，同时，把所有逻辑保留在整个层中。<br><strong>tf的实现：</strong></p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dropout</span><span class="params">(x, keep_prob, noise_shape=None, seed=None, name=None)</span>:</span>  <span class="comment"># pylint: disable=invalid-name</span></span><br><span class="line">  <span class="string">"""Computes dropout.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  With probability `keep_prob`, outputs the input element scaled up by</span></span><br><span class="line"><span class="string">  `1 / keep_prob`, otherwise outputs `0`.  The scaling is so that the expected</span></span><br><span class="line"><span class="string">  sum is unchanged.</span></span><br><span class="line"><span class="string">    ...</span></span><br><span class="line"><span class="string"> """</span></span><br><span class="line">  <span class="keyword">with</span> ops.name_scope(name, <span class="string">"dropout"</span>, [x]) <span class="keyword">as</span> name:</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment"># Do nothing if we know keep_prob == 1</span></span><br><span class="line">    <span class="keyword">if</span> tensor_util.constant_value(keep_prob) == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    noise_shape = noise_shape <span class="keyword">if</span> noise_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> array_ops.shape(x)</span><br><span class="line">    <span class="comment"># uniform [keep_prob, 1.0 + keep_prob)</span></span><br><span class="line">    random_tensor = keep_prob</span><br><span class="line">    random_tensor += random_ops.random_uniform(noise_shape,</span><br><span class="line">                                               seed=seed,</span><br><span class="line">                                               dtype=x.dtype)</span><br><span class="line">    <span class="comment"># 0. if [keep_prob, 1.0) and 1. if [1.0, 1.0 + keep_prob)</span></span><br><span class="line">    binary_tensor = math_ops.floor(random_tensor)</span><br><span class="line">    ret = math_ops.div(x, keep_prob) * binary_tensor</span><br><span class="line">    <span class="keyword">if</span> context.in_graph_mode():</span><br><span class="line">      ret.set_shape(x.get_shape())</span><br><span class="line">    <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure><h1><span id="bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</span><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan" class="header-anchor"></a></h1><p>如果在非dropout阶段不进行scaled会如何？<br>scaled<br><img src="/2019/10/17/dropout/scaled.png" alt="scaled.png"><br>without_scaled<br><img src="/2019/10/17/dropout/without-scaled.png" alt="without_scaled.png"><br>实验也说明非dropout阶段如果没有进行scaled（求平均），对应的loss会比train阶段高，同时acc也会降低。</p><p><strong>桥豆麻袋，到这里好像出现了一点问题：</strong><br>按照我们上面的思路，在test和evaluate阶段，我们从对sub-model求平均转化为对每个神经元的output进行scaled down，即 activation(x * W ) * (1 - p)， 而我们在实现时，只是对x进行scaled up操作，如果后面接的层的激活函数是线性的，这样处理没有什么问题，但是，后面的层不总是线性激活函数，那此时，output = activation(x * (1-p) * W)  != activation(x*W) * (1 - p),即我们得到的输出与我们想要的并不一样，按照以上的理解，我们对output进行scaled-down，验证一下两者的区别。<br>scaled_input<br><img src="/2019/10/17/dropout/scaled-input.png" alt="scaled_input.png"><br>scaled_output<br><img src="/2019/10/17/dropout/scaled-output.png" alt="scaled_output.png"></p><p>看上去对output进行scaled-down结果稍微好一点，但是并不显著，此时的激活函数是relu，而且是在倒数第二层，换个激活函数试试。<br>scaled_input_tanh<br><img src="/2019/10/17/dropout/scaled_input_tanh.png" alt="scaled_input_tanh.png"><br>scaled_output_tanh<br><img src="/2019/10/17/dropout/scaled_output_tanh.png" alt="scaled_output_tanh.png"><br>结果看上去对output进行scaled-down效果稍微差一些，但差距不大。<br>代码地址<a href="https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout" target="_blank" rel="noopener">https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout</a>，感兴趣的可以试试其他方式。<br>既然两种方式在结果上看，效果差不多，而对output进行scaled-down需要添加一个AfterDropLayer，逻辑会在不同的层中，而对inputs直接进行scaled-up，所有逻辑都保存在一个layer中，更清晰。<br><strong>But，Why？</strong>为什么两种方式的结果效果差异不大？真让人头秃啊！</p><p><strong>论文地址</strong><br><a href="http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" target="_blank" rel="noopener">http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf</a></p><p>================================</p><h1><span id="updating">updating…</span><a href="#updating" class="header-anchor"></a></h1><p><img src="/2019/10/17/dropout/linear.png" alt="image.png"></p><p>上图是sigmoid函数在[-8,8]区间的图像，其中linear是由[-8,-4,-2,2,4,8]截断的直线，看图可以看出，sigmoid在区间内都非常的接近”linear”，梯度变化较大的部分只在几个拐点周围，大部分都是近似”linear”,所以也就解释了为什么两种方式有差异，但是差异并不大。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>大四竞赛作品截图</p>]]></content>
+    <content type="html"><![CDATA[<div class="toc"><!-- toc --><ul><li><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</a></li><li><a href="#dropout">Dropout</a></li><li><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</a></li><li><a href="#updating">updating…</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</span><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti" class="header-anchor"></a></h1><p>深度神经网络由于其巨大的参数量，可以很方便的拟合非常复杂的非线性关系，同时，巨大的参数量也给模型带来了过拟合的问题。为了解决这个问题，也有人提出了早停和加入正则项等手段。而在传统机器学习中，除了这些手段，还有一种手段来解决这个问题，即bagging（参考我之前的文章<a href="https://xv44586.github.io/2019/10/16/bagging/">Bagging为什么能降低过拟合</a>），最典型的就是随机森林：对样本和特征进行抽样，训练多个模型，然后进行集成（投票/求平均）。那如何将这种思路引入到深度神经网络中呢？<br>首先,由于训练单个深度神经网络就已经非常耗时，通常样本量也不够多，不适合采样，所以像随机森林一样抽样训练多个模型的方案不可取。<br>剩下的思路就是用“一个”模型来模拟多个sub-model，那如何来模拟呢？</p><h1><span id="dropout">Dropout</span><a href="#dropout" class="header-anchor"></a></h1><p>对于深度神经网络，其最重要的部分就是其隐藏单元（神经元），对于一个有n个神经元的层，我们可以通过设置神经元是否激活，来模拟$2^n$ 种结构，即sub-model，而在evaluate阶段，我们将这些所有的sub-mdoel的结果进行求平均。那对于现在的结构，不可能对 $2^n$中结构都去做计算然后再求平均，一种近似的做法是用当前这“一个”模型来近似模拟：设置所有神经元都处于激活状态，同时，对每个神经元的输出乘以其激活概率keep_prob.这就是Dropout的背后思想。<br><img src="/2019/10/17/dropout/dropout.png" alt="Dropout"><br>简单总结Dropout的具体做法：训练阶段，在前向传播的时候，让某个神经元的激活值以一定的概率p停止工作；预测阶段，对每个神经元的输出乘以1-p (keep_prob)。<br>接下来思考一下，为什么这么做work:首先，训练阶段部分神经元失活，对应的结果是部分features不参与计算，本质上是对features进行采样；其次，从整个训练过程中看，每次训练（batch-data),都对应不同的失活神经元（sub-model)，对应的每个sub-model在单个epoch内，都是在对样本进行无放回的抽样，本质上是在bagging。最后，在预测阶段，为什么可以用“一个”完整的模型来模拟sub-model的求平均过程呢？从sub-model的角度看，每个sub-model被training的概率为(1-p), 而神经元对所有sub-model是共享的，唯一的区别是是否激活，所以归一到每个神经元上，单个神经元被training（激活）的概率为(1-p),而sub-model的总数是$2^n$，每个神经元求平均的过程即Out_i * (1-p) * $2^n$/ $2^n$ = Out_i * (1 -p).<br>具体实现时，我们的目的是在训练阶段对神经元进行随机（概率p)失活,而在test和evaluate时，对神经元的输出乘以(1-p),所以在实现时，可以采用一个trick：dropout时，对样本进行mask的同时，将其除以(1-p),这样就可以一次计算完成所有逻辑，同时，把所有逻辑保留在整个层中。<br><strong>tf的实现：</strong></p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dropout</span><span class="params">(x, keep_prob, noise_shape=None, seed=None, name=None)</span>:</span>  <span class="comment"># pylint: disable=invalid-name</span></span><br><span class="line">  <span class="string">"""Computes dropout.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  With probability `keep_prob`, outputs the input element scaled up by</span></span><br><span class="line"><span class="string">  `1 / keep_prob`, otherwise outputs `0`.  The scaling is so that the expected</span></span><br><span class="line"><span class="string">  sum is unchanged.</span></span><br><span class="line"><span class="string">    ...</span></span><br><span class="line"><span class="string"> """</span></span><br><span class="line">  <span class="keyword">with</span> ops.name_scope(name, <span class="string">"dropout"</span>, [x]) <span class="keyword">as</span> name:</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment"># Do nothing if we know keep_prob == 1</span></span><br><span class="line">    <span class="keyword">if</span> tensor_util.constant_value(keep_prob) == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    noise_shape = noise_shape <span class="keyword">if</span> noise_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> array_ops.shape(x)</span><br><span class="line">    <span class="comment"># uniform [keep_prob, 1.0 + keep_prob)</span></span><br><span class="line">    random_tensor = keep_prob</span><br><span class="line">    random_tensor += random_ops.random_uniform(noise_shape,</span><br><span class="line">                                               seed=seed,</span><br><span class="line">                                               dtype=x.dtype)</span><br><span class="line">    <span class="comment"># 0. if [keep_prob, 1.0) and 1. if [1.0, 1.0 + keep_prob)</span></span><br><span class="line">    binary_tensor = math_ops.floor(random_tensor)</span><br><span class="line">    ret = math_ops.div(x, keep_prob) * binary_tensor</span><br><span class="line">    <span class="keyword">if</span> context.in_graph_mode():</span><br><span class="line">      ret.set_shape(x.get_shape())</span><br><span class="line">    <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure><h1><span id="bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</span><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan" class="header-anchor"></a></h1><p>如果在非dropout阶段不进行scaled会如何？<br>scaled<br><img src="/2019/10/17/dropout/scaled.png" alt="scaled.png"><br>without_scaled<br><img src="/2019/10/17/dropout/without-scaled.png" alt="without_scaled.png"><br>实验也说明非dropout阶段如果没有进行scaled（求平均），对应的loss会比train阶段高，同时acc也会降低。</p><p><strong>桥豆麻袋，到这里好像出现了一点问题：</strong><br>按照我们上面的思路，在test和evaluate阶段，我们从对sub-model求平均转化为对每个神经元的output进行scaled down，即 activation(x * W ) * (1 - p)， 而我们在实现时，只是对x进行scaled up操作，如果后面接的层的激活函数是线性的，这样处理没有什么问题，但是，后面的层不总是线性激活函数，那此时，output = activation(x * (1-p) * W)  != activation(x*W) * (1 - p),即我们得到的输出与我们想要的并不一样，按照以上的理解，我们对output进行scaled-down，验证一下两者的区别。<br>scaled_input<br><img src="/2019/10/17/dropout/scaled-input.png" alt="scaled_input.png"><br>scaled_output<br><img src="/2019/10/17/dropout/scaled-output.png" alt="scaled_output.png"></p><p>看上去对output进行scaled-down结果稍微好一点，但是并不显著，此时的激活函数是relu，而且是在倒数第二层，换个激活函数试试。<br>scaled_input_tanh<br><img src="/2019/10/17/dropout/scaled_input_tanh.png" alt="scaled_input_tanh.png"><br>scaled_output_tanh<br><img src="/2019/10/17/dropout/scaled_output_tanh.png" alt="scaled_output_tanh.png"><br>结果看上去对output进行scaled-down效果稍微差一些，但差距不大。<br>代码地址<a href="https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout" target="_blank" rel="noopener">https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout</a>，感兴趣的可以试试其他方式。<br>既然两种方式在结果上看，效果差不多，而对output进行scaled-down需要添加一个AfterDropLayer，逻辑会在不同的层中，而对inputs直接进行scaled-up，所有逻辑都保存在一个layer中，更清晰。<br><strong>But，Why？</strong>为什么两种方式的结果效果差异不大？真让人头秃啊！</p><p><strong>论文地址</strong><br><a href="http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" target="_blank" rel="noopener">http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf</a></p><p>================================</p><h1><span id="updating">updating…</span><a href="#updating" class="header-anchor"></a></h1><p><img src="/2019/10/17/dropout/linear.png" alt="image.png"></p><p>上图是sigmoid函数在[-8,8]区间的图像，其中linear是由[-8,-4,-2,2,4,8]截断的直线，看图可以看出，sigmoid在区间内都非常的接近”linear”，梯度变化较大的部分只在几个拐点周围，大部分都是近似”linear”,所以也就解释了为什么两种方式有差异，但是差异并不大。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>大四竞赛作品截图</p>]]></content>
     
     <summary type="html">
     
@@ -316,17 +316,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="DeepLearning" scheme="http://xv44586.coding.me/tags/DeepLearning/"/>
+      <category term="DeepLearning" scheme="https://xv44586.github.io/tags/DeepLearning/"/>
     
   </entry>
   
   <entry>
     <title>Glove模型</title>
-    <link href="http://xv44586.coding.me/2019/10/17/glove/"/>
-    <id>http://xv44586.coding.me/2019/10/17/glove/</id>
+    <link href="https://xv44586.github.io/2019/10/17/glove/"/>
+    <id>https://xv44586.github.io/2019/10/17/glove/</id>
     <published>2019-10-17T01:15:58.000Z</published>
     <updated>2019-10-17T13:58:39.300Z</updated>
     
@@ -349,17 +349,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
   </entry>
   
   <entry>
     <title>随机森林模型中是不是树越多越好</title>
-    <link href="http://xv44586.coding.me/2019/10/17/randomForest/"/>
-    <id>http://xv44586.coding.me/2019/10/17/randomForest/</id>
+    <link href="https://xv44586.github.io/2019/10/17/randomForest/"/>
+    <id>https://xv44586.github.io/2019/10/17/randomForest/</id>
     <published>2019-10-17T01:10:50.000Z</published>
     <updated>2019-10-17T01:13:35.251Z</updated>
     
@@ -381,17 +381,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="MachineLearning" scheme="http://xv44586.coding.me/tags/MachineLearning/"/>
+      <category term="MachineLearning" scheme="https://xv44586.github.io/tags/MachineLearning/"/>
     
   </entry>
   
   <entry>
     <title>Bagging为什么能降低过拟合</title>
-    <link href="http://xv44586.coding.me/2019/10/16/bagging/"/>
-    <id>http://xv44586.coding.me/2019/10/16/bagging/</id>
+    <link href="https://xv44586.github.io/2019/10/16/bagging/"/>
+    <id>https://xv44586.github.io/2019/10/16/bagging/</id>
     <published>2019-10-16T02:05:45.000Z</published>
     <updated>2019-10-16T02:28:15.329Z</updated>
     
@@ -413,17 +413,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="MachineLearning" scheme="http://xv44586.coding.me/tags/MachineLearning/"/>
+      <category term="MachineLearning" scheme="https://xv44586.github.io/tags/MachineLearning/"/>
     
   </entry>
   
   <entry>
     <title>Xgboost原理</title>
-    <link href="http://xv44586.coding.me/2019/10/14/xgb/"/>
-    <id>http://xv44586.coding.me/2019/10/14/xgb/</id>
+    <link href="https://xv44586.github.io/2019/10/14/xgb/"/>
+    <id>https://xv44586.github.io/2019/10/14/xgb/</id>
     <published>2019-10-14T00:39:38.000Z</published>
     <updated>2019-10-14T01:10:47.152Z</updated>
     
@@ -446,17 +446,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="MachineLearning" scheme="http://xv44586.coding.me/tags/MachineLearning/"/>
+      <category term="MachineLearning" scheme="https://xv44586.github.io/tags/MachineLearning/"/>
     
   </entry>
   
   <entry>
     <title>神经网络语言模型(NNLM)</title>
-    <link href="http://xv44586.coding.me/2019/10/13/nnlm/"/>
-    <id>http://xv44586.coding.me/2019/10/13/nnlm/</id>
+    <link href="https://xv44586.github.io/2019/10/13/nnlm/"/>
+    <id>https://xv44586.github.io/2019/10/13/nnlm/</id>
     <published>2019-10-13T09:43:00.000Z</published>
     <updated>2019-10-17T14:32:35.272Z</updated>
     
@@ -479,19 +479,19 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
-      <category term="DeepLearning" scheme="http://xv44586.coding.me/tags/DeepLearning/"/>
+      <category term="DeepLearning" scheme="https://xv44586.github.io/tags/DeepLearning/"/>
     
   </entry>
   
   <entry>
     <title>Word2Vec之skip-gram</title>
-    <link href="http://xv44586.coding.me/2019/10/13/skipgram/"/>
-    <id>http://xv44586.coding.me/2019/10/13/skipgram/</id>
+    <link href="https://xv44586.github.io/2019/10/13/skipgram/"/>
+    <id>https://xv44586.github.io/2019/10/13/skipgram/</id>
     <published>2019-10-13T09:12:24.000Z</published>
     <updated>2019-10-13T09:41:54.733Z</updated>
     
@@ -514,17 +514,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
   </entry>
   
   <entry>
     <title>Python中的GIL</title>
-    <link href="http://xv44586.coding.me/2019/10/13/gil/"/>
-    <id>http://xv44586.coding.me/2019/10/13/gil/</id>
+    <link href="https://xv44586.github.io/2019/10/13/gil/"/>
+    <id>https://xv44586.github.io/2019/10/13/gil/</id>
     <published>2019-10-13T09:01:37.000Z</published>
     <updated>2019-10-17T14:08:09.874Z</updated>
     
@@ -547,17 +547,17 @@
     </summary>
     
     
-      <category term="Programming" scheme="http://xv44586.coding.me/categories/Programming/"/>
+      <category term="Programming" scheme="https://xv44586.github.io/categories/Programming/"/>
     
     
-      <category term="Python" scheme="http://xv44586.coding.me/tags/Python/"/>
+      <category term="Python" scheme="https://xv44586.github.io/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>python中的多线程</title>
-    <link href="http://xv44586.coding.me/2019/10/13/multiThreads/"/>
-    <id>http://xv44586.coding.me/2019/10/13/multiThreads/</id>
+    <link href="https://xv44586.github.io/2019/10/13/multiThreads/"/>
+    <id>https://xv44586.github.io/2019/10/13/multiThreads/</id>
     <published>2019-10-13T08:48:15.000Z</published>
     <updated>2019-10-17T14:08:09.866Z</updated>
     
@@ -583,17 +583,17 @@
     </summary>
     
     
-      <category term="Programming" scheme="http://xv44586.coding.me/categories/Programming/"/>
+      <category term="Programming" scheme="https://xv44586.github.io/categories/Programming/"/>
     
     
-      <category term="Python" scheme="http://xv44586.coding.me/tags/Python/"/>
+      <category term="Python" scheme="https://xv44586.github.io/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>python中实现单例模式</title>
-    <link href="http://xv44586.coding.me/2019/10/13/singleton/"/>
-    <id>http://xv44586.coding.me/2019/10/13/singleton/</id>
+    <link href="https://xv44586.github.io/2019/10/13/singleton/"/>
+    <id>https://xv44586.github.io/2019/10/13/singleton/</id>
     <published>2019-10-13T03:33:59.000Z</published>
     <updated>2019-10-17T14:08:09.882Z</updated>
     
@@ -619,17 +619,17 @@
     </summary>
     
     
-      <category term="Programming" scheme="http://xv44586.coding.me/categories/Programming/"/>
+      <category term="Programming" scheme="https://xv44586.github.io/categories/Programming/"/>
     
     
-      <category term="Python" scheme="http://xv44586.coding.me/tags/Python/"/>
+      <category term="Python" scheme="https://xv44586.github.io/tags/Python/"/>
     
   </entry>
   
   <entry>
     <title>逻辑回归与最大熵模型</title>
-    <link href="http://xv44586.coding.me/2019/10/13/logistic/"/>
-    <id>http://xv44586.coding.me/2019/10/13/logistic/</id>
+    <link href="https://xv44586.github.io/2019/10/13/logistic/"/>
+    <id>https://xv44586.github.io/2019/10/13/logistic/</id>
     <published>2019-10-13T01:50:58.000Z</published>
     <updated>2019-10-13T03:29:18.353Z</updated>
     
@@ -652,17 +652,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="MachineLearning" scheme="http://xv44586.coding.me/tags/MachineLearning/"/>
+      <category term="MachineLearning" scheme="https://xv44586.github.io/tags/MachineLearning/"/>
     
   </entry>
   
   <entry>
     <title>hello-world</title>
-    <link href="http://xv44586.coding.me/2019/10/10/hello-world/"/>
-    <id>http://xv44586.coding.me/2019/10/10/hello-world/</id>
+    <link href="https://xv44586.github.io/2019/10/10/hello-world/"/>
+    <id>https://xv44586.github.io/2019/10/10/hello-world/</id>
     <published>2019-10-10T00:24:35.000Z</published>
     <updated>2019-10-13T03:22:11.048Z</updated>
     
@@ -685,7 +685,7 @@
     </summary>
     
     
-      <category term="Life" scheme="http://xv44586.coding.me/categories/Life/"/>
+      <category term="Life" scheme="https://xv44586.github.io/categories/Life/"/>
     
     
   </entry>
