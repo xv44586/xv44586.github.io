@@ -1,3 +1,6 @@
+https://xv44586.github.io/2020/01/11/npm-environment/
+https://xv44586.github.io/2019/12/27/backup/
+https://xv44586.github.io/2019/12/26/from-softmax-to-crf/
 https://xv44586.github.io/2019/12/09/longton/
 https://xv44586.github.io/2019/11/30/statistics/
 https://xv44586.github.io/2019/11/28/domain-words/
@@ -17,4 +20,3 @@ https://xv44586.github.io/2019/10/13/gil/
 https://xv44586.github.io/2019/10/13/multiThreads/
 https://xv44586.github.io/2019/10/13/singleton/
 https://xv44586.github.io/2019/10/13/logistic/
-https://xv44586.github.io/2019/10/10/hello-world/
