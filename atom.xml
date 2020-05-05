@@ -5,9 +5,9 @@
   <subtitle>小蛋子</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://xv44586.coding.me/"/>
-  <updated>2020-01-11T06:37:47.709Z</updated>
-  <id>http://xv44586.coding.me/</id>
+  <link href="https://xv44586.github.io/"/>
+  <updated>2020-05-05T05:05:15.577Z</updated>
+  <id>https://xv44586.github.io/</id>
   
   <author>
     <name>[object Object]</name>
@@ -17,9 +17,39 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>装机指北</title>
+    <link href="https://xv44586.github.io/2020/05/05/make-a-computer/"/>
+    <id>https://xv44586.github.io/2020/05/05/make-a-computer/</id>
+    <published>2020-05-05T01:20:56.000Z</published>
+    <updated>2020-05-05T05:05:15.577Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#ying-jian-pian">硬件篇</a><ul><li><a href="#xian-qia">显卡</a></li><li><a href="#cpu">CPU</a></li><li><a href="#zhu-ban">主板</a></li><li><a href="#san-re">散热</a></li><li><a href="#cun-chu">存储</a></li><li><a href="#dian-yuan-yu-ji-xiang">电源与机箱</a></li></ul></li><li><a href="#an-zhuang">安装</a></li><li><a href="#ruan-jian-an-zhuang">软件安装</a><ul><li><a href="#xi-tong-an-zhuang">系统安装</a></li><li><a href="#an-zhuang-nvidia-qu-dong">安装Nvidia驱动</a></li><li><a href="#cuda-de-an-zhuang-yu-xie-zai">CUDA的安装与卸载</a><ul><li><a href="#xie-zai-cuda">卸载cuda</a></li><li><a href="#an-zhuang-cuda">安装cuda</a></li></ul></li><li><a href="#an-zhuang-cudnn">安装cudnn</a></li><li><a href="#python-huan-jing">Python环境</a><ul><li><a href="#conda-pei-zhi">conda配置</a></li><li><a href="#an-zhuang-jupyter">安装jupyter</a></li></ul></li><li><a href="#an-zhuang-tensorflow-gpu">安装tensorflow-gpu</a></li></ul></li><li><a href="#zong-jie">总结</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><p>  今年回来，第一件事就是要打造一个自己的实验环境，而这也是我第一次自己从硬件开始，所以前前后后差不多折腾了大半个月，总算是搞定了。为了纪念这次从0开始打造自己的深度学习实验环境，所以写了这篇指北。</p><h1><span id="ying-jian-pian">硬件篇</span><a href="#ying-jian-pian" class="header-anchor"></a></h1><p>  关于硬件，最主要的就是显卡、CPU、主板和散热了，接下来一个一个介绍经验。</p><h2><span id="xian-qia">显卡</span><a href="#xian-qia" class="header-anchor"></a></h2><p>  显卡的选择主要参考两个维度：1.显存大小；2.浮点计算能力。<br>  显卡主要分AMD与Nvidia系列。因为Nvidia有CUDA加持，加速计算，自然是Nvidia系列了，Nvidia显卡目前针对PC有三个系列：Quadro、GeForce和Tesla。其中Quadro系列是专业绘图，GeoForce是专业游戏显卡（可绘图可计算），而Tesla是专业计算卡。综合考虑价格与 state-of-the-art 的模型对硬件的最低要求，最终选择了2080Ti。关于GPU的选型，可以参考<a href="https://zhuanlan.zhihu.com/p/61411536" target="_blank" rel="noopener">深度学习GPU对比</a><br>  确定了型号，就是出品厂家选择了，主要区别就是公版非公版。公版就是Nvidia自己设计自己出的，而非公就是第三方厂商出的，包括evga，技嘉，微星等等。有一篇2080ti进行深度学习时的显卡性能测评的文章，找不到地址了，结论是evga &gt; Nvidia &gt; others 。evga与Nvidia的主要区别有两个：1.价格上evga略高 10% 左右；2. Nvidia 采用双风扇风冷，evga 采用单风扇风冷-水冷混合。最终选择了公版。</p><h2><span id="cpu">CPU</span><a href="#cpu" class="header-anchor"></a></h2><p>  CPU主要有两个系列：Intel 和 AMD 。也是因为主要用来做计算，所以肯定首选 AMD。目前ADM系列顶配是 3990X，但是价格大概在三万左右，太感人了。第二的是 3700X ，京东上一千三上下，那就是他了。</p><h2><span id="zhu-ban">主板</span><a href="#zhu-ban" class="header-anchor"></a></h2><p>  CPU确定了，主板型号基本就定了。 主要参考如下图：<br>  <img src="/2020/05/05/make-a-computer/board.png" alt="cpu-主板对应型号参考"><br>  看了一些测评，最终选择了微星<a href="https://item.jd.com/8259910.html" target="_blank" rel="noopener">B450</a></p><h2><span id="san-re">散热</span><a href="#san-re" class="header-anchor"></a></h2><p>  散热目前两个方式：风冷和水冷。两者的区别主要参考<a href="https://www.zhihu.com/question/57695465/answer/440467918" target="_blank" rel="noopener">风冷与水冷区别</a><br>  水冷在散热上还是要强一些的（240以上），所以打算试水一款水冷。主要推荐两款：<a href="https://item.m.jd.com/product/100003859323.html?wxa_abtest=o&amp;utm_user=plusmember&amp;ad_od=share&amp;utm_source=androidapp&amp;utm_medium=appshare&amp;utm_campaign=t_335139774&amp;utm_term=Wxfriends&amp;from=singlemessage&amp;isappinstalled=0" target="_blank" rel="noopener">乔思伯光影240</a> <a href="https://item.m.jd.com/product/6454809.html?wxa_abtest=o&amp;utm_user=plusmember&amp;ad_od=share&amp;utm_source=androidapp&amp;utm_medium=appshare&amp;utm_campaign=t_335139774&amp;utm_term=Wxfriends&amp;from=singlemessage&amp;isappinstalled=0" target="_blank" rel="noopener">九州风神水元素240T</a>。最后选择了九州风神水元素，因为买那天乔思伯涨价了～</p><h2><span id="cun-chu">存储</span><a href="#cun-chu" class="header-anchor"></a></h2><p>  存储上打算采用 32G + 1T ssd。内存自然上<a href="https://item.jd.com/8391349.html" target="_blank" rel="noopener">金士顿骇客神条</a>, ssd主要参考性价比，最终选择<a href="https://item.jd.com/100002580230.html" target="_blank" rel="noopener">三星1T SSD</a></p><h2><span id="dian-yuan-yu-ji-xiang">电源与机箱</span><a href="#dian-yuan-yu-ji-xiang" class="header-anchor"></a></h2><p>  由于目前暂时只插一张显卡，所以电源在 600W 以上即可。选一个品牌比较好的，那就是<a href="https://item.jd.com/6828141.html" target="_blank" rel="noopener">安钛克750</a> 了<br>  至于机箱，主要参考能不能够合理安放显卡、主板以及后续可能的散热。对于我当前的配置，只要是中塔的基本都够插显卡。买个安静低调的，那就他了：<a href="https://item.jd.com/100004999668.html" target="_blank" rel="noopener">爱国者M2</a><br>  最终的配置清单如下：<br>  <img src="/2020/05/05/make-a-computer/list.png" alt="list"></p><h1><span id="an-zhuang">安装</span><a href="#an-zhuang" class="header-anchor"></a></h1><p>  安装前，强烈建议多看几期安装教程视频，我主要看的是 B站 的<a href="https://www.bilibili.com/video/BV1vx41187cm" target="_blank" rel="noopener">跟装机猿搞装机</a> 系列。最困难的可能是水冷散热的安装了。由于平台不同，安装方式不同，推荐看对应水冷厂商给的安装视频。我主要参考<a href="https://www.bilibili.com/video/BV1EE411h7R1" target="_blank" rel="noopener">水元素安装教程</a><br>  安装过程大致总结一下：</p><ol><li>拿出主板和CPU，按照说明书将CPU装到主板上。</li><li>将水冷拿出，拿出硅脂，涂抹在CPU上，将冷头上的塑料膜撕掉，安装好支撑后，将水冷头贴在CPU上，安装固定。</li><li>拆开机箱侧板，将主板装上，并将水冷的风扇固定在机箱上。注意：风扇上没有挡板的是出风口，一般原则是从机箱内往外吹，注意风向。</li><li>插入内存条，固定固态硬盘</li><li>将线按说明一个一个插上</li><li>寻找机箱上显卡位置，可能需要扣掉挡板铁片。将显卡插入主板，同时固定在机箱上</li><li>放入电源，插好对应线<br>主要注意的主要是：1、水冷头上的膜一定要撕去，否则CPU上的热不能很好的传导出来。2、装之前大概看一下机箱各个位置，有些时候因为安装顺序会导致没地方下手，需要卸了重组。</li></ol><h1><span id="ruan-jian-an-zhuang">软件安装</span><a href="#ruan-jian-an-zhuang" class="header-anchor"></a></h1><h2><span id="xi-tong-an-zhuang">系统安装</span><a href="#xi-tong-an-zhuang" class="header-anchor"></a></h2><p>  系统选Linux的稳定版，所以装了CentOS 7。<br>  1.首先下载centos的镜像文件，外网可能会慢，选择<a href="http://mirrors.aliyun.com/centos/7/isos/x86_64/" target="_blank" rel="noopener">阿里源</a><br>  2.下载相应的刻录工具，插入u盘，将镜像刻录进u盘（刻录时会先格式化u盘，如果是windows系统，u盘默认是FAT32,这种格式下是没法放大于4G的单文件，所以需要进行格式转换：cmd下执行 convert e: /fs:ntfs)<br>  3.插入u盘，开机，引导开机进入u盘（大部分是自动进来），选择 test &amp; install<br>  4.一般安装时，对应的命令行中的目录是错误的，执行会报错：<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ERROR，could not insert <span class="string">'floppy'</span></span><br></pre></td></tr></table></figure></p><p>  而无法进入安装界面<br>  此时需要查找u盘对应名字，修改命令：<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span>:/dev &amp; ls</span><br></pre></td></tr></table></figure></p><p>  找到一个 <code>s##数字 </code>的串，我的是sdb4 ,然后重启，进入后先按 e 进入编辑模式，修改命令行<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">linuxefi/images/pxeboot/vmlinuz inst.stage2=hd:LABEL=CentOS\x207\x20x86_64 xdriver=vesa nomodeset quiet</span><br><span class="line">linuxefi/images/pxeboot/vmlinuz inst.stage2=hd:/dev/sdb4 xdriver=vesa nomodeset quiet</span><br></pre></td></tr></table></figure></p><p>  由于我的显卡是2080Ti,系统自带的nouveau驱动不匹配，需要禁用暂时，所以在后面加上 <code> nouveau.modeset=0 </code><br>  最终修改后完整的命令行为：<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">linuxefi/images/pxeboot/vmlinuz inst.stage2=hd:/dev/sdb4 xdriver=vesa nomodeset quiet nouveau.modeset=0</span><br></pre></td></tr></table></figure></p><p>  此时保存后退出，选择test &amp; install 即可进入安装界面<br>  进入后安装，安装时，注意软件选择中选择带网络的，剩下的就是按提示一步一步来即可。</p><h2><span id="an-zhuang-nvidia-qu-dong">安装Nvidia驱动</span><a href="#an-zhuang-nvidia-qu-dong" class="header-anchor"></a></h2><p>  1.检查显卡是否正常<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ lspci | grep -i nvidia</span><br></pre></td></tr></table></figure></p><p>  2.检查驱动版本<br>  添加EIRepo源<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org</span><br><span class="line">$ rpm -Uvh http://www.elrepo.org/elrepo-release-7.6-5.el7.elrepo.noarch.rpm</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">3.安装显卡驱动检查包</span><br><span class="line">```bash</span><br><span class="line">$ yum install nvidia-detect</span><br></pre></td></tr></table></figure></p><p>  检查驱动版本<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nvidia-detect -v</span><br></pre></td></tr></table></figure></p><p>  此时会得到对应的版本信息，注意那个数字<br>  4.安装编译环境<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) dkms</span><br><span class="line">$ yum -y update //注意这是升级系统</span><br><span class="line">$ yum -y install gcc kernel-devel kernel-headers dkms</span><br></pre></td></tr></table></figure></p><p>  5.禁用vouveau<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/modprobe.d/blacklist-nouveau.conf</span><br><span class="line">    blacklist nouveau</span><br><span class="line">    options nouveau modeset=0</span><br></pre></td></tr></table></figure></p><p>  6.重新建立initramfs image文件<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).img.bak</span><br><span class="line">$ dracut /boot/initramfs-$(uname -r).img $(uname -r)</span><br></pre></td></tr></table></figure></p><p>  7.reboot</p><h2><span id="cuda-de-an-zhuang-yu-xie-zai">CUDA的安装与卸载</span><a href="#cuda-de-an-zhuang-yu-xie-zai" class="header-anchor"></a></h2><h3><span id="xie-zai-cuda">卸载cuda</span><a href="#xie-zai-cuda" class="header-anchor"></a></h3>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo yum remove <span class="string">"*cublas*"</span> <span class="string">"cuda*"</span></span><br></pre></td></tr></table></figure><p>参考：<a href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#removing-cuda-tk-and-driver" target="_blank" rel="noopener">removing-cuda</a></p><h3><span id="an-zhuang-cuda">安装cuda</span><a href="#an-zhuang-cuda" class="header-anchor"></a></h3>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget path/to/your-version/install.rpm</span><br><span class="line">sudo rpm -i cuda-repo-rhel7-10-1-local-10.1.105-418.39-1.0-1.x86_64.rpm</span><br><span class="line">sudo yum clean all</span><br><span class="line">sudo yum install cuda</span><br></pre></td></tr></table></figure><p>参考：<a href="https://developer.nvidia.com/cuda-10.1-download-archive-base?target_os=Linux&amp;target_arch=x86_64&amp;target_distro=CentOS&amp;target_version=7&amp;target_type=rpmlocal" target="_blank" rel="noopener">cuda-download</a><br>注意：一定不要通过浏览器去下载，因为会非常非常非常慢，但是wget大概几分钟就搞定了</p><h2><span id="an-zhuang-cudnn">安装cudnn</span><a href="#an-zhuang-cudnn" class="header-anchor"></a></h2><p>  1.下载相应的包 libcudnn*.rpm</p><ol start="2"><li><p>安装包</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rpm -ivh libcudnn7-*.x86_64.rpm</span><br><span class="line">rpm -ivh libcudnn7-devel-*.x86_64.rpm</span><br><span class="line">rpm -ivh libcudnn7-doc-*.x86_64.rpm</span><br></pre></td></tr></table></figure><p>3.验证</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span>  <span class="variable">$HOME</span>/cudnn_samples_v7/mnistCUDNN</span><br><span class="line"><span class="variable">$make</span> clean &amp;&amp; make</span><br><span class="line">$ ./mnistCUDNN</span><br></pre></td></tr></table></figure><p>if: Test passed! 则验证通过<br>参考：<a href="https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#install-linux" target="_blank" rel="noopener">cudnn-install</a></p><h2><span id="python-huan-jing">Python环境</span><a href="#python-huan-jing" class="header-anchor"></a></h2><p>python环境采用Anaconda + jupyter notebook</p><h3><span id="conda-pei-zhi">conda配置</span><a href="#conda-pei-zhi" class="header-anchor"></a></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">conda create -n py3 python=3</span><br><span class="line">activate py3</span><br><span class="line">conda install ipykernel -n py3</span><br><span class="line">python -m ipykernel install --user --name py3 --display-name <span class="string">'py3'</span></span><br></pre></td></tr></table></figure><p>删除环境</p><figure class="highlight bash"><figcaption><span>jupyter kernelspec remove py3 ```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  pip 安装 与修改源</span><br><span class="line">```bash </span><br><span class="line">  conda install pip -n py3</span><br><span class="line">  vim ~/.pip/pip.conf</span><br><span class="line"></span><br><span class="line">  [global]</span><br><span class="line">  index-url=https://pypi.tuna.tsinghua.edu.cn/simple</span><br></pre></td></tr></table></figure><h3><span id="an-zhuang-jupyter">安装jupyter</span><a href="#an-zhuang-jupyter" class="header-anchor"></a></h3><figure class="highlight bash"><figcaption><span>pip install jupyter```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">  jupyter 作为后台服务器</span><br><span class="line">  1. 添加密码</span><br><span class="line">```bash </span><br><span class="line">  ipython</span><br><span class="line">  from jupyter.auth import passwd</span><br><span class="line">  passwd()</span><br></pre></td></tr></table></figure><p>此时会让你输入两次密码，输入后得到一串hash码，保存下来， 回到bash, 添加配置文件</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ jupyter notebook --generate-config</span><br><span class="line">$ vim ~/.jupyter/jupyter-notebook-config.py</span><br><span class="line"></span><br><span class="line"><span class="comment"># edit</span></span><br><span class="line"></span><br><span class="line">c.NotebookApp.ip=<span class="string">'*'</span>                                  <span class="comment"># * 代表所有iP都能访问 ，也可以指定ip</span></span><br><span class="line">c.NotebookApp.password = u<span class="string">'sha1:ce...'</span>       <span class="comment"># 刚才复制的那个密文</span></span><br><span class="line">c.NotebookApp.open_browser = False       <span class="comment"># 禁止自动打开浏览器</span></span><br><span class="line">c.NotebookApp.port =8888                         <span class="comment">#指定一个端口</span></span><br><span class="line">   </span><br><span class="line">c.NotebookApp.notebook_dir = <span class="string">'/home/user/user1'</span>  <span class="comment">#指定工作空间</span></span><br><span class="line">c.PAMAuthenticator.encoding = <span class="string">'utf8'</span>         <span class="comment">#指定utf-8编码，解决读取中文路径或者文件乱码问题</span></span><br></pre></td></tr></table></figure><p>后台运行</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nohup jupyter notebook --allow-root &gt; jupyter.log 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure></li></ol><p>  关闭后台运行<br>  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment"># ps -axu | grep jupyter</span></span><br><span class="line"><span class="comment"># kill -9 pid</span></span><br></pre></td></tr></table></figure></p><h2><span id="an-zhuang-tensorflow-gpu">安装tensorflow-gpu</span><a href="#an-zhuang-tensorflow-gpu" class="header-anchor"></a></h2><p>  tensorflow-gpu对cuda有版本要求，所以在安装cuda前需要提前查看，确定自己版本。参考官网<a href="https://www.tensorflow.org/install/source" target="_blank" rel="noopener">install</a><br>  <img src="/2020/05/05/make-a-computer/gpu.png" alt="tensorflow-gpu vs cuda"><br>  还记得cuda安装时，给出的卸载方法吗？就是因为装tensorflow-gpu后发现gpu不带动的，后来才发现是cuda版本太高了～<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ pip install tensorflow-gpu==2.1</span><br></pre></td></tr></table></figure></p><p>  验证<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ ipython</span><br><span class="line">  import tensorflow as tf</span><br><span class="line">  tf.config.list_physical_devices(<span class="string">'GPU'</span>)</span><br></pre></td></tr></table></figure></p><p>  没有报错则正常</p><h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>  以上就是从零开始搭建搭建一套自己的深度学习实验平台的个人经验，整个过程从硬件到最终的软件适配都走了很多坑，希望能给你一些借鉴。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>  部分硬件盒子</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
+      
+    
+    </summary>
+    
+    
+      <category term="Life" scheme="https://xv44586.github.io/categories/Life/"/>
+    
+    
+      <category term="tensorflow-gpu" scheme="https://xv44586.github.io/tags/tensorflow-gpu/"/>
+    
+      <category term="装机" scheme="https://xv44586.github.io/tags/%E8%A3%85%E6%9C%BA/"/>
+    
+      <category term="CUDA" scheme="https://xv44586.github.io/tags/CUDA/"/>
+    
+  </entry>
+  
+  <entry>
     <title>记一次npm环境问题</title>
-    <link href="http://xv44586.coding.me/2020/01/11/npm-environment/"/>
-    <id>http://xv44586.coding.me/2020/01/11/npm-environment/</id>
+    <link href="https://xv44586.github.io/2020/01/11/npm-environment/"/>
+    <id>https://xv44586.github.io/2020/01/11/npm-environment/</id>
     <published>2020-01-11T04:31:20.000Z</published>
     <updated>2020-01-11T06:37:47.709Z</updated>
     
@@ -35,17 +65,17 @@
     </summary>
     
     
-      <category term="Life" scheme="http://xv44586.coding.me/categories/Life/"/>
+      <category term="Life" scheme="https://xv44586.github.io/categories/Life/"/>
     
     
-      <category term="npm" scheme="http://xv44586.coding.me/tags/npm/"/>
+      <category term="npm" scheme="https://xv44586.github.io/tags/npm/"/>
     
   </entry>
   
   <entry>
     <title>Backup</title>
-    <link href="http://xv44586.coding.me/2019/12/27/backup/"/>
-    <id>http://xv44586.coding.me/2019/12/27/backup/</id>
+    <link href="https://xv44586.github.io/2019/12/27/backup/"/>
+    <id>https://xv44586.github.io/2019/12/27/backup/</id>
     <published>2019-12-27T14:24:21.000Z</published>
     <updated>2020-01-11T06:42:03.393Z</updated>
     
@@ -61,19 +91,19 @@
     </summary>
     
     
-      <category term="Life" scheme="http://xv44586.coding.me/categories/Life/"/>
+      <category term="Life" scheme="https://xv44586.github.io/categories/Life/"/>
     
     
-      <category term="Hexo" scheme="http://xv44586.coding.me/tags/Hexo/"/>
+      <category term="Hexo" scheme="https://xv44586.github.io/tags/Hexo/"/>
     
-      <category term="MarkDown" scheme="http://xv44586.coding.me/tags/MarkDown/"/>
+      <category term="MarkDown" scheme="https://xv44586.github.io/tags/MarkDown/"/>
     
   </entry>
   
   <entry>
     <title>from softmax to crf</title>
-    <link href="http://xv44586.coding.me/2019/12/26/from-softmax-to-crf/"/>
-    <id>http://xv44586.coding.me/2019/12/26/from-softmax-to-crf/</id>
+    <link href="https://xv44586.github.io/2019/12/26/from-softmax-to-crf/"/>
+    <id>https://xv44586.github.io/2019/12/26/from-softmax-to-crf/</id>
     <published>2019-12-26T12:45:56.000Z</published>
     <updated>2020-01-11T06:47:30.641Z</updated>
     
@@ -89,19 +119,19 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
-      <category term="CRF" scheme="http://xv44586.coding.me/tags/CRF/"/>
+      <category term="CRF" scheme="https://xv44586.github.io/tags/CRF/"/>
     
   </entry>
   
   <entry>
     <title>分享一个有趣的游戏</title>
-    <link href="http://xv44586.coding.me/2019/12/09/longton/"/>
-    <id>http://xv44586.coding.me/2019/12/09/longton/</id>
+    <link href="https://xv44586.github.io/2019/12/09/longton/"/>
+    <id>https://xv44586.github.io/2019/12/09/longton/</id>
     <published>2019-12-09T14:35:44.000Z</published>
     <updated>2019-12-13T13:29:33.341Z</updated>
     
@@ -117,17 +147,17 @@
     </summary>
     
     
-      <category term="Math" scheme="http://xv44586.coding.me/categories/Math/"/>
+      <category term="Math" scheme="https://xv44586.github.io/categories/Math/"/>
     
     
-      <category term="Game" scheme="http://xv44586.coding.me/tags/Game/"/>
+      <category term="Game" scheme="https://xv44586.github.io/tags/Game/"/>
     
   </entry>
   
   <entry>
     <title>有趣的概率统计题</title>
-    <link href="http://xv44586.coding.me/2019/11/30/statistics/"/>
-    <id>http://xv44586.coding.me/2019/11/30/statistics/</id>
+    <link href="https://xv44586.github.io/2019/11/30/statistics/"/>
+    <id>https://xv44586.github.io/2019/11/30/statistics/</id>
     <published>2019-11-30T02:28:23.000Z</published>
     <updated>2019-11-30T07:15:58.387Z</updated>
     
@@ -143,17 +173,17 @@
     </summary>
     
     
-      <category term="Math" scheme="http://xv44586.coding.me/categories/Math/"/>
+      <category term="Math" scheme="https://xv44586.github.io/categories/Math/"/>
     
     
-      <category term="Statistics" scheme="http://xv44586.coding.me/tags/Statistics/"/>
+      <category term="Statistics" scheme="https://xv44586.github.io/tags/Statistics/"/>
     
   </entry>
   
   <entry>
     <title>带约束的领域词挖掘</title>
-    <link href="http://xv44586.coding.me/2019/11/28/domain-words/"/>
-    <id>http://xv44586.coding.me/2019/11/28/domain-words/</id>
+    <link href="https://xv44586.github.io/2019/11/28/domain-words/"/>
+    <id>https://xv44586.github.io/2019/11/28/domain-words/</id>
     <published>2019-11-28T07:31:41.000Z</published>
     <updated>2019-12-04T01:47:13.812Z</updated>
     
@@ -169,23 +199,23 @@
     </summary>
     
     
-      <category term="Programming" scheme="http://xv44586.coding.me/categories/Programming/"/>
+      <category term="Programming" scheme="https://xv44586.github.io/categories/Programming/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
-      <category term="新词发现" scheme="http://xv44586.coding.me/tags/%E6%96%B0%E8%AF%8D%E5%8F%91%E7%8E%B0/"/>
+      <category term="新词发现" scheme="https://xv44586.github.io/tags/%E6%96%B0%E8%AF%8D%E5%8F%91%E7%8E%B0/"/>
     
-      <category term="领域词挖掘" scheme="http://xv44586.coding.me/tags/%E9%A2%86%E5%9F%9F%E8%AF%8D%E6%8C%96%E6%8E%98/"/>
+      <category term="领域词挖掘" scheme="https://xv44586.github.io/tags/%E9%A2%86%E5%9F%9F%E8%AF%8D%E6%8C%96%E6%8E%98/"/>
     
-      <category term="信息熵" scheme="http://xv44586.coding.me/tags/%E4%BF%A1%E6%81%AF%E7%86%B5/"/>
+      <category term="信息熵" scheme="https://xv44586.github.io/tags/%E4%BF%A1%E6%81%AF%E7%86%B5/"/>
     
   </entry>
   
   <entry>
     <title>天猫双十一销售额相关思考</title>
-    <link href="http://xv44586.coding.me/2019/11/24/tm-1111/"/>
-    <id>http://xv44586.coding.me/2019/11/24/tm-1111/</id>
+    <link href="https://xv44586.github.io/2019/11/24/tm-1111/"/>
+    <id>https://xv44586.github.io/2019/11/24/tm-1111/</id>
     <published>2019-11-24T01:49:06.000Z</published>
     <updated>2019-12-13T13:36:39.118Z</updated>
     
@@ -201,17 +231,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="机器学习" scheme="http://xv44586.coding.me/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+      <category term="机器学习" scheme="https://xv44586.github.io/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
     
   </entry>
   
   <entry>
     <title>文档查重之SimHash算法</title>
-    <link href="http://xv44586.coding.me/2019/10/26/simhash/"/>
-    <id>http://xv44586.coding.me/2019/10/26/simhash/</id>
+    <link href="https://xv44586.github.io/2019/10/26/simhash/"/>
+    <id>https://xv44586.github.io/2019/10/26/simhash/</id>
     <published>2019-10-26T02:13:06.000Z</published>
     <updated>2019-10-26T02:31:56.413Z</updated>
     
@@ -227,17 +257,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
   </entry>
   
   <entry>
     <title>分词算法综述</title>
-    <link href="http://xv44586.coding.me/2019/10/22/cutwords/"/>
-    <id>http://xv44586.coding.me/2019/10/22/cutwords/</id>
+    <link href="https://xv44586.github.io/2019/10/22/cutwords/"/>
+    <id>https://xv44586.github.io/2019/10/22/cutwords/</id>
     <published>2019-10-22T14:06:05.000Z</published>
     <updated>2019-10-23T00:57:58.725Z</updated>
     
@@ -253,17 +283,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
   </entry>
   
   <entry>
     <title>词向量总结</title>
-    <link href="http://xv44586.coding.me/2019/10/22/w2v-summary/"/>
-    <id>http://xv44586.coding.me/2019/10/22/w2v-summary/</id>
+    <link href="https://xv44586.github.io/2019/10/22/w2v-summary/"/>
+    <id>https://xv44586.github.io/2019/10/22/w2v-summary/</id>
     <published>2019-10-22T01:07:15.000Z</published>
     <updated>2019-11-27T01:44:41.318Z</updated>
     
@@ -279,19 +309,19 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
-      <category term="Thinking" scheme="http://xv44586.coding.me/tags/Thinking/"/>
+      <category term="Thinking" scheme="https://xv44586.github.io/tags/Thinking/"/>
     
   </entry>
   
   <entry>
     <title>深入谈谈word2vec</title>
-    <link href="http://xv44586.coding.me/2019/10/21/deep-w2v/"/>
-    <id>http://xv44586.coding.me/2019/10/21/deep-w2v/</id>
+    <link href="https://xv44586.github.io/2019/10/21/deep-w2v/"/>
+    <id>https://xv44586.github.io/2019/10/21/deep-w2v/</id>
     <published>2019-10-21T01:02:56.000Z</published>
     <updated>2019-10-22T01:24:14.513Z</updated>
     
@@ -307,21 +337,21 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
   </entry>
   
   <entry>
     <title>Dropout--深度神经网络中的Bagging</title>
-    <link href="http://xv44586.coding.me/2019/10/17/dropout/"/>
-    <id>http://xv44586.coding.me/2019/10/17/dropout/</id>
+    <link href="https://xv44586.github.io/2019/10/17/dropout/"/>
+    <id>https://xv44586.github.io/2019/10/17/dropout/</id>
     <published>2019-10-17T14:28:12.000Z</published>
     <updated>2019-10-17T15:01:46.580Z</updated>
     
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</a></li><li><a href="#dropout">Dropout</a></li><li><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</a></li><li><a href="#updating">updating…</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</span><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti" class="header-anchor"></a></h1><p>深度神经网络由于其巨大的参数量，可以很方便的拟合非常复杂的非线性关系，同时，巨大的参数量也给模型带来了过拟合的问题。为了解决这个问题，也有人提出了早停和加入正则项等手段。而在传统机器学习中，除了这些手段，还有一种手段来解决这个问题，即bagging（参考我之前的文章<a href="https://xv44586.github.io/2019/10/16/bagging/" target="_blank" rel="noopener">Bagging为什么能降低过拟合</a>），最典型的就是随机森林：对样本和特征进行抽样，训练多个模型，然后进行集成（投票/求平均）。那如何将这种思路引入到深度神经网络中呢？<br>首先,由于训练单个深度神经网络就已经非常耗时，通常样本量也不够多，不适合采样，所以像随机森林一样抽样训练多个模型的方案不可取。<br>剩下的思路就是用“一个”模型来模拟多个sub-model，那如何来模拟呢？</p><h1><span id="dropout">Dropout</span><a href="#dropout" class="header-anchor"></a></h1><p>对于深度神经网络，其最重要的部分就是其隐藏单元（神经元），对于一个有n个神经元的层，我们可以通过设置神经元是否激活，来模拟$2^n$ 种结构，即sub-model，而在evaluate阶段，我们将这些所有的sub-mdoel的结果进行求平均。那对于现在的结构，不可能对 $2^n$中结构都去做计算然后再求平均，一种近似的做法是用当前这“一个”模型来近似模拟：设置所有神经元都处于激活状态，同时，对每个神经元的输出乘以其激活概率keep_prob.这就是Dropout的背后思想。<br><img src="/2019/10/17/dropout/dropout.png" alt="Dropout"><br>简单总结Dropout的具体做法：训练阶段，在前向传播的时候，让某个神经元的激活值以一定的概率p停止工作；预测阶段，对每个神经元的输出乘以1-p (keep_prob)。<br>接下来思考一下，为什么这么做work:首先，训练阶段部分神经元失活，对应的结果是部分features不参与计算，本质上是对features进行采样；其次，从整个训练过程中看，每次训练（batch-data),都对应不同的失活神经元（sub-model)，对应的每个sub-model在单个epoch内，都是在对样本进行无放回的抽样，本质上是在bagging。最后，在预测阶段，为什么可以用“一个”完整的模型来模拟sub-model的求平均过程呢？从sub-model的角度看，每个sub-model被training的概率为(1-p), 而神经元对所有sub-model是共享的，唯一的区别是是否激活，所以归一到每个神经元上，单个神经元被training（激活）的概率为(1-p),而sub-model的总数是$2^n$，每个神经元求平均的过程即Out_i <em> (1-p) </em> $2^n$/ $2^n$ = Out_i * (1 -p).<br>具体实现时，我们的目的是在训练阶段对神经元进行随机（概率p)失活,而在test和evaluate时，对神经元的输出乘以(1-p),所以在实现时，可以采用一个trick：dropout时，对样本进行mask的同时，将其除以(1-p),这样就可以一次计算完成所有逻辑，同时，把所有逻辑保留在整个层中。<br><strong>tf的实现：</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dropout</span><span class="params">(x, keep_prob, noise_shape=None, seed=None, name=None)</span>:</span>  <span class="comment"># pylint: disable=invalid-name</span></span><br><span class="line">  <span class="string">"""Computes dropout.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  With probability `keep_prob`, outputs the input element scaled up by</span></span><br><span class="line"><span class="string">  `1 / keep_prob`, otherwise outputs `0`.  The scaling is so that the expected</span></span><br><span class="line"><span class="string">  sum is unchanged.</span></span><br><span class="line"><span class="string">    ...</span></span><br><span class="line"><span class="string"> """</span></span><br><span class="line">  <span class="keyword">with</span> ops.name_scope(name, <span class="string">"dropout"</span>, [x]) <span class="keyword">as</span> name:</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment"># Do nothing if we know keep_prob == 1</span></span><br><span class="line">    <span class="keyword">if</span> tensor_util.constant_value(keep_prob) == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    noise_shape = noise_shape <span class="keyword">if</span> noise_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> array_ops.shape(x)</span><br><span class="line">    <span class="comment"># uniform [keep_prob, 1.0 + keep_prob)</span></span><br><span class="line">    random_tensor = keep_prob</span><br><span class="line">    random_tensor += random_ops.random_uniform(noise_shape,</span><br><span class="line">                                               seed=seed,</span><br><span class="line">                                               dtype=x.dtype)</span><br><span class="line">    <span class="comment"># 0. if [keep_prob, 1.0) and 1. if [1.0, 1.0 + keep_prob)</span></span><br><span class="line">    binary_tensor = math_ops.floor(random_tensor)</span><br><span class="line">    ret = math_ops.div(x, keep_prob) * binary_tensor</span><br><span class="line">    <span class="keyword">if</span> context.in_graph_mode():</span><br><span class="line">      ret.set_shape(x.get_shape())</span><br><span class="line">    <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure></p><h1><span id="bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</span><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan" class="header-anchor"></a></h1><p>如果在非dropout阶段不进行scaled会如何？<br>scaled<br><img src="/2019/10/17/dropout/scaled.png" alt="scaled.png"><br>without_scaled<br><img src="/2019/10/17/dropout/without-scaled.png" alt="without_scaled.png"><br>实验也说明非dropout阶段如果没有进行scaled（求平均），对应的loss会比train阶段高，同时acc也会降低。</p><p><strong>桥豆麻袋，到这里好像出现了一点问题：</strong><br>按照我们上面的思路，在test和evaluate阶段，我们从对sub-model求平均转化为对每个神经元的output进行scaled down，即 activation(x <em> W ) </em> (1 - p)， 而我们在实现时，只是对x进行scaled up操作，如果后面接的层的激活函数是线性的，这样处理没有什么问题，但是，后面的层不总是线性激活函数，那此时，output = activation(x <em> (1-p) </em> W)  != activation(x<em>W) </em> (1 - p),即我们得到的输出与我们想要的并不一样，按照以上的理解，我们对output进行scaled-down，验证一下两者的区别。<br>scaled_input<br><img src="/2019/10/17/dropout/scaled-input.png" alt="scaled_input.png"><br>scaled_output<br><img src="/2019/10/17/dropout/scaled-output.png" alt="scaled_output.png"></p><p>看上去对output进行scaled-down结果稍微好一点，但是并不显著，此时的激活函数是relu，而且是在倒数第二层，换个激活函数试试。<br>scaled_input_tanh<br><img src="/2019/10/17/dropout/scaled_input_tanh.png" alt="scaled_input_tanh.png"><br>scaled_output_tanh<br><img src="/2019/10/17/dropout/scaled_output_tanh.png" alt="scaled_output_tanh.png"><br>结果看上去对output进行scaled-down效果稍微差一些，但差距不大。<br>代码地址<a href="https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout" target="_blank" rel="noopener">https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout</a>，感兴趣的可以试试其他方式。<br>既然两种方式在结果上看，效果差不多，而对output进行scaled-down需要添加一个AfterDropLayer，逻辑会在不同的层中，而对inputs直接进行scaled-up，所有逻辑都保存在一个layer中，更清晰。<br><strong>But，Why？</strong>为什么两种方式的结果效果差异不大？真让人头秃啊！</p><p><strong>论文地址</strong><br><a href="http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" target="_blank" rel="noopener">http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf</a></p><p>================================</p><h1><span id="updating">updating…</span><a href="#updating" class="header-anchor"></a></h1><p><img src="/2019/10/17/dropout/linear.png" alt="image.png"></p><p>上图是sigmoid函数在[-8,8]区间的图像，其中linear是由[-8,-4,-2,2,4,8]截断的直线，看图可以看出，sigmoid在区间内都非常的接近”linear”，梯度变化较大的部分只在几个拐点周围，大部分都是近似”linear”,所以也就解释了为什么两种方式有差异，但是差异并不大。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>大四竞赛作品截图</p>]]></content>
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</a></li><li><a href="#dropout">Dropout</a></li><li><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</a></li><li><a href="#updating">updating…</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</span><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti" class="header-anchor"></a></h1><p>深度神经网络由于其巨大的参数量，可以很方便的拟合非常复杂的非线性关系，同时，巨大的参数量也给模型带来了过拟合的问题。为了解决这个问题，也有人提出了早停和加入正则项等手段。而在传统机器学习中，除了这些手段，还有一种手段来解决这个问题，即bagging（参考我之前的文章<a href="https://xv44586.github.io/2019/10/16/bagging/">Bagging为什么能降低过拟合</a>），最典型的就是随机森林：对样本和特征进行抽样，训练多个模型，然后进行集成（投票/求平均）。那如何将这种思路引入到深度神经网络中呢？<br>首先,由于训练单个深度神经网络就已经非常耗时，通常样本量也不够多，不适合采样，所以像随机森林一样抽样训练多个模型的方案不可取。<br>剩下的思路就是用“一个”模型来模拟多个sub-model，那如何来模拟呢？</p><h1><span id="dropout">Dropout</span><a href="#dropout" class="header-anchor"></a></h1><p>对于深度神经网络，其最重要的部分就是其隐藏单元（神经元），对于一个有n个神经元的层，我们可以通过设置神经元是否激活，来模拟$2^n$ 种结构，即sub-model，而在evaluate阶段，我们将这些所有的sub-mdoel的结果进行求平均。那对于现在的结构，不可能对 $2^n$中结构都去做计算然后再求平均，一种近似的做法是用当前这“一个”模型来近似模拟：设置所有神经元都处于激活状态，同时，对每个神经元的输出乘以其激活概率keep_prob.这就是Dropout的背后思想。<br><img src="/2019/10/17/dropout/dropout.png" alt="Dropout"><br>简单总结Dropout的具体做法：训练阶段，在前向传播的时候，让某个神经元的激活值以一定的概率p停止工作；预测阶段，对每个神经元的输出乘以1-p (keep_prob)。<br>接下来思考一下，为什么这么做work:首先，训练阶段部分神经元失活，对应的结果是部分features不参与计算，本质上是对features进行采样；其次，从整个训练过程中看，每次训练（batch-data),都对应不同的失活神经元（sub-model)，对应的每个sub-model在单个epoch内，都是在对样本进行无放回的抽样，本质上是在bagging。最后，在预测阶段，为什么可以用“一个”完整的模型来模拟sub-model的求平均过程呢？从sub-model的角度看，每个sub-model被training的概率为(1-p), 而神经元对所有sub-model是共享的，唯一的区别是是否激活，所以归一到每个神经元上，单个神经元被training（激活）的概率为(1-p),而sub-model的总数是$2^n$，每个神经元求平均的过程即Out_i <em> (1-p) </em> $2^n$/ $2^n$ = Out_i * (1 -p).<br>具体实现时，我们的目的是在训练阶段对神经元进行随机（概率p)失活,而在test和evaluate时，对神经元的输出乘以(1-p),所以在实现时，可以采用一个trick：dropout时，对样本进行mask的同时，将其除以(1-p),这样就可以一次计算完成所有逻辑，同时，把所有逻辑保留在整个层中。<br><strong>tf的实现：</strong><br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dropout</span><span class="params">(x, keep_prob, noise_shape=None, seed=None, name=None)</span>:</span>  <span class="comment"># pylint: disable=invalid-name</span></span><br><span class="line">  <span class="string">"""Computes dropout.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  With probability `keep_prob`, outputs the input element scaled up by</span></span><br><span class="line"><span class="string">  `1 / keep_prob`, otherwise outputs `0`.  The scaling is so that the expected</span></span><br><span class="line"><span class="string">  sum is unchanged.</span></span><br><span class="line"><span class="string">    ...</span></span><br><span class="line"><span class="string"> """</span></span><br><span class="line">  <span class="keyword">with</span> ops.name_scope(name, <span class="string">"dropout"</span>, [x]) <span class="keyword">as</span> name:</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment"># Do nothing if we know keep_prob == 1</span></span><br><span class="line">    <span class="keyword">if</span> tensor_util.constant_value(keep_prob) == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    noise_shape = noise_shape <span class="keyword">if</span> noise_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> array_ops.shape(x)</span><br><span class="line">    <span class="comment"># uniform [keep_prob, 1.0 + keep_prob)</span></span><br><span class="line">    random_tensor = keep_prob</span><br><span class="line">    random_tensor += random_ops.random_uniform(noise_shape,</span><br><span class="line">                                               seed=seed,</span><br><span class="line">                                               dtype=x.dtype)</span><br><span class="line">    <span class="comment"># 0. if [keep_prob, 1.0) and 1. if [1.0, 1.0 + keep_prob)</span></span><br><span class="line">    binary_tensor = math_ops.floor(random_tensor)</span><br><span class="line">    ret = math_ops.div(x, keep_prob) * binary_tensor</span><br><span class="line">    <span class="keyword">if</span> context.in_graph_mode():</span><br><span class="line">      ret.set_shape(x.get_shape())</span><br><span class="line">    <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure></p><h1><span id="bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</span><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan" class="header-anchor"></a></h1><p>如果在非dropout阶段不进行scaled会如何？<br>scaled<br><img src="/2019/10/17/dropout/scaled.png" alt="scaled.png"><br>without_scaled<br><img src="/2019/10/17/dropout/without-scaled.png" alt="without_scaled.png"><br>实验也说明非dropout阶段如果没有进行scaled（求平均），对应的loss会比train阶段高，同时acc也会降低。</p><p><strong>桥豆麻袋，到这里好像出现了一点问题：</strong><br>按照我们上面的思路，在test和evaluate阶段，我们从对sub-model求平均转化为对每个神经元的output进行scaled down，即 activation(x <em> W ) </em> (1 - p)， 而我们在实现时，只是对x进行scaled up操作，如果后面接的层的激活函数是线性的，这样处理没有什么问题，但是，后面的层不总是线性激活函数，那此时，output = activation(x <em> (1-p) </em> W)  != activation(x<em>W) </em> (1 - p),即我们得到的输出与我们想要的并不一样，按照以上的理解，我们对output进行scaled-down，验证一下两者的区别。<br>scaled_input<br><img src="/2019/10/17/dropout/scaled-input.png" alt="scaled_input.png"><br>scaled_output<br><img src="/2019/10/17/dropout/scaled-output.png" alt="scaled_output.png"></p><p>看上去对output进行scaled-down结果稍微好一点，但是并不显著，此时的激活函数是relu，而且是在倒数第二层，换个激活函数试试。<br>scaled_input_tanh<br><img src="/2019/10/17/dropout/scaled_input_tanh.png" alt="scaled_input_tanh.png"><br>scaled_output_tanh<br><img src="/2019/10/17/dropout/scaled_output_tanh.png" alt="scaled_output_tanh.png"><br>结果看上去对output进行scaled-down效果稍微差一些，但差距不大。<br>代码地址<a href="https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout" target="_blank" rel="noopener">https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout</a>，感兴趣的可以试试其他方式。<br>既然两种方式在结果上看，效果差不多，而对output进行scaled-down需要添加一个AfterDropLayer，逻辑会在不同的层中，而对inputs直接进行scaled-up，所有逻辑都保存在一个layer中，更清晰。<br><strong>But，Why？</strong>为什么两种方式的结果效果差异不大？真让人头秃啊！</p><p><strong>论文地址</strong><br><a href="http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" target="_blank" rel="noopener">http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf</a></p><p>================================</p><h1><span id="updating">updating…</span><a href="#updating" class="header-anchor"></a></h1><p><img src="/2019/10/17/dropout/linear.png" alt="image.png"></p><p>上图是sigmoid函数在[-8,8]区间的图像，其中linear是由[-8,-4,-2,2,4,8]截断的直线，看图可以看出，sigmoid在区间内都非常的接近”linear”，梯度变化较大的部分只在几个拐点周围，大部分都是近似”linear”,所以也就解释了为什么两种方式有差异，但是差异并不大。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>大四竞赛作品截图</p>]]></content>
     
     <summary type="html">
     
@@ -333,17 +363,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="DeepLearning" scheme="http://xv44586.coding.me/tags/DeepLearning/"/>
+      <category term="DeepLearning" scheme="https://xv44586.github.io/tags/DeepLearning/"/>
     
   </entry>
   
   <entry>
     <title>Glove模型</title>
-    <link href="http://xv44586.coding.me/2019/10/17/glove/"/>
-    <id>http://xv44586.coding.me/2019/10/17/glove/</id>
+    <link href="https://xv44586.github.io/2019/10/17/glove/"/>
+    <id>https://xv44586.github.io/2019/10/17/glove/</id>
     <published>2019-10-17T01:15:58.000Z</published>
     <updated>2019-10-17T13:58:39.300Z</updated>
     
@@ -359,17 +389,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
   </entry>
   
   <entry>
     <title>随机森林模型中是不是树越多越好</title>
-    <link href="http://xv44586.coding.me/2019/10/17/randomForest/"/>
-    <id>http://xv44586.coding.me/2019/10/17/randomForest/</id>
+    <link href="https://xv44586.github.io/2019/10/17/randomForest/"/>
+    <id>https://xv44586.github.io/2019/10/17/randomForest/</id>
     <published>2019-10-17T01:10:50.000Z</published>
     <updated>2019-10-17T01:13:35.251Z</updated>
     
@@ -385,17 +415,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="MachineLearning" scheme="http://xv44586.coding.me/tags/MachineLearning/"/>
+      <category term="MachineLearning" scheme="https://xv44586.github.io/tags/MachineLearning/"/>
     
   </entry>
   
   <entry>
     <title>Bagging为什么能降低过拟合</title>
-    <link href="http://xv44586.coding.me/2019/10/16/bagging/"/>
-    <id>http://xv44586.coding.me/2019/10/16/bagging/</id>
+    <link href="https://xv44586.github.io/2019/10/16/bagging/"/>
+    <id>https://xv44586.github.io/2019/10/16/bagging/</id>
     <published>2019-10-16T02:05:45.000Z</published>
     <updated>2019-10-16T02:28:15.329Z</updated>
     
@@ -411,17 +441,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="MachineLearning" scheme="http://xv44586.coding.me/tags/MachineLearning/"/>
+      <category term="MachineLearning" scheme="https://xv44586.github.io/tags/MachineLearning/"/>
     
   </entry>
   
   <entry>
     <title>Xgboost原理</title>
-    <link href="http://xv44586.coding.me/2019/10/14/xgb/"/>
-    <id>http://xv44586.coding.me/2019/10/14/xgb/</id>
+    <link href="https://xv44586.github.io/2019/10/14/xgb/"/>
+    <id>https://xv44586.github.io/2019/10/14/xgb/</id>
     <published>2019-10-14T00:39:38.000Z</published>
     <updated>2019-10-14T01:10:47.152Z</updated>
     
@@ -437,17 +467,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="MachineLearning" scheme="http://xv44586.coding.me/tags/MachineLearning/"/>
+      <category term="MachineLearning" scheme="https://xv44586.github.io/tags/MachineLearning/"/>
     
   </entry>
   
   <entry>
     <title>神经网络语言模型(NNLM)</title>
-    <link href="http://xv44586.coding.me/2019/10/13/nnlm/"/>
-    <id>http://xv44586.coding.me/2019/10/13/nnlm/</id>
+    <link href="https://xv44586.github.io/2019/10/13/nnlm/"/>
+    <id>https://xv44586.github.io/2019/10/13/nnlm/</id>
     <published>2019-10-13T09:43:00.000Z</published>
     <updated>2019-10-17T14:32:35.272Z</updated>
     
@@ -463,19 +493,19 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
-      <category term="DeepLearning" scheme="http://xv44586.coding.me/tags/DeepLearning/"/>
+      <category term="DeepLearning" scheme="https://xv44586.github.io/tags/DeepLearning/"/>
     
   </entry>
   
   <entry>
     <title>Word2Vec之skip-gram</title>
-    <link href="http://xv44586.coding.me/2019/10/13/skipgram/"/>
-    <id>http://xv44586.coding.me/2019/10/13/skipgram/</id>
+    <link href="https://xv44586.github.io/2019/10/13/skipgram/"/>
+    <id>https://xv44586.github.io/2019/10/13/skipgram/</id>
     <published>2019-10-13T09:12:24.000Z</published>
     <updated>2019-10-13T09:41:54.733Z</updated>
     
@@ -491,17 +521,17 @@
     </summary>
     
     
-      <category term="Reading" scheme="http://xv44586.coding.me/categories/Reading/"/>
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
     
     
-      <category term="NLP" scheme="http://xv44586.coding.me/tags/NLP/"/>
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
   </entry>
   
   <entry>
     <title>Python中的GIL</title>
-    <link href="http://xv44586.coding.me/2019/10/13/gil/"/>
-    <id>http://xv44586.coding.me/2019/10/13/gil/</id>
+    <link href="https://xv44586.github.io/2019/10/13/gil/"/>
+    <id>https://xv44586.github.io/2019/10/13/gil/</id>
     <published>2019-10-13T09:01:37.000Z</published>
     <updated>2019-10-17T14:08:09.874Z</updated>
     
@@ -517,36 +547,10 @@
     </summary>
     
     
-      <category term="Programming" scheme="http://xv44586.coding.me/categories/Programming/"/>
+      <category term="Programming" scheme="https://xv44586.github.io/categories/Programming/"/>
     
     
-      <category term="Python" scheme="http://xv44586.coding.me/tags/Python/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>python中的多线程</title>
-    <link href="http://xv44586.coding.me/2019/10/13/multiThreads/"/>
-    <id>http://xv44586.coding.me/2019/10/13/multiThreads/</id>
-    <published>2019-10-13T08:48:15.000Z</published>
-    <updated>2019-10-17T14:08:09.866Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><!-- tocstop --></div><p>  最近在看Python的多线程，经常我们会听到老手说：“Python下多线程是鸡肋，推荐使用多进程！”，但是为什么这么说呢？<br>要知其然，更要知其所以然。所以有了下面的深入研究：<br>首先强调背景：<br><strong>1. GIL是什么？</strong><br>  GIL的全称是Global Interpreter Lock(全局解释器锁)，来源是python设计之初的考虑，为了数据安全所做的决定。</p><p><strong>2. 每个CPU在同一时间只能执行一个线程</strong><br>  在单核CPU下的多线程其实都只是并发，不是并行，并发和并行从宏观上来讲都是同时处理多路请求的概念。但并发和并行又有区别，并行是指两个或者多个事件在同一时刻发生；而并发是指两个或多个事件在同一时间间隔内发生。<br>在Python多线程下，每个线程的执行方式：<br>    <strong><strong>获取GIL</strong></strong><br>    <strong><strong>执行代码直到sleep或者是python虚拟机将其挂起。</strong></strong><br>    <strong><strong>释放GIL</strong></strong></p><p>  可见，某个线程想要执行，必须先拿到GIL，我们可以把GIL看作是“通行证”，并且在一个python进程中，GIL只有一个。拿不到通行证的线程，就不允许进入CPU执行。<br>在Python2.x里，GIL的释放逻辑是当前线程遇见IO操作或者ticks计数达到100（ticks可以看作是Python自身的一个计数器，专门作用于GIL，每次释放后归零，这个计数可以通过 sys.setcheckinterval 来调整），进行释放。而每次释放GIL锁，线程进行锁竞争、切换线程，会消耗资源。并且由于GIL锁存在，python里一个进程永远只能同时执行一个线程(拿到GIL的线程才能执行)，这就是为什么在多核CPU上，python的多线程效率并不高。那么是不是python的多线程就完全没用了呢？在这里我们进行分类讨论：</p><p>  <strong>CPU密集型</strong><br>  CPU密集型代码包括各种循环处理、计数等等，在这种情况下，由于计算工作多，ticks计数很快就会达到阈值，然后触发GIL的释放与再竞争（多个线程来回切换当然是需要消耗资源的），所以python下的多线程对CPU密集型代码并不友好。</p><p>  <strong>IO密集型</strong><br>  IO密集型代码包括文件处理、网络爬虫等，多线程能够有效提升效率(单线程下有IO操作会进行IO等待，造成不必要的时间浪费，而开启多线程能在线程A等待时，自动切换到线程B，可以不浪费CPU的资源，从而能提升程序执行效率)。所以python的多线程对IO密集型代码比较友好。<br>而在python3.x中，GIL不使用ticks计数，改为使用计时器（执行时间达到阈值后，当前线程释放GIL），这样对CPU密集型程序更加友好，但依然没有解决GIL导致的同一时间只能执行一个线程的问题，所以效率依然不尽如人意。<br>请注意：多核多线程比单核多线程更差，原因是单核下的多线程，每次释放GIL，唤醒的那个线程都能获取到GIL锁，所以能够无缝执行，但多核下，CPU0释放GIL后，其他CPU上的线程都会进行竞争，但GIL可能会马上又被CPU0拿到，导致其他几个CPU上被唤醒后的线程会醒着等待到切换时间后又进入待调度状态，这样会造成线程颠簸(thrashing)，导致效率更低。<br>回到最开始的问题：经常我们会听到老手说：“python下想要充分利用多核CPU，就用多进程”，原因是什么呢？<br>原因是：每个进程有各自独立的GIL，互不干扰，这样就可以真正意义上的并行执行，所以在python中，多进程的执行效率优于多线程(仅仅针对多核CPU而言)。<br>所以在这里说结论：多核下，想做并行提升效率，比较通用的方法是使用多进程，能够有效提高执行效率</p><p><strong>关于头图</strong><br>摄于首开广场</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
-      
-    
-    </summary>
-    
-    
-      <category term="Programming" scheme="http://xv44586.coding.me/categories/Programming/"/>
-    
-    
-      <category term="Python" scheme="http://xv44586.coding.me/tags/Python/"/>
+      <category term="Python" scheme="https://xv44586.github.io/tags/Python/"/>
     
   </entry>
   
