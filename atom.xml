@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://xv44586.github.io/"/>
-  <updated>2020-05-05T05:05:15.577Z</updated>
+  <updated>2020-08-01T14:54:55.245Z</updated>
   <id>https://xv44586.github.io/</id>
   
   <author>
@@ -15,6 +15,54 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>optimizer of bert</title>
+    <link href="https://xv44586.github.io/2020/08/01/optimizer-in-bert/"/>
+    <id>https://xv44586.github.io/2020/08/01/optimizer-in-bert/</id>
+    <published>2020-08-01T12:48:48.000Z</published>
+    <updated>2020-08-01T14:54:55.245Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#zheng-ti-you-hua-fang-an">整体优化方案</a></li><li><a href="#adam-in-bert">Adam in bert</a><ul><li><a href="#weight-decay">weight decay</a><ul><li><a href="#weight-decay-1">weight decay</a></li><li><a href="#l2-regularization">L2 regularization</a></li></ul></li></ul></li><li><a href="#learning-rate">Learning rate</a><ul><li><a href="#learning-rate-decay">Learning rate decay</a></li><li><a href="#warmup">warmup</a></li></ul></li><li><a href="#zong-jie">总结</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><p>最近尝试实现了 bert ,在最后 pretraining 是发现 bert 中的优化方法比较有趣，所以记录一下自己的理解。</p><h1><span id="zheng-ti-you-hua-fang-an">整体优化方案</span><a href="#zheng-ti-you-hua-fang-an" class="header-anchor"></a></h1><p>bert中的优化方案可以总结为：线性分段学习率 + weight decay Adam</p><h1><span id="adam-in-bert">Adam in bert</span><a href="#adam-in-bert" class="header-anchor"></a></h1><p>首先简单回忆一下 Adam Optimizer：<br>整体框架：<br><img src="/2020/08/01/optimizer-in-bert/wt.png" alt><br>其中一阶动量 m 与二阶动量 v 的计算方式：<br><img src="/2020/08/01/optimizer-in-bert/addam.png" alt><br>参数一般取值：ß1=0.9，ß2=0.999<br>而也是这个原因，初期对一阶动量m与二阶动量v的估算都偏小，会导致优化方向朝着 0 走，所以，一般会进行一个修正（bias correct），方式是：<br><img src="/2020/08/01/optimizer-in-bert/correct.png" alt><br>而 bert 中实现都 Adam 却没有进行这个修正，至于原因，放在下面一起说。</p><h2><span id="weight-decay">weight decay</span><a href="#weight-decay" class="header-anchor"></a></h2><p>在 bert 中对 Adam 进行了weight decay，具体代码上是这一段：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Just adding the square of the weights to the loss function is *not*</span></span><br><span class="line"><span class="comment"># the correct way of using L2 regularization/weight decay with Adam,</span></span><br><span class="line"><span class="comment"># since that will interact with the m and v parameters in strange ways.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Instead we want ot decay the weights in a manner that doesn't interact</span></span><br><span class="line"><span class="comment"># with the m/v parameters. This is equivalent to adding the square</span></span><br><span class="line"><span class="comment"># of the weights to the loss with plain (non-momentum) SGD.</span></span><br><span class="line"><span class="keyword">if</span> self._do_use_weight_decay(param_name):</span><br><span class="line">      update += self.weight_decay_rate * param</span><br></pre></td></tr></table></figure></p><p>这里讲到<code>直接将权重的平方加入到loss 上进行L2 regularization 在 Adam 上是一种错误到方式</code></p><h3><span id="weight-decay">weight decay</span><a href="#weight-decay" class="header-anchor"></a></h3><p>Weight decay是在每次更新的梯度基础上减去一个梯度<br><img src="/2020/08/01/optimizer-in-bert/weight.png" alt></p><h3><span id="l2-regularization">L2 regularization</span><a href="#l2-regularization" class="header-anchor"></a></h3><p>L2 regularrization是在参数上加上L2惩罚<br><img src="/2020/08/01/optimizer-in-bert/l2.png" alt><br>可以看出，在标准SGD下，两者是等价的<br>但是，在Adam下，两者却不是。我们将Adam下的梯度更新完整公式写出来：<br><img src="/2020/08/01/optimizer-in-bert/adam_l2.png" alt><br>而与参数有关的是右上角的部分：<br><img src="/2020/08/01/optimizer-in-bert/item.png" alt><br>而这一项表明，在梯度变化越大的方向上，v的值也越大，但对应的权重约束却越小，这显然是不合理的，此外，L2 与 weight decay 都是各个方向同性的，<br>所以针对这一问题，一种调整方式是将梯度更新与weight decay 解偶，<br><img src="/2020/08/01/optimizer-in-bert/de.png" alt><br>具体参考<a href="https://arxiv.org/pdf/1711.05101.pdf" target="_blank" rel="noopener">DECOUPLED WEIGHT DECAY REGULARIZATION</a><br>而 bert 中也是使用了这种weight decay 方式，来达到与L2正则等效</p><h1><span id="learning-rate">Learning rate</span><a href="#learning-rate" class="header-anchor"></a></h1><h3><span id="learning-rate-decay">Learning rate decay</span><a href="#learning-rate-decay" class="header-anchor"></a></h3><p>通常，为了让模型在后期避免震荡，更加稳定，都会随着训练的进行，将learning rate 进行调整，越是后期learning rate 越小。</p><h3><span id="warmup">warmup</span><a href="#warmup" class="header-anchor"></a></h3><p>而bert中的learning rate的调整是两段线性调整学习率：前 10% steps 将learning rate 从 0 增长到 init_learning_rate，然后，再一致递减 到0<br>而warmup为何有效？</p><ol><li>可以避免较早的对mini-batch过拟合，即较早的进入不好的局部最优而无法跳出；<br>2.保持模型深层的稳定性<br>具体可以参考<a href="https://www.zhihu.com/question/338066667/answer/771252708" target="_blank" rel="noopener">warmup 为什么有效</a></li></ol><p>此外，由于warmup要求前期保持较小的更新，所以Adam中由于前期会导致更新变小而需要进行的bias correct也可以去掉了。这也就是最初留下到那个问题到答案</p><h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>bert在 pretraining 为了让模型收敛到一个较好的点，不但在优化器 Adam 上使用了与 L2 regularization等效的weight decay，为了避免模型前期过早拟合进入local minimal，使用了warmup 策略。<br>bert作者也建议在进行fine-tuning时，使用与bert源码中相同的优化器，我也做了一些实验，提升有大概不到0.5个点（没有细调），所以在下游任务上可以尝试使用。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于圆明园荷花池</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
+      
+    
+    </summary>
+    
+    
+      <category term="Math" scheme="https://xv44586.github.io/categories/Math/"/>
+    
+    
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>darknet</title>
+    <link href="https://xv44586.github.io/2020/05/25/darknet/"/>
+    <id>https://xv44586.github.io/2020/05/25/darknet/</id>
+    <published>2020-05-25T00:16:52.000Z</published>
+    <updated>2020-05-25T12:56:52.488Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#darknet">darknet</a></li><li><a href="#build">build</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><p>yolov4出来了，打榜上看效果还不错，想自己测试一下，遂有了一次折腾darknet的机会，简单记录一下遇到的问题</p><h1><span id="darknet">darknet</span><a href="#darknet" class="header-anchor"></a></h1><p>首先从<a href="https://github.com/AlexeyAB/darknet" target="_blank" rel="noopener">AlexeyAB</a>下载源码，修改 <code> Makefile &lt;!code&gt; 中 <code>GPU=1 CUDNN=1 CUDNN_HALF=1 OPENCV=1 &lt;!code&gt;，<br>然后直接<code>make&lt;!code&gt;, 此时在当前文件夹下即可运行<code> ./darknet&lt;!code&gt;</code></code></code></code></p><p>下载预训练权重<a href="https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights" target="_blank" rel="noopener">yolov4.weights</a>,放入./build/darknet/x64/<br> cd ./build/darknet/x64<br> ../../../darknet detector demo cfg/coco.data cfg/yolov4.cfg yolov4.weights yolo_test.mp4 -out_filename res.mp4</p><h1><span id="build">build</span><a href="#build" class="header-anchor"></a></h1><ol><li>video stream stopped!<br>ffmpeg没有与opencv一起编译，需要重新安装opencv（从源码）<br>卸载之前安装的opencv，进入之前安装的opencv目录<br>&lt;!bash&gt;<br>sudo make uninstall<br>cd ..<br>rm -Rf build<br>cd /usr<br>find . -name “<em>opencv</em>“ | xargs sudo rm -rf<br>yum remove opencv-data python-opencv<br>&lt;&gt;</li></ol><p>cmake -D CMAKE_BUILD_TYPE=RELEASE     -D CMAKE_INSTALL_PREFIX=/usr/local     -D INSTALL_C_EXAMPLES=ON     -D INSTALL_PYTHON_EXAMPLES=ON     -D OPENCV_GENERATE_PKGCONFIG=ON     -D OPENCV_EXTRA_MODULES_PATH=~/root/Download/opencv_contrib/modules     -D BUILD_EXAMPLES=ON -D WITH_FFMPEG=ON ..</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
+      
+    
+    </summary>
+    
+    
+    
+  </entry>
   
   <entry>
     <title>装机指北</title>
@@ -499,58 +547,6 @@
       <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
       <category term="DeepLearning" scheme="https://xv44586.github.io/tags/DeepLearning/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Word2Vec之skip-gram</title>
-    <link href="https://xv44586.github.io/2019/10/13/skipgram/"/>
-    <id>https://xv44586.github.io/2019/10/13/skipgram/</id>
-    <published>2019-10-13T09:12:24.000Z</published>
-    <updated>2019-10-13T09:41:54.733Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#word2vec">Word2Vec</a></li><li><a href="#fake-task">Fake Task</a></li><li><a href="#train">Train</a></li><li><a href="#shu-ru">输入</a></li><li><a href="#yin-ceng">隐层</a></li><li><a href="#shu-chu-ceng">输出层</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="word2vec">Word2Vec</span><a href="#word2vec" class="header-anchor"></a></h1><p><img src="/2019/10/13/skipgram/w2v.jpeg" alt="Word2Vec"><br>Word2vec 主要有两种形式，CBOW 和Skip-gram，其中CBOW是通过上下文context来预测当前位置词，SKip-gram则是通过当前词来预测上下文</p><h1><span id="fake-task">Fake Task</span><a href="#fake-task" class="header-anchor"></a></h1><p>word2vec 实际上分为两部分，1，建立模型，2，通过模型获取词的嵌入向量（隐层参数）。整个过程与自编码器的思想类似，即基于训练数据训练一个神经网络，模型训练好后，并不会用这个模型处理后续的任务，真正需要的是这个模型学到的参数，如隐层的权重矩阵，基于训练数据建模的过程叫“Fake Task”，意味着建模并不是我们最终的目的。</p><h1><span id="train">Train</span><a href="#train" class="header-anchor"></a></h1><p>如何训练我们的神经网络模型？假如我们有一个句子“ The dog barked at the mailman”:</p><ul><li>首先，我们选择句子中一个词作为我们的input word， 如 dog</li><li>然后，我们需要定义一个skip_window参数，来指定上下文的大小，即input word 一侧选取词的数量，假如skip_window=2,那将从dog出发向左右两个方向取最近的两个word，即（the, dog,barked,at)，此时的span = skip_window <em> 2 + 1 = 5<br>另一个需要定义的参数是num_skips，即从上下文中选取多少个word来作为output word，这个参数应该小于等于2 </em> skip_window，即最多将所有上下文都作为output，但是不能重复。如设置num_skips = 2,此时从上下文选取2个词作为output，如（the， barked），最终我们将得到两组训练数据（dog, the) (dog, barked)</li></ul><p>神经网络将基于这些训练数据输出一个概率分布，这个概率分布代表着在输入数据下，词典中每个词是output的概率。如拿数据（dog， barked）来训练，则模型将会告诉我们每个单词是’barked’的概率大小。<br>模型的输出概率代表着词典中每个单词有多大可能性跟input word同时出现。举个栗子，如果我们向神经网络模型中输入一个单词“Soviet“，那么最终模型的输出概率中，像“Union”， ”Russia“这种相关词的概率将远高于像”watermelon“，”kangaroo“非相关词的概率。因为”Union“，”Russia“在文本中更大可能在”Soviet“的窗口中出现。<br>我们将通过给神经网络输入文本中成对的单词来训练它完成上面所说的概率计算。下面的图中给出了一些我们的训练样本的例子。我们选定句子“The quick brown fox jumps over lazy dog”，设定我们的窗口大小为2（window_size = 2），也就是说我们仅选输入词前后各两个词和输入词进行组合。下图中，蓝色代表input word，方框内代表位于窗口内的单词。</p><p><img src="/2019/10/13/skipgram/train.png" alt><br>模型将会从每队单词出现的次数中习得统计结果，模型可能会得到更多的（’soviet’， ‘union’）样本对，而（soviet， dog）这样的组合看到的很少。因此，当模型训练完成后，给定一个单词 soviet，输出结果中union 或者russia会比dog有更高的概率。</p><h1><span id="shu-ru">输入</span><a href="#shu-ru" class="header-anchor"></a></h1><p>常用做法是用训练文档构建词汇表，然后再对单词进行0ne-hot编码。编码后的向量，形如dog = [0, 0, 1, 0, …0], 如果词汇表大小为10000， 那这个向量包含了10000的概率，即为当前词为输入的概率<br>下图是神经网络结构：</p><p><img src="/2019/10/13/skipgram/arc.png" alt><br>我们基于成对的单词来对神经网络进行训练， 训练样本是（input word， output word）这样的单词对，input word 和 output word都是one-hot编码的向量，最终的模型输出是一个概率分布。</p><h1><span id="yin-ceng">隐层</span><a href="#yin-ceng" class="header-anchor"></a></h1><p>如果我们想要用300个特征来表示一个词（即每个词是300维的向量），即隐层有300个神经元，隐层的权重为10000 <em> 300的矩阵，下图中的左右两个图代表了不同角度看隐层权重，左图中每列代表一个10000维的词向量与隐层单个神经元的连接权重，右图每行代表了一个单词的词向量。<br><img src="/2019/10/13/skipgram/weights.png" alt><br>我们最终的目标就是学习这个隐层权重矩阵。<br>输入被one-hot编码后，实际上只有一个位置不为0，所以这个向量相当稀疏，那如果我们将1</em>10000的向量与10000*300的矩阵相乘，相当消耗计算资源，为了高效计算，仅仅会选择矩阵中对应的向量中纬度为1的索引行<br><img src="/2019/10/13/skipgram/lookup.png" alt="lookup table"><br>即实际不会进行矩阵乘法计算，而是根据输入向量中不为0 的维度去索引。这样模型中的隐层权重矩阵便成了一个查找表（lookup table），输出就是输入单词的嵌入词向量</p><h1><span id="shu-chu-ceng">输出层</span><a href="#shu-chu-ceng" class="header-anchor"></a></h1><p>隐层的输出是一个1*300的向量，而输出层是一个softmax回归分类器，他的每个结点将会输出一个0-1之间的值（概率），而结点的概率之和为1.<br><img src="/2019/10/13/skipgram/softmax.png" alt><br>我们会发现Word2Vec模型是一个超级大的神经网络（权重矩阵规模非常大）。<br>举个栗子，我们拥有10000个单词的词汇表，我们如果想嵌入300维的词向量，那么我们的输入-隐层权重矩阵和隐层-输出层的权重矩阵都会有 10000 x 300 = 300万个权重，在如此庞大的神经网络中进行梯度下降是相当慢的。更糟糕的是，你需要大量的训练数据来调整这些权重并且避免过拟合。百万数量级的权重矩阵和亿万数量级的训练样本意味着训练这个模型将会是个灾难（太凶残了）。<br>Word2Vec的作者在它的第二篇论文中强调了这些问题，下面是作者在第二篇论文中的三个创新：</p><ul><li><ol><li>将常见的单词组合（word pairs）或者词组作为单个“words”来处理。</li></ol></li><li><ol start="2"><li>对高频次单词进行抽样来减少训练样本的个数。</li></ol></li><li><ol start="3"><li>对优化目标采用“negative sampling”方法，这样每个训练样本的训练只会更新一小部分的模型权重，从而降低计算负担。<br>事实证明，对常用词抽样并且对优化目标采用“negative sampling”不仅降低了训练过程中的计算负担，还提高了训练的词向量的质量。</li></ol></li></ul><p><strong>word pairs and phases</strong><br>一些单词组合的含义和拆开以后具有完全不同的意义，比如 New York，单独的New 和York无法表达这个词组的含义。因此，应该把New York作为一个单独的词组来生成其词向量。<br><strong>对高频词抽样</strong><br>对于高频词，如 the ，按上面的处理方式会有两个问题：</p><ul><li><ol><li>当我们得到成对的单词训练样本时，（dog， the）这样的样本并不会提供更多关于dog的语义信息，因为the 在每个单词的上下文几乎都会出现</li></ol></li><li><ol start="2"><li>由于the 这样的高频词出现的概率很大，因此为们将会有大量的（the ， 。。。）这样的训练样本，而这些样本的数量远远超过我们学习the这个单词所需的训练样本数。</li></ol></li></ul><p>如果直接删除掉这些高频词，会有两个问题:</p><ul><li>1.删除后，the这个单词永远也不会出现在我们的上下文窗口</li><li>2.训练样本会减少</li></ul><p>所以word2vec 采用抽样的方式来解决这种高频词问题。他的基本思想是：对于我们在训练原始文本中遇到的每一个单词，他们都有一定概率被我们从文本中删除掉，而这个被删除的概率与单词的频率有关。<br><img src="/2019/10/13/skipgram/del.png" alt><br>wi 是一个单词，Z(wi)是这个单词在所有预料中出现的频次。P(wi)是被保留的概率。</p><ul><li>当Z(wi) &lt;= 0.0026时,P(wi) = 1.0。当单词在语料中出现的频率小于0.0026时，它是100%被保留的，这意味着只有那些在语料中出现频率超过0.26%的单词才会被采样。</li><li>当Z(wi) = 0.00746 时，P(wi) = 0.5，意味着这一部分的单词有50%的概率被保留。</li><li>当Z(wi) = 1.0 时，P(wi) = 0.033，意味着这部分单词以3.3%的概率被保留</li></ul><p><strong>负采样</strong><br>训练一个神经网络意味着要输入训练样本并且不断的调整神经元的权重，不断提高对目标的准确预测。而vocabulary的大小决定了skip-gram神经网络将拥有大规模的权重矩阵，所有的这些权重需要通过我们数以亿计的样本来训练调整，非常消耗计算资源，并且实际中会非常慢。<br>负采样解决了这个问题，不同于原本每个训练样本更新所有权重，负采样每次让一个训练样本仅仅更新一部分权重，减小计算量。<br>对于训练样本（fox，quick），都是经过one-hot编码的，当vocabulary的大小为10000时，我们期望输出对应的quick单词的那个神经元的输出是1，其余9999个都是0，这9999个输出为0的神经元所对应的单词称为negative word<br>隐层-输出层拥有300<em>10000的权重，而负采样时，我们仅仅更新quick 和我们选择的其他5个negative word的结点对应的权重，共6个神经元，300</em> 6 = 1800 个权重，相当于只计算了0.06%的权重，计算效率大大提高。<br><img src="/2019/10/13/skipgram/sample.png" alt><br>其中f(wi)代表每个单词出现的频次，p(wi)代表被选中的概率。<br>负采样的C语言实现非常的有趣。unigram table有一个包含了一亿个元素的数组，这个数组是由词汇表中每个单词的索引号填充的，并且这个数组中有重复，也就是说有些单词会出现多次。那么每个单词的索引在这个数组中出现的次数该如何决定呢，由公式P(wi) <em> table_size，也就是说计算出的负采样概率</em>1亿=单词在表中出现的次数。<br>有了这张表以后，每次去我们进行负采样时，只需要在0-1亿范围内生成一个随机数，然后选择表中索引号为这个随机数的那个单词作为我们的negative word即可。一个单词的负采样概率越大，那么它在这个表中出现的次数就越多，它被选中的概率就越大。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于内蒙古乌兰布统</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
-      
-    
-    </summary>
-    
-    
-      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
-    
-    
-      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Python中的GIL</title>
-    <link href="https://xv44586.github.io/2019/10/13/gil/"/>
-    <id>https://xv44586.github.io/2019/10/13/gil/</id>
-    <published>2019-10-13T09:01:37.000Z</published>
-    <updated>2019-10-17T14:08:09.874Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#gil-shi-shi-me">GIL是什么</a></li><li><a href="#gil-ji-zhi">GIL机制</a></li><li><a href="#dai-lai-de-wen-ti">带来的问题</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="gil-shi-shi-me">GIL是什么</span><a href="#gil-shi-shi-me" class="header-anchor"></a></h1><p>熟悉Python的人对GIL肯定都不陌生, 其全称是全局解释器锁(Global Interpreter Lock)。但是，很多人都误以为GIL是python的特性，所以，首先需要明确的一点是GIL并不是Python的特性，它是在实现Python解析器(CPython)时所引入的一个概念。而其他的实现版本如JPython就没有GIL。然而因为CPython是大部分环境下默认的Python执行环境。所以在很多人的概念里CPython就是Python，也就想当然的把GIL归结为Python语言的缺陷。所以这里要先明确一点：GIL并不是Python的特性，Python完全可以不依赖于GIL<br>那么CPython实现中的GIL又是什么呢？官方给出的解释：</p><blockquote><p>In CPython, the global interpreter lock, or GIL, is a mutex that protects access to Python objects, preventing multiple threads from executing Python bytecodes at once. This lock is necessary mainly because CPython’s memory management is not thread-safe. (However, since the GIL exists, other features have grown to depend on the guarantees that it enforces.)</p><p><a href="https://wiki.python.org/moin/GlobalInterpreterLock" target="_blank" rel="noopener">https://wiki.python.org/moin/GlobalInterpreterLock</a></p></blockquote><p>即原因是在CPython中的线程实际是操作系统的原生线程,而CPython的内存管理不是线程安全的，于是使用GIL这把大锁锁住其他线程,保证同一时刻只有一个线程可以解释执行字节码。</p><h1><span id="gil-ji-zhi">GIL机制</span><a href="#gil-ji-zhi" class="header-anchor"></a></h1><p>按照Python社区的想法，操作系统本身的线程调度已经非常成熟稳定了，没有必要自己搞一套。所以Python的线程就是C语言的一个pthread，并通过操作系统调度算法进行调度（例如linux是CFS）。为了让各个线程能够平均利用CPU时间，python会计算当前已执行的微代码数量ticks，达到一定阈值后就强制释放。而这时也会触发一次操作系统的线程调度（当然是否真正进行上下文切换由操作系统自主决定）。<br>Python释放GIL的时机之一:<br>有一个周期性计数的计数器,不断递减,保证Python线程可以在执行一段时间之后释放GIL<br>仔细分析就会发现问题,假如在解析执行字节码的过程中当前线程遇到了一个IO操作,却由于等待数据而被阻塞在该IO操作上,而从GIL的设计来看，GIL只能通过当前线程主动释放,其他线程才有可能获取。而当前<br>线程阻塞在IO操作上时,此时给其他线程运行的机会并没有什么问题,因为GIL只是用来同步线程执行字节码的,并非一般的互斥共享资源的互斥锁。在阻塞操作之前让出GIL,其他线程可以继续执行,而当前线程可以继续执行阻塞型的操作,当该阻塞型的操作完成之后,再次试图获取GIL,继续执行余下的字节码。<br>由此可以看出,Python释放GIL的第二个时机:<br>在IO操作等可能会引起阻塞的system call之前,可以暂时释放GIL,但在执行完毕后,必须重新获取GIL</p><h1><span id="dai-lai-de-wen-ti">带来的问题</span><a href="#dai-lai-de-wen-ti" class="header-anchor"></a></h1><p>1.CPU密集型代码(各种循环处理、计数等等)，在这种情况下，ticks计数很快就会达到阈值，然后触发GIL的释放与再竞争（多个线程来回切换当然是需要消耗资源的）<br>2.线程的释放与获取是没有间隙的，单核下没什么问题，多核情况下，当当前master线程释放GIL后，其他核心上的线程被唤醒，而此时大部分情况下当前线程又获取了GIL，而被唤醒的线程只能浪费cpu时间而无法运行，直到达到切换时间，切换为待调度状态，这样会造成线程颠簸(thrashing)，导致效率更低。<br><img src="/2019/10/13/gil/gil_war.png" alt="Multi GIL War"><br>因此，3开始做了一些优化，如将基于pcode调度改为分时调度；避免释放GIL的线程再次立即被调度等。</p><hr><p><a href="http://www.dabeaz.com/GIL/" target="_blank" rel="noopener">http://www.dabeaz.com/GIL/</a><br><a href="http://cyrusin.github.io/2016/04/27/python-gil-implementaion/" target="_blank" rel="noopener">http://cyrusin.github.io/2016/04/27/python-gil-implementaion/</a><br><a href="https://zhuanlan.zhihu.com/p/20953544" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/20953544</a><br><a href="http://cenalulu.github.io/python/gil-in-python/" target="_blank" rel="noopener">http://cenalulu.github.io/python/gil-in-python/</a></p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于世园会</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
-      
-    
-    </summary>
-    
-    
-      <category term="Programming" scheme="https://xv44586.github.io/categories/Programming/"/>
-    
-    
-      <category term="Python" scheme="https://xv44586.github.io/tags/Python/"/>
     
   </entry>
   
