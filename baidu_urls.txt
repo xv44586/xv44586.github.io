@@ -1,3 +1,4 @@
+https://xv44586.github.io/2020/08/22/qa-augmentation/
 https://xv44586.github.io/2020/08/19/bert-of-theseus-2/
 https://xv44586.github.io/2020/08/09/bert-of-theseus/
 https://xv44586.github.io/2020/08/01/optimizer-in-bert/
@@ -19,4 +20,3 @@ https://xv44586.github.io/2019/10/17/glove/
 https://xv44586.github.io/2019/10/17/randomForest/
 https://xv44586.github.io/2019/10/16/bagging/
 https://xv44586.github.io/2019/10/14/xgb/
-https://xv44586.github.io/2019/10/13/nnlm/
