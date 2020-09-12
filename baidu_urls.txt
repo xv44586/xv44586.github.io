@@ -1,3 +1,4 @@
+https://xv44586.github.io/2020/08/31/bert-01/
 https://xv44586.github.io/2020/08/22/qa-augmentation/
 https://xv44586.github.io/2020/08/19/bert-of-theseus-2/
 https://xv44586.github.io/2020/08/09/bert-of-theseus/
@@ -19,4 +20,3 @@ https://xv44586.github.io/2019/10/17/dropout/
 https://xv44586.github.io/2019/10/17/glove/
 https://xv44586.github.io/2019/10/17/randomForest/
 https://xv44586.github.io/2019/10/16/bagging/
-https://xv44586.github.io/2019/10/14/xgb/
