@@ -6,7 +6,6 @@ https://xv44586.github.io/2020/08/22/qa-augmentation/
 https://xv44586.github.io/2020/08/19/bert-of-theseus-2/
 https://xv44586.github.io/2020/08/09/bert-of-theseus/
 https://xv44586.github.io/2020/08/01/optimizer-in-bert/
-https://xv44586.github.io/2020/05/25/darknet/
 https://xv44586.github.io/2020/05/05/make-a-computer/
 https://xv44586.github.io/2020/01/11/npm-environment/
 https://xv44586.github.io/2019/12/27/backup/
@@ -20,3 +19,4 @@ https://xv44586.github.io/2019/10/22/cutwords/
 https://xv44586.github.io/2019/10/22/w2v-summary/
 https://xv44586.github.io/2019/10/21/deep-w2v/
 https://xv44586.github.io/2019/10/17/dropout/
+https://xv44586.github.io/2019/10/17/glove/

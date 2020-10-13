@@ -47,9 +47,9 @@
     <link href="https://xv44586.github.io/2020/09/25/fastbert/"/>
     <id>https://xv44586.github.io/2020/09/25/fastbert/</id>
     <published>2020-09-25T14:32:38.000Z</published>
-    <updated>2020-09-30T12:33:45.277Z</updated>
+    <updated>2020-10-13T13:32:41.112Z</updated>
     
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#116-473004-39-993306">116.473004,39.993306</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><p>之前Knowledge Distillation 相关的两篇分别介绍了两种知识蒸馏的方式：<a href="https://xv44586.github.io/2020/08/09/bert-of-theseus/">模型替换之bert-of-theseus</a> 和<a href="https://xv44586.github.io/2020/08/31/bert-01/">知识迁移</a>,本篇介绍一种从样本入手的知识蒸馏方法。</p><h1><span id="116-473004-39-993306">116.473004,39.993306</span><a href="#116-473004-39-993306" class="header-anchor"></a></h1><p>116.46688673941635, 39.99200300843388</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>芝麻街</p>]]></content>
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#knowledge-distillation-mu-de">Knowledge Distillation 目的</a></li><li><a href="#zen-me-zuo">怎么做</a><ul><li><a href="#qu-fen-yang-ben">区分样本</a></li><li><a href="#mo-xing-can-shu-gong-xiang">模型参数共享</a></li><li><a href="#zheng-ti-jia-gou">整体架构</a></li></ul></li><li><a href="#fu-xian">复现</a></li><li><a href="#zong-jie">总结</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><p>之前Knowledge Distillation 相关的两篇分别介绍了两种知识蒸馏的方式：<a href="https://xv44586.github.io/2020/08/09/bert-of-theseus/">模型替换之bert-of-theseus</a> 和<a href="https://xv44586.github.io/2020/08/31/bert-01/">知识迁移</a>,本篇介绍一种从样本入手的知识蒸馏方法。</p><h1><span id="knowledge-distillation-mu-de">Knowledge Distillation 目的</span><a href="#knowledge-distillation-mu-de" class="header-anchor"></a></h1><p>再来看看我们做knowledge distillation 的目的是什么：我们是想要模型即性能好又推理快，那要推理快，我们直接使用一个更小的模型，比如3层的bert就比12层的bert快，那为什么不这么做呢？这是因为直接用3层bert来fine-tuning的结果往往不那么“性能好”，所以他只能满足推理快这一半。<br>所以我们要通过一个teacher 来引导这个小模型，来把“性能好”这个特性补上。</p><h1><span id="zen-me-zuo">怎么做</span><a href="#zen-me-zuo" class="header-anchor"></a></h1><p>而一般做KD ，我们往往关注怎么去让student 更好的学习teacher，但是好像没人关注过student 直接fine-tuning 的时候到底有多差？拿文本分类来说，我们用bert-3 在IFLYTEK数据上进行fine-tuning，最终的accuracy 大概在57.9%，而bert-12 大概在60.7%((结果)[<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_bert_of_theseus.py])，3层是不如12层，但是差距只有不到3个点，换句不严谨的话说，只有不到3%的数据需要12层的bert才能达到当前最优性能，而大部分样本在前3层就已经能确定了。" target="_blank" rel="noopener">https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_bert_of_theseus.py])，3层是不如12层，但是差距只有不到3个点，换句不严谨的话说，只有不到3%的数据需要12层的bert才能达到当前最优性能，而大部分样本在前3层就已经能确定了。</a><br>换成一句我们都能理解的事实描述就是：样本有难易之分，有的样本容易区分，有的样本不容易区分。这时候，如果全部样本都当不容易区分看待，对这部分容易区分的样本来说就是“杀鸡用牛刀”了，那一个简单直观的办法就是，我们“杀鸡时用杀鸡刀，杀牛时用杀牛刀”，即我们按样本难易程度，分别为他们指定不同的模型来分类，简单的样本只需要用小模型，因为他就能得到与大模型一致的结果，而难的样本再用大模型，这样就能“性能好”的同时推理又快了，因为大部分模型只需要小模型推理即可。</p><h2><span id="qu-fen-yang-ben">区分样本</span><a href="#qu-fen-yang-ben" class="header-anchor"></a></h2><p>接下来的问题就是我们怎么区分样本是简单样本还是难样本了。这里我们将其换个思路：假如小模型对自己的结果非常有信心（确定），那我们就相信小模型的结果，反之，我们就将样本送进大模型，让大模型来进一步判断。注意，这里如果小模型非常“确定”的将样本给了错误结果，那这个结果也将认为是最终结果，即使这个结果送进大模型有被改正确的可能。那如何判断一个结果的不确定性呢？通常我们用熵来判断一个分布的不确定性，这里也一样。</p><h2><span id="mo-xing-can-shu-gong-xiang">模型参数共享</span><a href="#mo-xing-can-shu-gong-xiang" class="header-anchor"></a></h2><p>到了这一步，我们取得了“性能好”又“推理快”的目标了吗？其实还没有，因为此时我们会有多个模型，每个模型对应不同难易程度的样本，这样无疑是将推理从一次变成了多次，那怎么解决呢？我们可以利用上一个小模型的结果而不用再从头算，这样最终的模型就由一系列模型变为一个带有多个分支的大模型，只是每个分支的部分会进行一次判断，如果其结果的不确定性非常低，则直接返回结果而不再往后继续计算。而由于利用了上一层的结果，所以整体的时间上只增加了多个分类器与判断结果置信度的时间，而这个时间相对于其他计算要小的多。</p><h2><span id="zheng-ti-jia-gou">整体架构</span><a href="#zheng-ti-jia-gou" class="header-anchor"></a></h2><p>模型整体架构示意图：<br><img src="/2020/09/25/fastbert/fastbert.png" alt></p><p>以上就是fastbert 模型的整体思路了。对于fastbert 来说，越靠前的层的性能越好，其推理速度提升的就越大，所以有必要尽量提高前面层的性能。这里就是Knowledge Distillation 的任务了：由于fastbert 本身就是一个12层bert，所以将最后一个分类器作为Teacher Model，然后生成对应的soft labels，然后迁移到fastbert 的每一个分支model上。之前的<a href="https://xv44586.github.io/2020/08/31/bert-01/">实验</a>我们也提到过这种self-distillation 能提高性能，作者这里也是一样的思路。</p><h1><span id="fu-xian">复现</span><a href="#fu-xian" class="header-anchor"></a></h1><p>实验代码在<a href="https://github.com/xv44586/Knowledge-Distillation-NLP/blob/master/knowledge_distillation_fastbert.py" target="_blank" rel="noopener">fastbert</a>感兴趣的同学可以看看.不过由于我只会keras(tensorflow)，而tf 这种静态图不好实现这种分支结构，所以我的实验代码其实并没有真的提前终止计算返回结果，暂时没找到更好的实现方式，如果有知道的同学也欢迎告知。</p><h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>fastbert从思路上来说，通过对样本进行难易程度进行划分，对样本进行adaptive predict ，但是缺点也比较明显：1. 用确定性来代替难易，中间有不对等会导致较难样本在初期被错分后没有修正对机会；2.其基本假设是易分样本远多于难分样本，否则会使推理速度不降反增。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>芝麻街</p>]]></content>
     
     <summary type="html">
     
@@ -235,28 +235,6 @@
     
     
       <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>darknet</title>
-    <link href="https://xv44586.github.io/2020/05/25/darknet/"/>
-    <id>https://xv44586.github.io/2020/05/25/darknet/</id>
-    <published>2020-05-25T00:16:52.000Z</published>
-    <updated>2020-08-01T16:13:19.156Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#darknet">darknet</a></li><li><a href="#build">build</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><p>yolov4出来了，打榜上看效果还不错，想自己测试一下，遂有了一次折腾darknet的机会，简单记录一下遇到的问题</p><h1><span id="darknet">darknet</span><a href="#darknet" class="header-anchor"></a></h1><p>首先从<a href="https://github.com/AlexeyAB/darknet" target="_blank" rel="noopener">AlexeyAB</a>下载源码，修改 <code> Makefile </code> 中 <code>GPU=1 CUDNN=1 CUDNN_HALF=1 OPENCV=1 </code>，<br>然后直接<code>make</code>, 此时在当前文件夹下即可运行<code> ./darknet</code></p><p>下载预训练权重<a href="https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights" target="_blank" rel="noopener">yolov4.weights</a>,放入./build/darknet/x64/<br> cd ./build/darknet/x64<br> ../../../darknet detector demo cfg/coco.data cfg/yolov4.cfg yolov4.weights yolo_test.mp4 -out_filename res.mp4</p><h1><span id="build">build</span><a href="#build" class="header-anchor"></a></h1><ol><li>video stream stopped!<br>ffmpeg没有与opencv一起编译，需要重新安装opencv（从源码）<br>卸载之前安装的opencv，进入之前安装的opencv目录<br>&lt;!bash&gt;<br>sudo make uninstall<br>cd ..<br>rm -Rf build<br>cd /usr<br>find . -name “<em>opencv</em>“ | xargs sudo rm -rf<br>yum remove opencv-data python-opencv<br>&lt;&gt;</li></ol><p>cmake -D CMAKE_BUILD_TYPE=RELEASE     -D CMAKE_INSTALL_PREFIX=/usr/local     -D INSTALL_C_EXAMPLES=ON     -D INSTALL_PYTHON_EXAMPLES=ON     -D OPENCV_GENERATE_PKGCONFIG=ON     -D OPENCV_EXTRA_MODULES_PATH=~/root/Download/opencv_contrib/modules     -D BUILD_EXAMPLES=ON -D WITH_FFMPEG=ON ..</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
-      
-    
-    </summary>
-    
-    
     
   </entry>
   
@@ -559,6 +537,32 @@
       <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
       <category term="Thinking" scheme="https://xv44586.github.io/tags/Thinking/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>深入谈谈word2vec</title>
+    <link href="https://xv44586.github.io/2019/10/21/deep-w2v/"/>
+    <id>https://xv44586.github.io/2019/10/21/deep-w2v/</id>
+    <published>2019-10-21T01:02:56.000Z</published>
+    <updated>2019-10-22T01:24:14.513Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#nnlm-fu-za-du">NNLM复杂度</a></li><li><a href="#you-hua-fang-an">优化方案</a><ul><li><a href="#1-hierarchical-softmax">1.Hierarchical softmax</a></li><li><a href="#2-negative-sampling">2.negative sampling</a></li></ul></li><li><a href="#si-chong-xun-lian-fang-an">四种训练方案</a></li><li><a href="#si-kao">思考</a></li><li><a href="#hui-da">回答</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="nnlm-fu-za-du">NNLM复杂度</span><a href="#nnlm-fu-za-du" class="header-anchor"></a></h1><p>原始的NNLM在训练词向量时非常耗时，尤其是大规模语料上，作者在论文后也提出了可能的优化方案，所以word2vec的关注点就是如果更加有效的在大规模语料上训练词向量。<br>每个训练样本的计算复杂度：<br>Q = N <em> D + N </em> D <em>H +H </em> V<br>其中V是词典大小，每个词编码为1-of-V，N是当前序列中当前词的前N个词，D是词向量大小，H是神经网络层中隐层神经元个数。<br>这个Q中的主要部分是最后的H <em> V 部分，但通过一些优化方法可以降低（hs/ng), 所以此时的主要的复杂度来着 N </em> D * H, 所以作者直接将神经网络层去掉，来提高计算效率。<br>作者之前的工作发现成功的训练一个神经网络语言模型可以通过两步进行：1，首先通过一个简单模型训练词向量，2，然后在这之上训练N-gram NNLM。同时，增加当前词后续的词（下文信息）可以得到更好的结果。基于此，提出了两种结构的模型：<br><img src="/2019/10/21/deep-w2v/model.png" alt="CBOW vs  Skip-gram"></p><p>1.CBOW：与NNLM类似，但是将网络层去掉，同时使用当前词的下文，即通过将上下文窗口内的词投影得到统一向量，然后预测当前词。此时模型内词的顺序不再影响投影结果，计算复杂度为：Q = N <em> D + D </em> log(V)<br>2.Skip-gram: 与CBOW类似，不过是通过当前此来预测上下文内的词，为了提高效率，在实际工程上对上下文内的词进行了采样，此时的计算复杂度为：Q = C <em> (D + D </em> log(V))</p><h1><span id="you-hua-fang-an">优化方案</span><a href="#you-hua-fang-an" class="header-anchor"></a></h1><p>之前提到原始NNLM中的主要计算复杂度是输出层，即 H * V，主要的优化思路是避免全量计算V的概率，作者实现了两种方案，即 Hierarchical Softmax 和negative sampling</p><h2><span id="1-hierarchical-softmax">1.Hierarchical softmax</span><a href="#1-hierarchical-softmax" class="header-anchor"></a></h2><p>通过词频构建霍夫曼树，然后将输出层用霍夫曼树替换，上一层结果与每个节点做二分类，判断属于词类，叶子节点为对应的词，判断属于该词的概率</p><p><img src="/2019/10/21/deep-w2v/hs.png" alt></p><p>特点：高频词的位置更靠近根节点，所需的计算进一步降低。但对于低频词，其对应位置远离根，对应路径长，所需计算量依然很大，效率不高</p><h2><span id="2-negative-sampling">2.negative  sampling</span><a href="#2-negative-sampling" class="header-anchor"></a></h2><p>在输出层避免对全量字典进行判断，而通过先验知识来圈出最容易混淆的一部分，然后组成负样本（相对于当前词）。作者提出通过词频来归一化后的比例来组成一定比例的候选集，随机的在候选集选取一定数量的负样本(n &lt;&lt; V)来组成负样本集，最后的softmax多分类层变成多个sigmod二分类层，来提高计算效率及词向量的质量。</p><h1><span id="si-chong-xun-lian-fang-an">四种训练方案</span><a href="#si-chong-xun-lian-fang-an" class="header-anchor"></a></h1><ul><li>1.基于hs的CBOW</li></ul><p><img src="/2019/10/21/deep-w2v/hs-cbow.png" alt><br>其中</p><p><img src="/2019/10/21/deep-w2v/xw.png" alt></p><p><img src="/2019/10/21/deep-w2v/pw.png" alt></p><p><img src="/2019/10/21/deep-w2v/gd.png" alt></p><p>对应的伪代码：</p><p><img src="/2019/10/21/deep-w2v/code.png" alt></p><ul><li>2.基于hs的Skip-gram<br><img src="/2019/10/21/deep-w2v/sk.png" alt></li></ul><p>对应的伪代码：<br><img src="/2019/10/21/deep-w2v/sk-code.png" alt></p><ul><li>3.基于ng的CBOW</li></ul><p><img src="/2019/10/21/deep-w2v/ng-cbow.png" alt><br><img src="/2019/10/21/deep-w2v/G.png" alt="image.png"></p><p>对应伪代码：</p><p><img src="/2019/10/21/deep-w2v/ng-code.png" alt></p><ul><li>4.基于hs的skip-gram<br><img src="/2019/10/21/deep-w2v/opt.png" alt></li></ul><p>G中表达式与基于hs的CBOW一样，只是在最外面多了一层求和，后面的过程与CBOW一样。</p><h1><span id="si-kao">思考</span><a href="#si-kao" class="header-anchor"></a></h1><ul><li>1.词向量的训练过程是一个fake task，我们的目标不是最后的语言模型，而是在这个过程中产生的feature vector，用一个real task 来训练是不是更好？</li><li>2.因为是个fake task，那我们如何评估这个task，又如何评估得到的词向量的质量？论文中使用了近似词对及线性平移的特性，有没有更好的方式？</li><li>3.词向量的“similarity”具体是什么含义？</li></ul><h1><span id="hui-da">回答</span><a href="#hui-da" class="header-anchor"></a></h1><ul><li>1.用real task来训练一般会得到更好的词向量，但一般下游任务都是在词向量之上构建，所以一般情况是训练一个词向量，然后作为embedding层的初始参数进行下游任务的训练。</li><li>2.除了相似词及线性平移性，其他情况下可以通过下游任务的效率来评估。</li><li>3.词向量的“similarity”跟通常意义的近义词或相似词有本质上的区别，词向量更多的含义是“同位词”，即上下文相近的词。换个角度，我们将模型的连接函数形式写出来：</li></ul><p><img src="/2019/10/21/deep-w2v/pwk.png" alt></p><p>上式中v分别对应左右两个词向量空间的词向量，由于模型是对称的，所以实际使用时左右两个词向量可以任选一个。</p><p>其中<img src="/2019/10/21/deep-w2v/pwi.png" alt></p><p>分母是归一化项，暂时忽略，最终最大化P(wk|wi)的同时，即让 Vwk与 Vwi的内积更大。即模型内隐式的用词向量的内积（方向）来表示词向量直接的距离远近（语义距离），所以可以利用词向量的cosine来寻找语义更接近的词。进一步的，左右两个词向量分属不同的向量空间，最小化两个词的语义距离被转化为最小化两个词在不同语义空间的距离，而不是在同一个向量空间，为什么这种方案可行？原文里提到是因为放在同一个向量空间（同一个矩阵），两个词向量正交在一起，不好优化，，分开放在两个向量空间更利于优化。两个词向量空间为什么可行？我认为主要是因为模型是对称的，虽然两个向量空间不同，但是可以认为是只是经过了旋转缩放，词在向量空间的相对位置没有发生改变（词向量之间的角度）。</p><p>优点：</p><ul><li>1.没有神经网络层，所以没有耗时的矩阵相乘，只保留了一个softmax层，计算效率高。</li><li>2.优化时使用的是随机梯度下降，罕见词不会主导优化目标<br>demo：<a href="https://github.com/xv44586/Papers/blob/master/NLP/WordVector/word2vecDemo.ipynb" target="_blank" rel="noopener">https://github.com/xv44586/Papers/blob/master/NLP/WordVector/word2vecDemo.ipynb</a></li></ul><p><strong>论文</strong><br><a href="https://arxiv.org/pdf/1301.3781.pdf" target="_blank" rel="noopener">https://arxiv.org/pdf/1301.3781.pdf</a><br><a href="https://arxiv.org/abs/1310.4546" target="_blank" rel="noopener">https://arxiv.org/abs/1310.4546</a></p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于苏州</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
+      
+    
+    </summary>
+    
+    
+      <category term="Reading" scheme="https://xv44586.github.io/categories/Reading/"/>
+    
+    
+      <category term="NLP" scheme="https://xv44586.github.io/tags/NLP/"/>
     
   </entry>
   
