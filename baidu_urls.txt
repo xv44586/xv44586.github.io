@@ -1,3 +1,4 @@
+https://xv44586.github.io/2020/10/19/triangle/
 https://xv44586.github.io/2020/10/14/focal-loss/
 https://xv44586.github.io/2020/09/30/location/
 https://xv44586.github.io/2020/09/25/fastbert/
@@ -19,4 +20,3 @@ https://xv44586.github.io/2019/10/26/simhash/
 https://xv44586.github.io/2019/10/22/cutwords/
 https://xv44586.github.io/2019/10/22/w2v-summary/
 https://xv44586.github.io/2019/10/21/deep-w2v/
-https://xv44586.github.io/2019/10/17/dropout/
