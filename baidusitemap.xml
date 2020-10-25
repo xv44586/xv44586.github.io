@@ -1,48 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://xv44586.github.io/2020/10/25/adabelief/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2020/10/14/focal-loss/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2020/08/31/bert-01/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/22/w2v-summary/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2020/08/09/bert-of-theseus/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2020/08/22/qa-augmentation/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2020/08/01/optimizer-in-bert/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/26/simhash/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/12/26/from-softmax-to-crf/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/11/24/tm-1111/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/11/28/domain-words/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2020/09/13/classification-label-augment/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2020/09/25/fastbert/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2020/08/19/bert-of-theseus-2/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/22/cutwords/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/13/logistic/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/17/randomForest/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/13/nnlm/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/13/skipgram/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/17/dropout/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/17/glove/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/16/bagging/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/21/deep-w2v/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/14/xgb/</loc>
+    <lastmod>2020-10-25</lastmod>
+  </url>
+  <url>
     <loc>https://xv44586.github.io/2020/10/19/triangle/</loc>
     <lastmod>2020-10-20</lastmod>
   </url>
   <url>
-    <loc>https://xv44586.github.io/2020/10/14/focal-loss/</loc>
-    <lastmod>2020-10-16</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2020/09/25/fastbert/</loc>
-    <lastmod>2020-10-13</lastmod>
-  </url>
-  <url>
     <loc>https://xv44586.github.io/2020/09/30/location/</loc>
     <lastmod>2020-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2020/08/22/qa-augmentation/</loc>
-    <lastmod>2020-09-26</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2020/09/13/classification-label-augment/</loc>
-    <lastmod>2020-09-26</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2020/08/31/bert-01/</loc>
-    <lastmod>2020-09-26</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2020/08/09/bert-of-theseus/</loc>
-    <lastmod>2020-09-26</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2020/08/19/bert-of-theseus-2/</loc>
-    <lastmod>2020-09-26</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2020/08/01/optimizer-in-bert/</loc>
-    <lastmod>2020-08-09</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/12/26/from-softmax-to-crf/</loc>
-    <lastmod>2020-08-06</lastmod>
   </url>
   <url>
     <loc>https://xv44586.github.io/2020/05/05/make-a-computer/</loc>
@@ -57,44 +117,12 @@
     <lastmod>2020-01-11</lastmod>
   </url>
   <url>
-    <loc>https://xv44586.github.io/2019/11/24/tm-1111/</loc>
-    <lastmod>2019-12-13</lastmod>
-  </url>
-  <url>
     <loc>https://xv44586.github.io/2019/12/09/longton/</loc>
     <lastmod>2019-12-13</lastmod>
   </url>
   <url>
-    <loc>https://xv44586.github.io/2019/11/28/domain-words/</loc>
-    <lastmod>2019-12-04</lastmod>
-  </url>
-  <url>
     <loc>https://xv44586.github.io/2019/11/30/statistics/</loc>
     <lastmod>2019-11-30</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/22/w2v-summary/</loc>
-    <lastmod>2019-11-27</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/26/simhash/</loc>
-    <lastmod>2019-10-26</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/22/cutwords/</loc>
-    <lastmod>2019-10-23</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/21/deep-w2v/</loc>
-    <lastmod>2019-10-22</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/17/dropout/</loc>
-    <lastmod>2019-10-17</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/13/nnlm/</loc>
-    <lastmod>2019-10-17</lastmod>
   </url>
   <url>
     <loc>https://xv44586.github.io/2019/10/13/singleton/</loc>
@@ -107,30 +135,6 @@
   <url>
     <loc>https://xv44586.github.io/2019/10/13/multiThreads/</loc>
     <lastmod>2019-10-17</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/17/glove/</loc>
-    <lastmod>2019-10-17</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/17/randomForest/</loc>
-    <lastmod>2019-10-17</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/16/bagging/</loc>
-    <lastmod>2019-10-16</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/14/xgb/</loc>
-    <lastmod>2019-10-14</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/13/skipgram/</loc>
-    <lastmod>2019-10-13</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/13/logistic/</loc>
-    <lastmod>2019-10-13</lastmod>
   </url>
   <url>
     <loc>https://xv44586.github.io/2019/10/10/hello-world/</loc>
