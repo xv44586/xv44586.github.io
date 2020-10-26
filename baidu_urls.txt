@@ -1,4 +1,6 @@
+https://xv44586.github.io/2020/10/25/pet/
 https://xv44586.github.io/2020/10/25/adabelief/
+https://xv44586.github.io/2020/10/22/pet/pet/
 https://xv44586.github.io/2020/10/19/triangle/
 https://xv44586.github.io/2020/10/14/focal-loss/
 https://xv44586.github.io/2020/09/30/location/
@@ -18,5 +20,3 @@ https://xv44586.github.io/2019/11/30/statistics/
 https://xv44586.github.io/2019/11/28/domain-words/
 https://xv44586.github.io/2019/11/24/tm-1111/
 https://xv44586.github.io/2019/10/26/simhash/
-https://xv44586.github.io/2019/10/22/cutwords/
-https://xv44586.github.io/2019/10/22/w2v-summary/
