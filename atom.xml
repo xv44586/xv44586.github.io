@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://xv44586.github.io/"/>
-  <updated>2020-10-27T13:11:56.892Z</updated>
+  <updated>2020-11-08T04:45:02.602Z</updated>
   <id>https://xv44586.github.io/</id>
   
   <author>
@@ -15,6 +15,34 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ccf_qa</title>
+    <link href="https://xv44586.github.io/2020/11/08/ccf-qa/"/>
+    <id>https://xv44586.github.io/2020/11/08/ccf-qa/</id>
+    <published>2020-11-08T02:44:15.000Z</published>
+    <updated>2020-11-08T04:45:02.602Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#bi-sai-shuo-ming">比赛说明</a></li><li><a href="#baseline">baseline</a><ul><li><a href="#qa-pair">qa pair</a></li><li><a href="#point">point</a></li><li><a href="#pet">pet</a></li></ul></li><li><a href="#dui-bi">对比</a></li><li><a href="#chang-shi">尝试</a><ul><li><a href="#post-training">Post-training</a></li><li><a href="#focal-loss">focal loss</a></li><li><a href="#dui-kang-xun-lian-yu-ti-du-cheng-fa">对抗训练与梯度惩罚</a></li><li><a href="#tricks">tricks</a></li></ul></li><li><a href="#zong-jie">总结</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><p>这两周玩了一下ccf 2020 中的<a href="https://www.datafountain.cn/competitions/474" target="_blank" rel="noopener">房产聊天问答匹配</a>比赛，虽然还没完赛，但是先总结一下目前的收获。</p><h1><span id="bi-sai-shuo-ming">比赛说明</span><a href="#bi-sai-shuo-ming" class="header-anchor"></a></h1><p>首先，这个比赛的任务是在一系列回答中找到针对客户问题的回答。而客户提问前的对话及回答前的对话都是不可见的，即整个IM信息是不连续的，任务就是在不连续的回答中找到那些针对客户问题的答案。样本示例：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">query: 采荷一小是分校吧。</span><br><span class="line">reply:</span><br><span class="line">  是的  <span class="number">0</span></span><br><span class="line">  杭州市采荷第一小学钱江苑校区，杭州市钱江新城实验学校。  <span class="number">1</span></span><br><span class="line">  这是五楼  <span class="number">0</span></span><br></pre></td></tr></table></figure></p><p>可以看到，样本中所谓的针对问题的回答，不仅仅是直接回答问题的答案，而是更有针对性和说明的回答。</p><h1><span id="baseline">baseline</span><a href="#baseline" class="header-anchor"></a></h1><p>模型选择上，baseline全部使用bert，鉴于相对位置编码优于绝对位置编码，所以选择<a href="https://github.com/huawei-noah/Pretrained-Language-Model/tree/master/NEZHA-TensorFlow" target="_blank" rel="noopener">NEZHA</a>作为预训练权重。备选方案Roberta。</p><h2><span id="qa-pair">qa pair</span><a href="#qa-pair" class="header-anchor"></a></h2><p>由于回答是不连续的，所以可以将问题和答案一一对应，组成qa pair，然后分别判断是否是针对问题的回答。</p><p><img src="/2020/11/08/ccf-qa/pair.png" alt="pair"></p><h2><span id="point">point</span><a href="#point" class="header-anchor"></a></h2><p>虽然对话是不连续的，但是是同一个对话，所以不同的回答能相互支撑，提供部分信息，所以，第二种思路就是将同一个问题的所有回答都拼接在当前回答后面，然后同时对每一个回答进行判断。</p><p><img src="/2020/11/08/ccf-qa/point.png" alt="point"></p><h2><span id="pet">pet</span><a href="#pet" class="header-anchor"></a></h2><p>由于预训练模型使用的语料与当前任务所处领域有一定的gap，所以一个比较简单的想法是先在任务语料上进行Post-training，然后再进行fine-tuning。不过，上次我们介绍过<code>Pattern-Exploiting Training</code>,不了解的可以参考<a href="https://xv44586.github.io/2020/10/25/pet/">PET-文本分类的又一种妙解</a>。借鉴PET的方式，我们将posting-training与fine-tuning结合，即在label data上进行pattern exploiting training，在unlable data上进行mlm任务进行post-traing.</p><p><img src="/2020/11/08/ccf-qa/pet.png" alt="pet"></p><p>以上三种baseline的代码放在<a href="https://github.com/xv44586/ccf_2020_qa_match" target="_blank" rel="noopener">ccf_2020_qa_match</a>,感兴趣的可以查阅。</p><h1><span id="dui-bi">对比</span><a href="#dui-bi" class="header-anchor"></a></h1><p>第一种方案（pair-wise），由于缺少一定的上下文信息，加上很多回答都非常短，同时又可能会离提问”较远”，所以效果是最差的，不过线上提交单模型也有0.75左右了，所以bert确实强大！<br>第二种方案（point）中，将所有已知的上下文信息都整合到一起，所以相对上一种有所提升，不过由于这种上下文的可见性，所以也会带来一定的迷惑：即对某一个reply来说，假如其他的reply中有一个是针对性的回答，就有可能会干扰对当前reply的判断。<br>第三种方案（pet）中，通过mlm进行post-training，可以将领域间的gap缩小，同时，由于在训练时”看到”了测试数据，也在一定程度上减小了线上线下的差距，所以性能是最好的，单模型最好能达到0.765左右。</p><h1><span id="chang-shi">尝试</span><a href="#chang-shi" class="header-anchor"></a></h1><h2><span id="post-training">Post-training</span><a href="#post-training" class="header-anchor"></a></h2><p>第一个想法是尝试进行post-training，来提升所有方案的性能。由于问答之间是不连续的，所以在组织语料上进行了不同方式：</p><ol><li>query reply1 reply2 \n…</li><li>query \n  reply1 \n reply2 \n…</li><li>sentence_left \n sentence_right \n …</li></ol><p>第一种，将同一对话作为同一篇文档顺序排列；第二种，将问题作为单独文档，同一问题的所有回答作为单独文档，第三种，将问题和回答都作为单独文档，同时将其拆分为左右两个部分来做nsp任务。<br>在mask选择上，选择动态mask，即每个epoch都重新选择mask的token。<br>最终结果是以上三种都不能带来pair-wise方案的提升，反而会带来不小的降低，猜测原因可能与以上三种方式的nsp任务与当前任务的模式不同，所以反而会引起降低。</p><h2><span id="focal-loss">focal loss</span><a href="#focal-loss" class="header-anchor"></a></h2><p>由于针对性回答与非针对性回答在数量上有不小差距，大约3:1，所以也想到尝试在loss上进行调节。<br>最终结果是没有多少提升，最后将普通loss训练后的模型在train data上进行了predict，并借鉴之前<a href="https://xv44586.github.io/2020/10/14/focal-loss/">focal loss</a>中的方式分析了一下，发现其难样本并不多也不聚集，所以focal loss并不难带来提升。</p><h2><span id="dui-kang-xun-lian-yu-ti-du-cheng-fa">对抗训练与梯度惩罚</span><a href="#dui-kang-xun-lian-yu-ti-du-cheng-fa" class="header-anchor"></a></h2><p>对抗训练与梯度惩罚也是两种比较有效的提升模型泛化性能的方法。其中对抗采用的FGM。<br>最终实验后发现两者都能带来线上线下的提升，尤其是对抗，最高能提升三个点，不过相同参数下结果也会差二个点左右，所以每个模型都要少不了调参的过程，所以适合后期提高时使用。</p><h2><span id="tricks">tricks</span><a href="#tricks" class="header-anchor"></a></h2><p>由于也是第一次做比赛，所以走了不少弯路，也学到了一些trick：</p><ol><li>对样本进行kfold然后训练，得到k个模型再进行ensemble。其中k从5增加到10，也会有提升。这种方式的好处是可以让更多的数据参与到训练，同时多个模型进行投票，也会带来或多或少的提升。</li><li>对数据进行post-training，虽然我的尝试暂时没有起到提升，但是交流时有其他组的同学通过这个方法就达到单模型0.77以上。而我三种方案对比，pet的方式也是最好的，所以也在一定程度上说明这种方式的有效性。</li><li>bert后接新的层，如cnn,dgcnn等。虽然bert的特征提取能力强大，但是在bert后面接一些新的层，总能带来一定的提升，尤其是DGCNN。这种方式可以看作是两种模型的stacking，即利用bert做特征提取，后面的模型在其上做下游任务。</li><li>不同模型进行ensemble，如将上述三种方案进行ensemble，由于不同模型关注点不同，融合后会带来一定提升。</li><li>更大的模型，如bert-xxlarge等。虽然我的显卡没法实验这种方案，但是交流后发现很多同学都是使用的大模型，baseline就可以达到0.77以上了，所以有时候还是需要一些”钞能力”.</li><li>数据清洗与增强。交流中有人提到用外部数据做增强，所以如果有能力，先做清洗与增强，结果也会提升很多。</li></ol><h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>以上就是对当前比赛的一些思考与总结，现在单模型最好的成绩为线上<code>0.7779</code>, 虽然只排到61名，不过鉴于我使用的是base模型，同时也是单模型，没有任何其他后续处理，所以结果感觉还行。后续完赛后如果有新的收获再更新一篇吧。最后，附上暂时排名截图。</p><p><img src="/2020/11/08/ccf-qa/leadboard.png" alt></p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
+      
+    
+    </summary>
+    
+    
+      <category term="NLP" scheme="https://xv44586.github.io/categories/NLP/"/>
+    
+    
+      <category term="QA" scheme="https://xv44586.github.io/tags/QA/"/>
+    
+      <category term="CCF" scheme="https://xv44586.github.io/tags/CCF/"/>
+    
+  </entry>
   
   <entry>
     <title>PET-文本分类的又一种妙解</title>
@@ -527,36 +555,6 @@
     
     
       <category term="Statistics" scheme="https://xv44586.github.io/tags/Statistics/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>带约束的领域词挖掘</title>
-    <link href="https://xv44586.github.io/2019/11/28/domain-words/"/>
-    <id>https://xv44586.github.io/2019/11/28/domain-words/</id>
-    <published>2019-11-28T07:31:41.000Z</published>
-    <updated>2020-10-25T02:55:33.042Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#bei-jing">背景</a></li><li><a href="#fang-an">方案</a><ul><li><a href="#shi-yan">实验</a></li><li><a href="#shi-yan-jie-guo">实验结果</a></li></ul></li><li><a href="#zong-jie">总结</a><ul><li><a href="#you-dian">优点</a></li><li><a href="#que-dian">缺点</a></li><li><a href="#fen-xiang">分享</a></li></ul></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><h1><span id="bei-jing">背景</span><a href="#bei-jing" class="header-anchor"></a></h1><p>分享一个最近做的项目方案，背景是当前的内容标签是最细粒度到一级大类，而产品希望出一些三级小类（当前最细分类）的标签，而且这些标签应该是有别于其他三级小类的。</p><h1><span id="fang-an">方案</span><a href="#fang-an" class="header-anchor"></a></h1><p>我将其看作是领域词挖掘任务，只是这个任务带有一些约束，及这些领域词是个性化的，与其他小类内的领域词是不同的。<br>所以，需要做的是抽词（新词发现）+领域词挖掘+个性化判断。<br>由于之前做过新词发现，主要参考<a href="http://www.matrix67.com/blog/archives/5044" target="_blank" rel="noopener">互联网时代的社会语言学：基于SNS的文本数据挖掘</a>,<br>对应的java实现<a href="https://github.com/xv44586/dict_build" target="_blank" rel="noopener">dict_build</a>。<br>除了无监督抽词外，matrix67的博文后面半部分也很有意思：通过对两份语料进行抽词，然后对词进行词频统计，通过对比词在两份语料内的词频差异，来发现“热词”。<br>回到现在的任务，个性化的词，必定在当前小类内相对于其他小类更“热”，我们可以将当前小类内的词与非当前小类进行对比，就能得到当前小类的“热词”，<br>有了热词，我们在判断这些“热词”是不是领域词，即可得到想要的结果。而实际上，由于一级大类之间的词已经有很大差异，所以，我们在抽当前小类“热词”时，不必对全量非当前小类语料进行统计，只需要对其一级大类内非当前小类语料进行统计对比，即可得到“热词”。<br>而对于领域词判断，由于我们已经有了一级大类的标签，我们可以利用这部分信息来进行领域词判断。<br>所以，最终的方案是先抽词，然后对词进行领域词判断，对词进行是否是“热词”判断，对领域词与热词进行求交运算，得到个性化的领域词。</p><h2><span id="shi-yan">实验</span><a href="#shi-yan" class="header-anchor"></a></h2><p>实际处理时，由于我们挖掘的“词”其实更像是一个短语，其长度也比词稍长，而“词”的组合上限是${CharCount}^{WordLength}$，而字符大概有12000+， 词平均长度假如是7，这个量也是相当大的。<br>所以抽词对内存要求很高，而且非常耗时（10h+).在思考如何优化抽词程序时，看到了<a href="https://kexue.fm/archives/6540" target="_blank" rel="noopener">分享一次专业领域词汇的无监督挖掘</a>，作者的思路与我的思路一样，不过不同的是，<br>作者在抽词时，并没有沿用matrix67的博文中根据凝合度与信息熵来进行是否成词判断，而且用信息熵是否低于某个阈值，来判断是否切开，即为两个词，这个思路还是非常巧妙的，这样，不光计算量减小了很多，而且不在需要设置超参数中ngram的值，<br>挖掘出的词也更符号“语义完整性”；而领域词判断，作者采用的是通过语料训练词向量，再由种子词来扩展领域词，也不失为一个好思路。</p><h2><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h2><p>从结果上看，效果还是很不错的。<br><img src="/2019/11/28/domain-words/words.png" alt="热词结果"><br>热词结果<br><img src="/2019/11/28/domain-words/keywords.png" alt="领域词结果"><br>领域词结果<br><img src="/2019/11/28/domain-words/result.png" alt="最终结果"><br>最终挖掘的个性化领域词</p><h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><h2><span id="you-dian">优点</span><a href="#you-dian" class="header-anchor"></a></h2><p>挖掘领域词任务中，首先是如何对”词”进行判断，然后才是”领域词”判断，所以影响最终结果好坏的主要因素也是”词”划分的质量与”领域词”判断的准确性。<br>上述方案中，通过用信息熵的最小阈值来判断相邻两个字是否属于同一个词内来进行分词，优点是速度快，能切分出高频的短语；<br>通过种子词在词向量空间来一层一层挖掘领域词，主要思路是近邻的近邻，虽然与你”直线距离”稍远，但通过你的近邻点跳转后”距离”近，这样来扩大召回，所以通过少量种子点即可召回出大量”近邻”词。</p><h2><span id="que-dian">缺点</span><a href="#que-dian" class="header-anchor"></a></h2><p>缺点也很明显，首先分词时，容易将常用搭配错误切分，如html容易切出 *h/tml,的xxx容易切分为一个词，所以需要写一些规则过滤掉明显错误切分的词；种子词在召回时，由于词向量用的是word2vec这种静态词向量，近邻容易跳出当前domain，如用”华为”做种子词，直接聚类出”小米”/“苹果”，而苹果的近邻就可能跳出手机品牌，<br>转向水果，如”西瓜”/“桃子”，所以需要控制扩散的层次深度。</p><h2><span id="fen-xiang">分享</span><a href="#fen-xiang" class="header-anchor"></a></h2><p>机器学习中最重要的一个思路就是寻找差异，找到合理的差异往往是解决问题的关键。本次分享了一个通过对比差异来进行领域词挖掘的例子，希望给做类似任务的同学一些思路。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于奥森</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
-      
-    
-    </summary>
-    
-    
-      <category term="NLP" scheme="https://xv44586.github.io/categories/NLP/"/>
-    
-    
-      <category term="新词发现" scheme="https://xv44586.github.io/tags/%E6%96%B0%E8%AF%8D%E5%8F%91%E7%8E%B0/"/>
-    
-      <category term="领域词挖掘" scheme="https://xv44586.github.io/tags/%E9%A2%86%E5%9F%9F%E8%AF%8D%E6%8C%96%E6%8E%98/"/>
-    
-      <category term="信息熵" scheme="https://xv44586.github.io/tags/%E4%BF%A1%E6%81%AF%E7%86%B5/"/>
     
   </entry>
   
