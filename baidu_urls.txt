@@ -1,3 +1,4 @@
+https://xv44586.github.io/2020/11/10/eda/
 https://xv44586.github.io/2020/11/08/ccf-qa/
 https://xv44586.github.io/2020/10/25/pet/
 https://xv44586.github.io/2020/10/25/adabelief/
@@ -19,4 +20,3 @@ https://xv44586.github.io/2019/12/26/from-softmax-to-crf/
 https://xv44586.github.io/2019/12/09/longton/
 https://xv44586.github.io/2019/11/30/statistics/
 https://xv44586.github.io/2019/11/28/domain-words/
-https://xv44586.github.io/2019/11/24/tm-1111/
