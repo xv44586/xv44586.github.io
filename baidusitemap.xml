@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://xv44586.github.io/2019/10/22/w2v-summary/</loc>
+    <lastmod>2020-11-11</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/14/xgb/</loc>
+    <lastmod>2020-11-11</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2020/08/19/bert-of-theseus-2/</loc>
+    <lastmod>2020-11-11</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2020/10/14/focal-loss/</loc>
+    <lastmod>2020-11-11</lastmod>
+  </url>
+  <url>
     <loc>https://xv44586.github.io/2020/11/10/eda/</loc>
     <lastmod>2020-11-10</lastmod>
   </url>
@@ -21,15 +37,7 @@
     <lastmod>2020-10-25</lastmod>
   </url>
   <url>
-    <loc>https://xv44586.github.io/2020/10/14/focal-loss/</loc>
-    <lastmod>2020-10-25</lastmod>
-  </url>
-  <url>
     <loc>https://xv44586.github.io/2020/08/31/bert-01/</loc>
-    <lastmod>2020-10-25</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/22/w2v-summary/</loc>
     <lastmod>2020-10-25</lastmod>
   </url>
   <url>
@@ -69,10 +77,6 @@
     <lastmod>2020-10-25</lastmod>
   </url>
   <url>
-    <loc>https://xv44586.github.io/2020/08/19/bert-of-theseus-2/</loc>
-    <lastmod>2020-10-25</lastmod>
-  </url>
-  <url>
     <loc>https://xv44586.github.io/2019/10/22/cutwords/</loc>
     <lastmod>2020-10-25</lastmod>
   </url>
@@ -106,10 +110,6 @@
   </url>
   <url>
     <loc>https://xv44586.github.io/2019/10/21/deep-w2v/</loc>
-    <lastmod>2020-10-25</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/14/xgb/</loc>
     <lastmod>2020-10-25</lastmod>
   </url>
   <url>
