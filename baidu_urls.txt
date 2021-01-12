@@ -1,3 +1,4 @@
+https://xv44586.github.io/2021/01/12/matrix/
 https://xv44586.github.io/2020/11/24/fine-tune/
 https://xv44586.github.io/2020/11/23/scl/
 https://xv44586.github.io/2020/11/21/ad-dti/
@@ -19,4 +20,3 @@ https://xv44586.github.io/2020/08/01/optimizer-in-bert/
 https://xv44586.github.io/2020/05/05/make-a-computer/
 https://xv44586.github.io/2020/01/11/npm-environment/
 https://xv44586.github.io/2019/12/27/backup/
-https://xv44586.github.io/2019/12/26/from-softmax-to-crf/
