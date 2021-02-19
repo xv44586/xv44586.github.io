@@ -1,3 +1,4 @@
+https://xv44586.github.io/2021/02/19/happy-new-year/
 https://xv44586.github.io/2021/01/20/ccf-qa-2/
 https://xv44586.github.io/2021/01/12/matrix/
 https://xv44586.github.io/2020/11/24/fine-tune/
@@ -19,4 +20,3 @@ https://xv44586.github.io/2020/08/19/bert-of-theseus-2/
 https://xv44586.github.io/2020/08/09/bert-of-theseus/
 https://xv44586.github.io/2020/08/01/optimizer-in-bert/
 https://xv44586.github.io/2020/05/05/make-a-computer/
-https://xv44586.github.io/2020/01/11/npm-environment/
