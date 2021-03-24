@@ -2,6 +2,48 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://xv44586.github.io/2019/10/22/cutwords/</loc>
+    
+    <lastmod>2021-03-24T07:01:06.857Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/10/22/w2v-summary/</loc>
+    
+    <lastmod>2021-03-24T02:16:30.395Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/10/21/deep-w2v/</loc>
+    
+    <lastmod>2021-03-24T02:06:58.138Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/10/17/glove/</loc>
+    
+    <lastmod>2021-03-24T02:01:40.842Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2020/08/01/optimizer-in-bert/</loc>
+    
+    <lastmod>2021-03-08T05:47:53.757Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2020/08/19/bert-of-theseus-2/</loc>
+    
+    <lastmod>2021-03-04T09:43:52.930Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://xv44586.github.io/2020/11/08/ccf-qa/</loc>
     
     <lastmod>2021-02-24T01:00:00.125Z</lastmod>
@@ -12,13 +54,6 @@
     <loc>https://xv44586.github.io/2021/01/20/ccf-qa-2/</loc>
     
     <lastmod>2021-02-24T01:00:00.120Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2020/08/19/bert-of-theseus-2/</loc>
-    
-    <lastmod>2021-02-24T00:40:42.218Z</lastmod>
     
   </url>
   
@@ -65,13 +100,6 @@
   </url>
   
   <url>
-    <loc>https://xv44586.github.io/2019/10/22/w2v-summary/</loc>
-    
-    <lastmod>2020-11-11T15:40:36.924Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://xv44586.github.io/2019/10/14/xgb/</loc>
     
     <lastmod>2020-11-11T15:39:42.051Z</lastmod>
@@ -100,13 +128,6 @@
   </url>
   
   <url>
-    <loc>https://xv44586.github.io/2020/10/22/pet/pet/</loc>
-    
-    <lastmod>2020-10-26T14:15:48.266Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://xv44586.github.io/2020/10/25/adabelief/</loc>
     
     <lastmod>2020-10-25T03:18:27.710Z</lastmod>
@@ -124,13 +145,6 @@
     <loc>https://xv44586.github.io/2020/08/22/qa-augmentation/</loc>
     
     <lastmod>2020-10-25T02:55:33.062Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2020/08/01/optimizer-in-bert/</loc>
-    
-    <lastmod>2020-10-25T02:55:33.059Z</lastmod>
     
   </url>
   
@@ -177,13 +191,6 @@
   </url>
   
   <url>
-    <loc>https://xv44586.github.io/2019/10/22/cutwords/</loc>
-    
-    <lastmod>2020-10-25T02:48:38.992Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://xv44586.github.io/2019/10/13/logistic/</loc>
     
     <lastmod>2020-10-25T02:47:51.062Z</lastmod>
@@ -219,23 +226,9 @@
   </url>
   
   <url>
-    <loc>https://xv44586.github.io/2019/10/17/glove/</loc>
-    
-    <lastmod>2020-10-25T02:47:50.996Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://xv44586.github.io/2019/10/16/bagging/</loc>
     
     <lastmod>2020-10-25T02:47:50.980Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2019/10/21/deep-w2v/</loc>
-    
-    <lastmod>2020-10-25T02:47:50.964Z</lastmod>
     
   </url>
   
