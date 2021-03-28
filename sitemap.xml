@@ -2,6 +2,41 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://xv44586.github.io/2021/03/28/multi-task/</loc>
+    
+    <lastmod>2021-03-28T03:34:57.816Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/10/13/skipgram/</loc>
+    
+    <lastmod>2021-03-28T03:20:44.546Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/10/13/nnlm/</loc>
+    
+    <lastmod>2021-03-28T01:22:52.248Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/10/17/glove/</loc>
+    
+    <lastmod>2021-03-28T00:51:38.543Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/10/17/dropout/</loc>
+    
+    <lastmod>2021-03-28T00:47:18.673Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://xv44586.github.io/2019/10/22/cutwords/</loc>
     
     <lastmod>2021-03-24T07:01:06.857Z</lastmod>
@@ -19,13 +54,6 @@
     <loc>https://xv44586.github.io/2019/10/21/deep-w2v/</loc>
     
     <lastmod>2021-03-24T02:06:58.138Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2019/10/17/glove/</loc>
-    
-    <lastmod>2021-03-24T02:01:40.842Z</lastmod>
     
   </url>
   
@@ -201,27 +229,6 @@
     <loc>https://xv44586.github.io/2019/10/17/randomForest/</loc>
     
     <lastmod>2020-10-25T02:47:51.042Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2019/10/13/nnlm/</loc>
-    
-    <lastmod>2020-10-25T02:47:51.032Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2019/10/13/skipgram/</loc>
-    
-    <lastmod>2020-10-25T02:47:51.015Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2019/10/17/dropout/</loc>
-    
-    <lastmod>2020-10-25T02:47:51.010Z</lastmod>
     
   </url>
   

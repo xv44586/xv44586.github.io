@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://xv44586.github.io/2021/03/28/multi-task/</loc>
+    <lastmod>2021-03-28</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/13/skipgram/</loc>
+    <lastmod>2021-03-28</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/13/nnlm/</loc>
+    <lastmod>2021-03-28</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/17/glove/</loc>
+    <lastmod>2021-03-28</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/17/dropout/</loc>
+    <lastmod>2021-03-28</lastmod>
+  </url>
+  <url>
     <loc>https://xv44586.github.io/2019/10/22/cutwords/</loc>
     <lastmod>2021-03-24</lastmod>
   </url>
@@ -10,10 +30,6 @@
   </url>
   <url>
     <loc>https://xv44586.github.io/2019/10/21/deep-w2v/</loc>
-    <lastmod>2021-03-24</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/17/glove/</loc>
     <lastmod>2021-03-24</lastmod>
   </url>
   <url>
@@ -114,18 +130,6 @@
   </url>
   <url>
     <loc>https://xv44586.github.io/2019/10/17/randomForest/</loc>
-    <lastmod>2020-10-25</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/13/nnlm/</loc>
-    <lastmod>2020-10-25</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/13/skipgram/</loc>
-    <lastmod>2020-10-25</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/17/dropout/</loc>
     <lastmod>2020-10-25</lastmod>
   </url>
   <url>
