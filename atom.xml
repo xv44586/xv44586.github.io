@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://xv44586.github.io/"/>
-  <updated>2021-03-28T03:34:57.816Z</updated>
+  <updated>2021-07-06T14:45:58.134Z</updated>
   <id>https://xv44586.github.io/</id>
   
   <author>
@@ -15,6 +15,36 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>对比学习心路历程</title>
+    <link href="https://xv44586.github.io/2021/07/06/cl2rdrop/"/>
+    <id>https://xv44586.github.io/2021/07/06/cl2rdrop/</id>
+    <published>2021-07-06T14:25:15.000Z</published>
+    <updated>2021-07-06T14:45:58.134Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#qian-yan">前言</a></li><li><a href="#dui-bi-xue-xi-fan-shi">对比学习范式</a></li><li><a href="#wu-jian-du-dui-bi-xue-xi">无监督对比学习</a></li><li><a href="#you-jian-du-dui-bi-xue-xi">有监督对比学习</a></li><li><a href="#zong-jie">总结</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --><p></div></p><h1><span id="qian-yan">前言</span><a href="#qian-yan" class="header-anchor"></a></h1><p>在之前的<a href="https://xv44586.github.io/2021/01/20/ccf-qa-2/">博客</a>里，笔者介绍了在有监督任务（文本匹配）上，增加对比学习来提高模型性能的实验，而当时尝试后却发现，在新增了对比学习的任务后，模型的性能并没有得到对应的提升，经过简单分析后，笔者也尝试给出了一些可能的问题与解决方案。虽然笔者的实验都失败了，但是笔者依然认为对比学习是一个非常好的方向，所以也在持续关注，这篇就算是后续的填坑与总结吧。</p><h1><span id="dui-bi-xue-xi-fan-shi">对比学习范式</span><a href="#dui-bi-xue-xi-fan-shi" class="header-anchor"></a></h1><p>之前也提到过，这里在简单称述一下对比学习目前的主要范式。对比学习主要是通过对比，拉近相似样本之间的距离，推远不相似样本之间的距离。而相似样本的构造，又可以分为有监督与无监督两种：</p><ul><li>有监督对比学习：通过将监督样本中的相同label的样本作为正样本，不同label的样本作为负样本，来进行对比学习；</li><li>无监督对比学习：由于没有监督信号（label），此时，我们对同一个样本构造两个view，让同一样本构造的两个view互为正样本，而其他样本构造的view则全部为负样本，以此来进行对比学习。而由同一个样本构造两个view，又是数据扩增的过程，所以也可以称作是数据扩展对比学习。而不管那种范式，通常对比学习都是在batch内进行。</li></ul><h1><span id="wu-jian-du-dui-bi-xue-xi">无监督对比学习</span><a href="#wu-jian-du-dui-bi-xue-xi" class="header-anchor"></a></h1><p>笔者曾经在实验中，通过对样本进行eda（随机替换、随机删除、随机重复和随机互换），来构造不同view，由此进行对比学习。实验失败后，笔者也提到失败的可能原因主要有两点：batch size太小且样本上直接进行操作，获得的新样本与原来的语义可能由较大的差别甚至是完全的反义。如：“我不会再爱你” –&gt; “我会再爱你”,而强行让这两个样本的语义距离相互靠近，效果自然不会好；而batch size太小的问题，一来是换大的GPU，二来可以尝试在算法层面进行优化，如将Adam 替换为AdaFactor，re-compute等，这不是本文的重点，所以就不再细说了。<br>而针对直接对样本进行修改会导致语义不一致的问题，其主要原因是NLP中，样本的输入是one-hot形式的，我们的相似样本应该是语义上相似，对应的修改后的语义距离应该尽可能“小”，而直接对one-hot形式进行修改，对应的距离恒定是$\sqrt{2}$ ，怎么看也不小。一种解决方法是借鉴对抗训练在NLP中的方式，将修改放在Embedding 层，由于one-hot与Embedding的对应关系，就能够获得“相似语义”的样本了。对应思路的论文有美团今年的<a href="http://arxiv.org/abs/2105.11741" target="_blank" rel="noopener">ConSERT: A Contrastive Framework for Self-Supervised Sentence Representation Transfer</a>,总的来说，这篇paper就是将EDA的思路放在embedding 层，然后构建不同view后进行对比学习，最后获得的语义表示超过了当前的sota，在多个数据集上获得了提升。不过值得吐槽的是，美团也学坏了，竟然学会了谷歌那套在更多数据上进行训练然后跟只有原始数据的结果进行对比，可能是论文本身没什么亮点，只能通过“大的提升”来吸引眼球了吧~<br>而做数据扩增时，最常用的两个方式随机删除与随机互换，而位置编码在transformer 中起到的作用不是关键性的，且直接互换位置也会带来语义变化较大的风险，那只使用随机删除策略做数据扩增，进行对比学习效果如何呢？答案是非常好！女神陈丹琦最近的论文<a href="https://arxiv.org/abs/2104.08821" target="_blank" rel="noopener">SimCSE: Simple Contrastive Learning of Sentence Embeddings</a>,只使用dropout ，对同一个样本构造两个不同的view，然后进行对比学习，最终的效果在非监督学习任务下8个点提升起步，在监督任务下4个点提升起步，此外，<a href="https://github.com/bojone/SimCSE" target="_blank" rel="noopener">苏神</a>在中文任务上也进行了实验，再次验证了该方法的有效性。</p><p><img src="/2021/07/06/cl2rdrop/simcse.png" alt="效果对比"></p><p>而simcse具体是如何工作的呢？其实做法相当简单，即将一个样本进入模型两次，然后通过dropout 两次，获得两个不同的view，互为正样本。而dropout 由于是在feature 维度进行随机mask，所以就得到了与在embedding层随机mask相同的效果，此外，由于在transformer 中，dropout 多次使用，也进一步的增加了两个view 的差异。读完论文，看着效果，直叹“大道至简”，而对比在embedding 做扰动与直接使用dropout，从效果上看dropout 也是一种更加有效的数据扩增手段。那这个思路是不是可以扩展到有监督任务呢？<br>其实读完SimCSE后，笔者就觉得dropout 是一种更加有效的数据扩增手段，自然可以扩展到有监督任务学习中。这里的有监督任务学习有别与有监督对比学习，请读者注意区分。而在有监督任务学习中的方案也是比较直观：将样本进入模型两遍，然后在做监督任务的同时，增加一个对比学习，不过笔者实验时被之前无监督任务的思路所束缚了，一直使用encoder output 的logits来表征语义，所以调来调去效果时好时坏，好的时候也没有超过0.5的提升，所以就放弃了。<br>而最近的论文<a href="http://arxiv.org/abs/2106.14448" target="_blank" rel="noopener">R-Drop: Regularized Dropout for Neural Networks</a>却成功的将这个思路延续了下来，在读完其<a href="https://github.com/dropreg/R-Drop" target="_blank" rel="noopener">代码</a>后，才发现原来是自己姿势不对~<br>R-Drop中的完整思路是这样的：首先，我们通过将样本重复的输入到模型，然后通过dropout，获取不同的view，而dropout的目的是为了将集成模型的思路延续到深度学习中，本质目的是增加模型的鲁棒性。所以，不同的view获得的最终的输出，我们也希望其尽可能的一致。而论文中的任务都是分类任务，所以模型最终的输出是一个概率分布，衡量两个概率分别的差异通常使用kl散度，所以最终的loss增加了一个对应view之间的kl-divergence。<br>对比笔者之前的思路与R-Drop 中的思路，首先R-Drop 中是直接作用在最终的probs上，而笔者是希望encoder output logits 之间能“同性相吸，异性排斥”，而由于在做分类任务时，在logits 后都会接一个dense层来压缩维度，这个dense 层就会大大抑制前面的对比学习的效果，即前面的logits可以差异很大，但通过最后的dense层，却能得到一样的预测结果（label相同），而直接作用在最终的输出层，才会得到想要的效果；其次在R-Drop 中，不再需要与其他样本做对比，即只要相同view 的输出足够“接近”即可，而不需要其与其他的view 尽可能的“远”，考虑到同一个batch 内，存在同样label的样本的概率是极大的，而要求同时预测对label又要其结果之间尽可能不同是不合理的，所以取消掉与其他view之间的对比也是合理与必要的；而由于不需要去其他view做对比，对比学习中大batch size的要求也就不再需要，即在小的batch size 下该方法依然有效，真可谓“方法简单效果好”，在所有的NLP任务中都值得尝试。<br>前面提到笔者之前的思路的最大问题是对比的不是最后一层的输出，而同一batch内，又不可避免的会出现相同label，让相同label的logits之间相互“远离”似乎不太合理，但从对抗训练或者模型的鲁棒性上考虑，让同一样本的不同view之间相互接近而与其他view之间相互远离，可以达到让样本在一个范围内的输出尽可能的保持一致，从而能使模型更加的鲁棒，自然会增加一些泛化能力。这个思路笔者也在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_tnews_contrastive_learning_dropout.py" target="_blank" rel="noopener">之前的实验</a>上进行了修改尝试，结果显示确实能提高一些性能，但是与只拉近相同view之间的kl-divergence相比，提升就不够看了。</p><h1><span id="you-jian-du-dui-bi-xue-xi">有监督对比学习</span><a href="#you-jian-du-dui-bi-xue-xi" class="header-anchor"></a></h1><p>有监督对比学习是指相同label之间互为正样本，不同label间为负样本，与上文提到的有监督任务是不同的。而有监督任务中也可以使用无监督对比学习的思路，如上文提到的R-Drop，而有监督对比学习自从<a href="https://arxiv.org/abs/2011.01403" target="_blank" rel="noopener">Supervised Contrastive Learning for Pre-trained Language Model Fine-tuning</a>后，笔者还未关注到有什么新的进展，所以还是推荐在有监督任务上使用R-Drop思路。</p><h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文主要总结了从笔者之前对比学习实验时留下的问题，到最近一些论文中提出的解决思路，虽然整个心路历程与原作者们的肯定不一样，但希望能给读者提供对比学习到目前为止的一些进展脉络。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>据说人工智能中有80%的部分是人工😄</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
+      
+    
+    </summary>
+    
+    
+      <category term="NLP" scheme="https://xv44586.github.io/categories/NLP/"/>
+    
+    
+      <category term="Contrastive Learning" scheme="https://xv44586.github.io/tags/Contrastive-Learning/"/>
+    
+      <category term="SimCSE" scheme="https://xv44586.github.io/tags/SimCSE/"/>
+    
+      <category term="R-Drop" scheme="https://xv44586.github.io/tags/R-Drop/"/>
+    
+  </entry>
   
   <entry>
     <title>多任务学习-以天池比赛为例的三种思路</title>
@@ -90,9 +120,9 @@
     
       <category term="QA" scheme="https://xv44586.github.io/tags/QA/"/>
     
-      <category term="CCF" scheme="https://xv44586.github.io/tags/CCF/"/>
-    
       <category term="Competition" scheme="https://xv44586.github.io/tags/Competition/"/>
+    
+      <category term="CCF" scheme="https://xv44586.github.io/tags/CCF/"/>
     
   </entry>
   
@@ -250,9 +280,9 @@
     
       <category term="QA" scheme="https://xv44586.github.io/tags/QA/"/>
     
-      <category term="CCF" scheme="https://xv44586.github.io/tags/CCF/"/>
-    
       <category term="Competition" scheme="https://xv44586.github.io/tags/Competition/"/>
+    
+      <category term="CCF" scheme="https://xv44586.github.io/tags/CCF/"/>
     
   </entry>
   
@@ -466,9 +496,9 @@
       <category term="NLP" scheme="https://xv44586.github.io/categories/NLP/"/>
     
     
-      <category term="BERT" scheme="https://xv44586.github.io/tags/BERT/"/>
-    
       <category term="Distillation" scheme="https://xv44586.github.io/tags/Distillation/"/>
+    
+      <category term="BERT" scheme="https://xv44586.github.io/tags/BERT/"/>
     
   </entry>
   
@@ -524,37 +554,9 @@
       <category term="NLP" scheme="https://xv44586.github.io/categories/NLP/"/>
     
     
-      <category term="BERT" scheme="https://xv44586.github.io/tags/BERT/"/>
-    
       <category term="Distillation" scheme="https://xv44586.github.io/tags/Distillation/"/>
     
-  </entry>
-  
-  <entry>
-    <title>Knowledge Distillation (1) &amp;#58; 模块替换之bert-of-theseus-上篇</title>
-    <link href="https://xv44586.github.io/2020/08/09/bert-of-theseus/"/>
-    <id>https://xv44586.github.io/2020/08/09/bert-of-theseus/</id>
-    <published>2020-08-09T13:26:26.000Z</published>
-    <updated>2021-02-24T00:32:35.713Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#mo-xing-ya-suo">模型压缩</a><ul><li><a href="#jian-zhi">剪枝</a></li><li><a href="#liang-hua">量化</a></li><li><a href="#zhi-shi-zheng-liu">知识蒸馏</a></li><li><a href="#quan-chong-gong-xiang">权重共享</a></li><li><a href="#quan-chong-fen-jie">权重分解</a></li><li><a href="#mo-xing-ya-suo-de-bi-yao-xing">模型压缩的必要性</a></li><li><a href="#bert-of-theseus">Bert of theseus</a></li><li><a href="#ju-ti-liu-cheng">具体流程</a></li><li><a href="#shi-yan-xiao-guo">实验效果</a></li></ul></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><blockquote>如果忒修斯的船上的木头被逐渐替换，直到所有的木头都不是原来的木头，那这艘船还是原来的那艘船吗？<br><br>-普鲁塔克</blockquote><p>最近遇到一个需要对算法加速的场景，了解到了一个比较简洁实用的方法：<a href="https://arxiv.org/abs/2002.02925" target="_blank" rel="noopener">Bert-of-theseus</a>,了解了原理后参考代码实验后，验证了其有效性，所以总结一下。</p><h1><span id="mo-xing-ya-suo">模型压缩</span><a href="#mo-xing-ya-suo" class="header-anchor"></a></h1><p>模型在设计之初都是过参数化的，这是因为模型的参数量与复杂度代表着模型的容量与学习能力，但当我们实际使用时，我们需要更好的部署他（低资源），更快的响应（快速推理），常常需要进行模型压缩。<br>模型压缩就是<code>简化大的模型，得到推理快资源占用低的小模型</code>，而想”即要马而跑又不用吃草”通常是很难的，所以压缩后的模型常常也会有不同程度的牺牲，如模型性能下降。<br>此外，模型压缩是作用在推理阶段，带来的常常是训练时间的增加。<br>模型压缩又分为三种方式：一种是<code>剪枝(Pruning)</code>与<code>量化(Quantization)</code>,一种是<code>知识蒸馏(Knowledge Distillation)</code>,还有一种是<code>权重共享（Sharing）与因数分解（Factorization）</code>。该部分内容推荐一篇博客：<a href="http://mitchgordon.me/machine/learning/2019/11/18/all-the-ways-to-compress-BERT.html" target="_blank" rel="noopener">All The Ways You Can Compress BERT</a></p><h2><span id="jian-zhi">剪枝</span><a href="#jian-zhi" class="header-anchor"></a></h2><p>剪枝技术是通过将大模型中一些”不重要”的连接剪断，得到一个”稀疏”结构的模型。剪枝又分为”结构性剪枝”与”非结构性剪枝”.剪枝可以作用在权重粒度，也可以作用在attention heads / layer粒度上。不过剪枝技术感觉会逐步被<cdoe>NAS（Neural Architecture Search）取。</cdoe></p><h2><span id="liang-hua">量化</span><a href="#liang-hua" class="header-anchor"></a></h2><p>量化不改变模型的网络结构，而是改变模型的参数的数据格式，通常模型在建立与训练时使用的是 float32 格式的，量化就是将格式转换为 <code>low-bit</code>, 如 float16 甚至二值化，如此即提速又省显存。</p><h2><span id="zhi-shi-zheng-liu">知识蒸馏</span><a href="#zhi-shi-zheng-liu" class="header-anchor"></a></h2><p>知识蒸馏是训练一个小模型(student)来学习大模型(teacher)，由于大模型是之前已经fine-tuning的，所以此时学习的目标已经转换为对应的logit而<br>不再是one-hot编码了，所以student有可能比teacher的性能更好。这样即小又准的模型实在太好了。不过为了达到这样的效果，通常设计小模型时不<br>光要学习大模型的输出，还要学习各个中间层结果，相关矩阵等，这就需要仔细设计模型的结构与loss及loss融合方案了。一种简单的方法是只学习大模型的logit，这与对label做embedding有点类似，不过我没做过实验还。</p><h2><span id="quan-chong-gong-xiang">权重共享</span><a href="#quan-chong-gong-xiang" class="header-anchor"></a></h2><p>将部分权重在多个层中共享以达到压缩模型的效果，如ALBERT中共享self-attention中的参数。</p><h2><span id="quan-chong-fen-jie">权重分解</span><a href="#quan-chong-fen-jie" class="header-anchor"></a></h2><p>将权重矩阵进行因数分解，形成两个低秩的矩阵相乘的形式，从而降低计算量，如ALBERT中通过将Embedding分解降低参数量。</p><h2><span id="mo-xing-ya-suo-de-bi-yao-xing">模型压缩的必要性</span><a href="#mo-xing-ya-suo-de-bi-yao-xing" class="header-anchor"></a></h2><p>看了上面模型压缩的方法，每一个都有种”脱裤子放屁”的感觉，与其训练一个大模型，再费力把它变小，为何不直接开始就弄个小的呢？<br>首先，模型在设计之初是都是会或多或少的过参数化，因为模型的参数量与复杂度代表着模型的容量与学习能力；<br>其次，开始就用一个小模型，那这个小模型也是需要设计的，不能随便拿来一个，而设计一个性能高参数规模小的小模型难度是非常大的，往往是模型小了性能也低了；<br>第三点，大模型压缩后与小模型虽然参数规模相当，但是对应的模型空间并不相同。<br>此外，为了更好的部署，如手机或FPGA等，得到精度更高模型更小(distillation)或者利用硬件加速(low-bit)，模型压缩都是值得试一试的手段。<br>更详细的讨论，可以参考<a href="https://www.zhihu.com/question/303922732" target="_blank" rel="noopener">为什么要压缩模型，而不直接训练一个小的CNN</a></p><h2><span id="bert-of-theseus">Bert of theseus</span><a href="#bert-of-theseus" class="header-anchor"></a></h2><p>Bert of theseus 方法属于上面提到的知识蒸馏，知识蒸馏中我们提到，在蒸馏时，我们不光要学习teacher的输出，对中间层我们也希望他们直接尽量相似，<br>那想象一个这种状态对应对理想情况：<code>中间层的结果一致，最终的结果一致</code>,既然我们的期望中间结果一致，那也就意味着两者可以互相替换。<br>正如开头提到的忒修斯之船一样。所以核心思想是：<br><code>与其设计复杂的loss来让中间层结果相似不如直接用小模型替换大模型来训练</code><br>通过复杂loss来达到与中间层结果相似可以看作是一种整体渐进式的逼近，让小模型一点点去学习，而直接替换可以看作是一种简单粗暴的方式，<br>但是他不需要设计各种loss，优化目标也是同一个，就只有一个下游任务相关的loss，突出一个<code>简洁</code>。<br>这就好比高中上学一样，即使花高价也要让孩子去一所好高中，因为学校的”氛围”能让孩子的学习成绩进步，其实是因为周围的孩子带着一起学，<br>弱鸡也能学的比平时更多一点。bert-of-theseus也是类似的道理，跟着大佬（teacher）总比单独fine-tuning效果好。</p><h2><span id="ju-ti-liu-cheng">具体流程</span><a href="#ju-ti-liu-cheng" class="header-anchor"></a></h2><p>如果直接将小模型替换大模型，那其实是在对小模型进行微调，与大模型就脱离了，也达不到对应的效果，所以作者采用了一种概率替换的方式。<br>首先呢，想象我们现在已经训练好了一个6层的BERT，我们成为<code>Predecessor（前辈）</code>, 而我们需要训练一个三层的bert，<br>他的结果近似12层BERT的效果，我们成为<code>Successor(传承者)</code>,那 bert-of-theseus的模型结构如<a href="https://spaces.ac.cn/archives/7575" target="_blank" rel="noopener">下图</a>所示：</p><p><img src="/2020/08/09/bert-of-theseus/bert-of-theseus.png" alt="bert-of-theseus"></p><p>在bert-of-theseus中，首先固定predecessor的权重，然后将6层的Bert分为3个block，每个block与successor的一层对应，训练过程分为两个stage：<br>首先用successor中的层概率替换predecessor中对应的block，在下游任务中直接fine-tuning（只训练successor），<br>然后将successor从bert-of-theseus中分离出来，单独在下游任务中进行fine-tuning，直到指标不再上升。<br>所谓替换，就是输出的替换，在进入下一层前在predecessor和successor的输出中二选一。<br>替换概率作者也给出了两种方式，一种是固定 0.5,一种是线性从0-1,如下图所示：<br><img src="/2020/08/09/bert-of-theseus/figure2.png" alt></p><h2><span id="shi-yan-xiao-guo">实验效果</span><a href="#shi-yan-xiao-guo" class="header-anchor"></a></h2><p>实验代码主要参考<a href="https://github.com/bojone/bert-of-theseus" target="_blank" rel="noopener">bert-of-theseus</a>, 实验主要做了三组，一组文本分类两组ner-crf，结果如下：</p><p>文本分类：CLUE的iflytek数据集</p><p>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 60.11\% &amp; 58.99\%  &amp; 57.96\%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 59.6\%  &amp; 59.3\% \end{array}\\<br>\hline<br>\end{array}<br>$$</p><p>ner-crf: 公司数据<br>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 97.5\% &amp; 97.0\%  &amp; 96.1\%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 97.3\%  &amp; 96.6\% \end{array}\\<br>\hline<br>\end{array}<br>$$</p><p>可以看到，相比直接那前几层微调，bert-of-theseus的效果确实更好，此外，我还尝试了线性策略的替换概率，效果上差别不大。<br>实验代码：<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_bert_of_theseus.py" target="_blank" rel="noopener">classification_ifytek_bert_of_theseus</a><br><a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/sequence_labeling_ner_bert_of_theseus.py" target="_blank" rel="noopener">sequence_labeling_ner_bert_of_theseus</a></p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p><a href="https://github.com/JetRunner/BERT-of-Theseus" target="_blank" rel="noopener">论文原作者配图</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
-      
-    
-    </summary>
-    
-    
-      <category term="NLP" scheme="https://xv44586.github.io/categories/NLP/"/>
-    
-    
       <category term="BERT" scheme="https://xv44586.github.io/tags/BERT/"/>
-    
-      <category term="Distillation" scheme="https://xv44586.github.io/tags/Distillation/"/>
     
   </entry>
   
