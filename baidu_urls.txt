@@ -1,3 +1,6 @@
+https://xv44586.github.io/2022/09/08/tokenizers/
+https://xv44586.github.io/2022/07/06/horovod-multi-nodes/
+https://xv44586.github.io/2022/07/05/nohup-debug/
 https://xv44586.github.io/2022/05/25/horovod/
 https://xv44586.github.io/2022/05/23/faster-decoder/
 https://xv44586.github.io/2021/08/14/speed-up/
@@ -17,6 +20,3 @@ https://xv44586.github.io/2020/10/19/triangle/
 https://xv44586.github.io/2020/10/14/focal-loss/
 https://xv44586.github.io/2020/09/30/location/
 https://xv44586.github.io/2020/09/25/fastbert/
-https://xv44586.github.io/2020/09/13/classification-label-augment/
-https://xv44586.github.io/2020/08/31/bert-01/
-https://xv44586.github.io/2020/08/22/qa-augmentation/
