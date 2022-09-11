@@ -1,0 +1,15 @@
+g_{t}=\bigtriangledown f(w_{t})
+m_{t}=\Phi (g_{1},g_{2},...,g_{t})
+v_{t}=\Psi (g_{1},g_{2},...,g_{t})
+\eta =\alpha \cdot m_{t}/\sqrt{V_{t}}
+\omega _{t+1}=\omega_{t}-\eta_{t}
+\hat{m_{t}}=m_{t}/1-{\beta _{1}}^{t}
+\hat{v_{t}}=v_{t}/1-{\beta_{2}}^{t}
+
+\theta_{t+1}=(1-\lambda )\theta_{t} -\alpha \bigtriangledown f_{t}(\theta_{t})
+f_{t}^{reg}(\theta)=f_{t}(\theta)+\frac{{\lambda }'}{2}\left \| \theta\right \|_{2}^{2}
+\theta_{t+1}=(1-\lambda )\theta_{t} -\alpha \bigtriangledown f_{t}(\theta_{t})
+f_{t}^{reg}(\theta)=f_{t}(\theta)+\frac{{\lambda }'}{2}\left \| \theta\right \|_{2}^{2}
+\theta_{t}\leftarrow \theta_{t-1} -\alpha \frac{\beta _{1}m_{t-1}+(1-\beta_{1})(\bigtriangledown f_{t}+\lambda \theta_{t-1})}{\sqrt{\hat{v_{t}}} + \varepsilon  }
+
+\frac{\lambda \theta_{t-1}}{\sqrt{v_{t}}}

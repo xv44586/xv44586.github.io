@@ -4,20 +4,20 @@
 
 # Site
 title: 小蛋子
-subtitle: Xv44586
+subtitle: 小蛋子
 # banner显示的简短介绍
-subtitle_desc: 日常学习与兴趣交流
+subtitle_desc: NLP | Machine Learning | Developer
 description: NLP | Machine Learning | Developer
 keywords: NLP, 机器学习, 深度学习, Python, Backend
 # 个人介绍
-introduction: 不思量，自难忘！
-author: Xv44586
+introduction: NLP | Machine Learning | Developer
 language: zh-cn
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+#    url: http://xv44586.coding.me
+url: https://xv44586.github.io/
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -33,13 +33,13 @@ i18n_dir: :lang
 skip_render:
 
 # Writing
-new_post_name: :title.md # File name of new posts
 default_layout: post
 titlecase: false # Transform title into titlecase
-external_link: true # Open external links in new tab
+# external_link: true # Open external links in new tab
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
+new_post_name: :year-:month-:day-:title.md # File name of new posts
 relative_link: false
 future: true
 highlight:
@@ -47,7 +47,7 @@ highlight:
   line_number: true
   auto_detect: false
   tab_replace:
-  
+
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
 # per_page: Posts displayed per page. (0 = disable pagination)
@@ -56,10 +56,13 @@ index_generator:
   path: ''
   per_page: 10
   order_by: -date
-  
+
 # Category & Tag
 default_category: uncategorized
 category_map:
+  PaperReading: PaperReading
+  Programming: Programming
+  Life: Life
 tag_map:
 
 # Date / Time format
@@ -83,15 +86,22 @@ theme: hexo-theme-skapp
 ## Docs: https://hexo.io/docs/deployment.html
 # Deployment
 deploy:
-  type: git
-  repo: git@github.com:xv44586/xv44586.github.io.git
-  branch: master
+  - type: git
+    repository:
+        git: git@github.com:xv44586/xv44586.github.io.git
+#            coding: git@git.dev.tencent.com:xv44586/xv44586.git
+    branch: master
+
+  - type: baidu_url_submitter
+
 
 #menu
 menu:
   home: /
   archive: /archives
   about: /about
+#  tags: /tags/ || tags
+#  categories: /categories/ || th
 
 
 toc:
@@ -101,6 +111,85 @@ toc:
   decodeEntities: false
   anchor:
     position: after
-    symbol: '#'
+    symbol: ''
     style: header-anchor
+
+
+# 博客的favicon图标，支持本地及在线两种方式，本地请将图标放置于 themes/hexo-theme-skapp/source/img 目录下
+favicon_ico: /img/favicon.ico
+
+# 博客的左上角logo图标，支持本地及在线两种方式
+logo: /img/lg.png
+
+# 头像/二维码（用于显示在底部）二选一
+#avatar: http://oo12ugek5.bkt.clouddn.com/img/qrcode.png
+# qrcode: /img/sponsor.JPG
+
+# 文章的默认封面
+default_cover: /img/default_cover.jpeg
+
+# header 的背景图
+header_cover: /img/header_cov.jpeg
+
+# 404 页面的背景图
+error_page_bg: /other/404.png
+
+# 页面加载loading图标
+loader_img: /other/loading.gif
+
+# 站长信息
+author:
+  name: 小蛋子
+  link: https://github.com/xv44586
+# 用于页面 footer 的站长信息
+about:
+  info: 本站是基于 Hexo 搭建的静态资源博客，主要用于分享日常学习、生活及工作的一些心得总结。
+  address: Beijing, China
+  email: xv44586@gmail.com
+# Baidu statistic
+baidu_statistic: b1d2a1d2b250300950a8ffb5caa20818  # eb2fe66531a96575314ce55bc3399d87
+# Google statistic
+#google_statistic: ***
+
+# Busuanzi
+busuanzi: true
+
+# Baidu SEO
+baidu_push: true
+
+# 百度链接自动提交
+baidu_url_submit:
+  count: 57 # 提交最新的链接数量
+#      host:  http://xv44586.coding.me #
+  host:  http://xv44586.github.io  # 在百度站长平台中注册的域名
+  token: G6kaef7pgbVccylB # 请注意这是您的秘钥， 所以请不要把博客源代码发布在公众仓库里!
+  path: baidu_urls.txt # 文本文档的地址， 新链接会保存在此文本文档里作者：MeanMouse
+
+baidu_site_verification_github: true
+baidu_site_verification_token_github: NBO0j1DAOy  #github
+baidu_site_verification_coding: true
+baidu_site_verification_token_coding: ulZR80nUkv  # coding    # NBO0j1DAOy  github
+
+google_site_verification: true
+#    google_site_verification_token: ptcwuAdCk1Y2V7IiDN-hTKI4jk1ZXkzkk6nUUrxjhYM
+google_site_verification_token: tbK2z0UTHcAWdqNCgEwykaDA9vvvXnN4ZSp_LFbAbDc
+
+# Feed Atom
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+
+# Sitemap
+sitemap:
+  path: sitemap.xml
+
+# Gitalk
+# gitTalk:
+#   clientId: 6584f394cc686984e53d
+#   clientSecret: fe5f8e6b9f84ee67d9a507e1116c17e389787d61
+#   repo: gittalk
+#   owner: xv44586
+#   admin: 
+#     - xv44586
 
