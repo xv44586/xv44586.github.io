@@ -65,29 +65,6 @@
       </tags>
   </entry>
   <entry>
-    <title>python中的多线程</title>
-    <url>/2019/10/13/multiThreads/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<!-- tocstop -->
-</div>
-
-<p>  最近在看Python的多线程，经常我们会听到老手说：“Python下多线程是鸡肋，推荐使用多进程！”，但是为什么这么说呢？<br>要知其然，更要知其所以然。所以有了下面的深入研究：<br>首先强调背景：<br><strong>1. GIL是什么？</strong><br>  GIL的全称是Global Interpreter Lock(全局解释器锁)，来源是python设计之初的考虑，为了数据安全所做的决定。</p>
-<p><strong>2. 每个CPU在同一时间只能执行一个线程</strong><br>  在单核CPU下的多线程其实都只是并发，不是并行，并发和并行从宏观上来讲都是同时处理多路请求的概念。但并发和并行又有区别，并行是指两个或者多个事件在同一时刻发生；而并发是指两个或多个事件在同一时间间隔内发生。<br>在Python多线程下，每个线程的执行方式：<br>    <strong><strong>获取GIL</strong></strong><br>    <strong><strong>执行代码直到sleep或者是python虚拟机将其挂起。</strong></strong><br>    <strong><strong>释放GIL</strong></strong></p>
-<p>  可见，某个线程想要执行，必须先拿到GIL，我们可以把GIL看作是“通行证”，并且在一个python进程中，GIL只有一个。拿不到通行证的线程，就不允许进入CPU执行。<br>在Python2.x里，GIL的释放逻辑是当前线程遇见IO操作或者ticks计数达到100（ticks可以看作是Python自身的一个计数器，专门作用于GIL，每次释放后归零，这个计数可以通过 sys.setcheckinterval 来调整），进行释放。而每次释放GIL锁，线程进行锁竞争、切换线程，会消耗资源。并且由于GIL锁存在，python里一个进程永远只能同时执行一个线程(拿到GIL的线程才能执行)，这就是为什么在多核CPU上，python的多线程效率并不高。那么是不是python的多线程就完全没用了呢？在这里我们进行分类讨论：</p>
-<p>  <strong>CPU密集型</strong><br>  CPU密集型代码包括各种循环处理、计数等等，在这种情况下，由于计算工作多，ticks计数很快就会达到阈值，然后触发GIL的释放与再竞争（多个线程来回切换当然是需要消耗资源的），所以python下的多线程对CPU密集型代码并不友好。</p>
-<p>  <strong>IO密集型</strong><br>  IO密集型代码包括文件处理、网络爬虫等，多线程能够有效提升效率(单线程下有IO操作会进行IO等待，造成不必要的时间浪费，而开启多线程能在线程A等待时，自动切换到线程B，可以不浪费CPU的资源，从而能提升程序执行效率)。所以python的多线程对IO密集型代码比较友好。<br>而在python3.x中，GIL不使用ticks计数，改为使用计时器（执行时间达到阈值后，当前线程释放GIL），这样对CPU密集型程序更加友好，但依然没有解决GIL导致的同一时间只能执行一个线程的问题，所以效率依然不尽如人意。<br>请注意：多核多线程比单核多线程更差，原因是单核下的多线程，每次释放GIL，唤醒的那个线程都能获取到GIL锁，所以能够无缝执行，但多核下，CPU0释放GIL后，其他CPU上的线程都会进行竞争，但GIL可能会马上又被CPU0拿到，导致其他几个CPU上被唤醒后的线程会醒着等待到切换时间后又进入待调度状态，这样会造成线程颠簸(thrashing)，导致效率更低。<br>回到最开始的问题：经常我们会听到老手说：“python下想要充分利用多核CPU，就用多进程”，原因是什么呢？<br>原因是：每个进程有各自独立的GIL，互不干扰，这样就可以真正意义上的并行执行，所以在python中，多进程的执行效率优于多线程(仅仅针对多核CPU而言)。<br>所以在这里说结论：多核下，想做并行提升效率，比较通用的方法是使用多进程，能够有效提高执行效率</p>
-<p><strong>关于头图</strong><br>摄于首开广场</p>
-]]></content>
-      <categories>
-        <category>Programming</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>逻辑回归与最大熵模型</title>
     <url>/2019/10/13/logistic/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p><strong>最大熵是概论模型学习的一个准则。</strong></p>
@@ -127,6 +104,29 @@
       </categories>
       <tags>
         <tag>LR</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>python中的多线程</title>
+    <url>/2019/10/13/multiThreads/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<!-- tocstop -->
+</div>
+
+<p>  最近在看Python的多线程，经常我们会听到老手说：“Python下多线程是鸡肋，推荐使用多进程！”，但是为什么这么说呢？<br>要知其然，更要知其所以然。所以有了下面的深入研究：<br>首先强调背景：<br><strong>1. GIL是什么？</strong><br>  GIL的全称是Global Interpreter Lock(全局解释器锁)，来源是python设计之初的考虑，为了数据安全所做的决定。</p>
+<p><strong>2. 每个CPU在同一时间只能执行一个线程</strong><br>  在单核CPU下的多线程其实都只是并发，不是并行，并发和并行从宏观上来讲都是同时处理多路请求的概念。但并发和并行又有区别，并行是指两个或者多个事件在同一时刻发生；而并发是指两个或多个事件在同一时间间隔内发生。<br>在Python多线程下，每个线程的执行方式：<br>    <strong><strong>获取GIL</strong></strong><br>    <strong><strong>执行代码直到sleep或者是python虚拟机将其挂起。</strong></strong><br>    <strong><strong>释放GIL</strong></strong></p>
+<p>  可见，某个线程想要执行，必须先拿到GIL，我们可以把GIL看作是“通行证”，并且在一个python进程中，GIL只有一个。拿不到通行证的线程，就不允许进入CPU执行。<br>在Python2.x里，GIL的释放逻辑是当前线程遇见IO操作或者ticks计数达到100（ticks可以看作是Python自身的一个计数器，专门作用于GIL，每次释放后归零，这个计数可以通过 sys.setcheckinterval 来调整），进行释放。而每次释放GIL锁，线程进行锁竞争、切换线程，会消耗资源。并且由于GIL锁存在，python里一个进程永远只能同时执行一个线程(拿到GIL的线程才能执行)，这就是为什么在多核CPU上，python的多线程效率并不高。那么是不是python的多线程就完全没用了呢？在这里我们进行分类讨论：</p>
+<p>  <strong>CPU密集型</strong><br>  CPU密集型代码包括各种循环处理、计数等等，在这种情况下，由于计算工作多，ticks计数很快就会达到阈值，然后触发GIL的释放与再竞争（多个线程来回切换当然是需要消耗资源的），所以python下的多线程对CPU密集型代码并不友好。</p>
+<p>  <strong>IO密集型</strong><br>  IO密集型代码包括文件处理、网络爬虫等，多线程能够有效提升效率(单线程下有IO操作会进行IO等待，造成不必要的时间浪费，而开启多线程能在线程A等待时，自动切换到线程B，可以不浪费CPU的资源，从而能提升程序执行效率)。所以python的多线程对IO密集型代码比较友好。<br>而在python3.x中，GIL不使用ticks计数，改为使用计时器（执行时间达到阈值后，当前线程释放GIL），这样对CPU密集型程序更加友好，但依然没有解决GIL导致的同一时间只能执行一个线程的问题，所以效率依然不尽如人意。<br>请注意：多核多线程比单核多线程更差，原因是单核下的多线程，每次释放GIL，唤醒的那个线程都能获取到GIL锁，所以能够无缝执行，但多核下，CPU0释放GIL后，其他CPU上的线程都会进行竞争，但GIL可能会马上又被CPU0拿到，导致其他几个CPU上被唤醒后的线程会醒着等待到切换时间后又进入待调度状态，这样会造成线程颠簸(thrashing)，导致效率更低。<br>回到最开始的问题：经常我们会听到老手说：“python下想要充分利用多核CPU，就用多进程”，原因是什么呢？<br>原因是：每个进程有各自独立的GIL，互不干扰，这样就可以真正意义上的并行执行，所以在python中，多进程的执行效率优于多线程(仅仅针对多核CPU而言)。<br>所以在这里说结论：多核下，想做并行提升效率，比较通用的方法是使用多进程，能够有效提高执行效率</p>
+<p><strong>关于头图</strong><br>摄于首开广场</p>
+]]></content>
+      <categories>
+        <category>Programming</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -861,33 +861,6 @@
       </tags>
   </entry>
   <entry>
-    <title>有趣的概率统计题</title>
-    <url>/2019/11/30/statistics/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-
-<p>昨晚下雪了，开心😄！</p>
-<h1><span id="fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</span><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti" class="header-anchor"></a></h1><p>一段线段上，任意取两不重合的点，将这条线段切分成三段，问，这三条线段组成三角形点概率是多少？</p>
-<p>现在我们将问题转化一下，假设原始线段长度为1，即$(0，1)$表示原始线段，此时，随机在$(0，1)$范围内选两个点a，b，组成$(0，a)$，$(a，b)$，$(b，1)$三个线段，<br>此时原始问题等价于现在的三个线段组成三角形的概率。<br>现在我们来考虑一下，三条线段分别为$A$， $B$，$C$，其中$A &gt;= B &gt;= C$,则A的长度必定在$[1/3, 1)$,而要组成三角形，则需要 $B + C &gt; A$,所以 B + C 的长度为$(1/2, 1)$,<br>而对应的A的长度也就在[1/3, 1/2)内，所以，最终能构成三角形的概率即为 $A_{triangle} / A_{all} = (1/2 - 1/3) / (1 - 1/3) = 1/4$</p>
-<p>看似非常复杂的问题，从最基本的数学知识就能解答，还真是有趣！ </p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>2019年的第一场雪，摄于望京地铁站</p>
-]]></content>
-      <categories>
-        <category>Math</category>
-      </categories>
-      <tags>
-        <tag>Statistics</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>带约束的领域词挖掘</title>
     <url>/2019/11/28/domain-words/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -930,6 +903,33 @@
       </tags>
   </entry>
   <entry>
+    <title>有趣的概率统计题</title>
+    <url>/2019/11/30/statistics/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+
+<p>昨晚下雪了，开心😄！</p>
+<h1><span id="fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</span><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti" class="header-anchor"></a></h1><p>一段线段上，任意取两不重合的点，将这条线段切分成三段，问，这三条线段组成三角形点概率是多少？</p>
+<p>现在我们将问题转化一下，假设原始线段长度为1，即$(0，1)$表示原始线段，此时，随机在$(0，1)$范围内选两个点a，b，组成$(0，a)$，$(a，b)$，$(b，1)$三个线段，<br>此时原始问题等价于现在的三个线段组成三角形的概率。<br>现在我们来考虑一下，三条线段分别为$A$， $B$，$C$，其中$A &gt;= B &gt;= C$,则A的长度必定在$[1/3, 1)$,而要组成三角形，则需要 $B + C &gt; A$,所以 B + C 的长度为$(1/2, 1)$,<br>而对应的A的长度也就在[1/3, 1/2)内，所以，最终能构成三角形的概率即为 $A_{triangle} / A_{all} = (1/2 - 1/3) / (1 - 1/3) = 1/4$</p>
+<p>看似非常复杂的问题，从最基本的数学知识就能解答，还真是有趣！ </p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>2019年的第一场雪，摄于望京地铁站</p>
+]]></content>
+      <categories>
+        <category>Math</category>
+      </categories>
+      <tags>
+        <tag>Statistics</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>分享一个有趣的游戏</title>
     <url>/2019/12/09/longton/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -954,6 +954,166 @@
       </categories>
       <tags>
         <tag>Game</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>from softmax to crf</title>
+    <url>/2019/12/26/from-softmax-to-crf/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#xu-lie-biao-zhu">序列标注</a><ul>
+<li><a href="#mo-xing">模型</a></li>
+<li><a href="#shu-xue-xing-shi">数学形式</a></li>
+</ul>
+</li>
+<li><a href="#yan-shi-jian-zhou-softmax">沿时间轴Softmax</a></li>
+<li><a href="#crf">CRF</a></li>
+<li><a href="#xian-xing-lian-crf">线性链CRF</a></li>
+<li><a href="#qiu-jie">求解</a></li>
+<li><a href="#demo">demo</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>又做NER相关东西， 用到了CRF，所以想给组里人从头一步一步的将CRF讲一遍，希望大家看完能明白CRF的数学模型已经工程上的使用。<br>网上关于CRF大多数都是将他与HMM及概率图模型一起对比着讲，但是我觉得这需要一些背景知识，鉴于上次分享发现大家并没有什么背景知识，<br>所以这次希望能尽量减少背景知识就能让人搞懂CRF。</p>
+<h1><span id="xu-lie-biao-zhu">序列标注</span><a href="#xu-lie-biao-zhu" class="header-anchor"></a></h1><h2><span id="mo-xing">模型</span><a href="#mo-xing" class="header-anchor"></a></h2><p>通常CRF出现在序列标注任务中，所以我们先来看看序列标注主要是做什么的。<br>序列标注是NLP中一个重要的任务，它包括分词、词性标注、命名实体识等。下面用一个分词的例子来简单说明。（<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a>)<br>假设我们现在用$bmes$四标签来进行分词，其中b 代表begin即词的开头， m代表middle即词内，e代表end即词的结尾，s代表single即单独成词。<br>现在我们有一个字符串序列 “今天天气不错”，如果对应的分词结果为“今天/天气/不/错”，则其标签序列为“bebess”。由于在序列标注中，我们认为正确的标签序列是唯一的，<br>所以我们的目标就是在所有可能的标签序列中（如bbbbbb,ssssss)挑选出真实的标签序列（bebess), 即最大化概率$P(bebess|今天天气不错）$。<br><img src="/2019/12/26/from-softmax-to-crf/seg.png" alt="4tag分词网络示意图"><br>即在上图中，所有从左至右的连线中，选出黄色的那条。</p>
+<h2><span id="shu-xue-xing-shi">数学形式</span><a href="#shu-xue-xing-shi" class="header-anchor"></a></h2><p>我们假设输入序列是$X=[x_1, x_2, x_3, …, x_n]$,对应的输出序列是 $Y = [y_1, y_2, …, y_n]$,<br>label的集合为$L = [l_1, l_2, … , l_k]$. 任务目标是让真实的输出序列的概率最大，即：<br>$$<br>Max(P(y_1,y_2,..y_n|X))<br>$$</p>
+<h1><span id="yan-shi-jian-zhou-softmax">沿时间轴Softmax</span><a href="#yan-shi-jian-zhou-softmax" class="header-anchor"></a></h1><p>直接对上述模型进行求解比较困难，所以我们先将问题简化，然后在对简化后的问题进行求解。<br>首先，我们引入朴素假设：即标签之间独立不相关，对应的目标就简化为：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>$$<br>为了对$P(y_i|X)$进行建模，通常我们先通过RNNs（LSTM，BiLSTM, etc)来捕获输入X的全局信息，获得隐藏状态序列$\bar{x_1}, \bar{x_2}, …, \bar{x_n}$,<br>此时的$\bar{x_i}$可以看作是$x_i$ 通过X获取的特征，由于RNNs可以捕获全局信息，所以我们认为特征$\bar{x_i}$之间互不相关，对应的<br>$$P(y_i|X) = P(y_i|\bar{x_i})$$<br>我们的目标：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>= Max(P(y_1|\bar{x_1})P(y_2|\bar{x_2})..P(y_n|\bar{x_n}))<br>= Max(\prod(P(y_i|\bar{x_i})))<br>$$<br>此时只需要$Max(P(y_i|\bar{x_i}))$进行求解，即沿时间轴一步一步的对RNNs的隐藏输出通过softmax来最大化对应目标标签概率。<br><img src="/2019/12/26/from-softmax-to-crf/softmax.png" alt="沿时间轴softmax"></p>
+<h1><span id="crf">CRF</span><a href="#crf" class="header-anchor"></a></h1><p>因为在上一个方案中，我们做了朴素建设，将输出序列看作是相互独立的一元模型，这样会引入一些问题，如在分词中（bmes），m- 标签不能出现在s- 后面，<br>s- 标签不能出现在b- 和m-后面等，所以即使在上述方案中，至少也需要人为的设置一个“转移矩阵”，将不合理的转移方式得分置为0，来避免不合理方案的出现。<br>而上述方案出现错误的原因，本质上是因为我们的朴素假设：标签之间相互独立。为了解决上述方案的问题，我们至少需要在输出端显式考虑标签的关联性，即输出标签与上下文相关。<br><img src="/2019/12/26/from-softmax-to-crf/crf_example.png" alt="显式考虑输出端上下文"><br>显式考虑输出端上下文相关</p>
+<p>现在我们回到原始目标上来，原始目标是$Max(P(y_1,y_2,..y_n|X)) $, 上个方案中我们是因为直接对$P(y_1, y_2,…y_n|x_1, x_2, …,x_n)$直接建模很难，<br>所以才做出了假设，简化目标。现在让我们换个思路，为了求解上述概率，我们还可以穷举出输出序列所有的可能结果$Y_1, Y_2, …, Y_{k^n}$,<br>然后如果能计算出当前输入X对应每种可能的输出序列的“值”， 则我们可以通过Softmax计算出真实输出序列的概率，即得到$P(Y_{true}|X)$。<br><code>假设一：我们可以学习一个打分函数f，通过函数f可以得到输出序列关于输入的得分，即$score_i = f(Y_i, X)$</code><br>此时，我们的目标就转化为 $P(Y|X) = \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}$.<br>其中$Z(X) = \sum_{i=1}^{k^n}(exp(f(Y_i, X)))$。即此时的概率P是一个指数分布。<br>此时我们的方案是<code>1</code>个<code>$k^n$</code>多分类问题，即我们是对一个完整的输出序列为单位来计算概率（路径积分），而上一个方案中，是<code>n</code>个<code>k</code>分类问题，<br>这是两个方案的不同点之一。<br>在方案一中我们也说过，直接对完整序列建模比较困难，此时我们直接对$f(Y_i, X)$求解也会面临相同的困难，为了避免方案一的问题，我们不再使用一元模型，改为二元模型。<br><code>引入一阶马尔可夫假设，且其关联性是加性的。即当前输出标签只与前一个输出标签相关，其总得分是对所有得分求和。</code><br>此时的目标就转化为<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= P(y_1|X)P(y_2|y_1;X)…P(y_n|y_{n-1}|X)<br>= P(y_1|X)\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)} P(y_2|X) … \frac{P(y_{n-1}, y_n|X)}{P(y_{n-1}|X)P(y_n|X)} P(y_n|X)<br>$$<br>假设一中我们假设P是一个指数分布，所以此时我们引入两个函数e 和 t：e对$P(y_i|X)$建模, t 对$\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)}$建模，即：<br>$$<br>P(y_i|X) = exp(e(y_i, X))<br>\frac{P(y_{i-1},y_1|X)}{P(y_{i-1}|X)P(y_i|X)} = P(y_i|X)exp(t(y_{i-i}, y_i; X))<br>$$</p>
+<p>此时的目标就化简为：<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}<br>= \frac{1}{Z(X)} exp(e(y_i,X) + t(y_1, y_2; X) + e(y_2, X) + … + t(y_{n-1}, y_n; X) + e(y_n, X))<br>$$<br>此时我们只需要对每个标签和相邻标签打分，然后将所有打分求和，即可得到总得分，然后对目标进行求解。</p>
+<h1><span id="xian-xing-lian-crf">线性链CRF</span><a href="#xian-xing-lian-crf" class="header-anchor"></a></h1><p>虽然上面已经做了大量简化，但是求解时依然比较困难，主要是在求解t中，因为需要同时对输入X与标签$y_i$, $y_{i-1}$同时考虑，而在e中，<br>已经将输入与输出的关联进行了建模，此时我们引入线性链假设：假设t与输入X无关，则此时$ t(y_{i-1}, y_i;X) = t(y_{i-1}, y_i)$，那打分函数f简化为：<br>$$<br>f(y_1, y_2, …, y_n;X)<br>= e(y_1,X) + t(y_1, y_2) + e(y_2, X) + … + t(y_{n-1},y_n;X) + e(y_n,X)<br>$$<br>此时t就是一个待训练的参数矩阵，而e则可以通过RNNs来建模，概率分布也变为：</p>
+<p>$$<br>P(y_1, y_2,…,y_n|x_1, x_2,…,x_n)<br>= exp(e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e(y_{i+1}, X)])) \frac{1}{Z(X)}<br>$$</p>
+<h1><span id="qiu-jie">求解</span><a href="#qiu-jie" class="header-anchor"></a></h1><p>为了求解模型，我们用最大似然法， 即：</p>
+<p>$$loss = -logP(y_1, y_2, …, y_n|x_1, x_2, …, x_n)$$<br>将上式代入：</p>
+<p>$$loss = logZ(X) - (e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e( y_{i+1} , X)]) $$</p>
+<p>减号后面的项通过添加一个待训练的参数矩阵循环计算即可得到结果，难算的前面的归一化因子Z(X)。前面我们也说了，我们此时是以路径为单位，<br>则此时Z(X) 需要我们穷举所有可能的路径比对其打分求和，而此时的路径有 $k^n$条，是指数级的，直接算效率太低，几乎不可能。<br>在假设二中，我们引入了一阶马尔可夫假设，当前标签只与前一个标签有联系，因此我们可以递归的计算归一化因子，这使得原来是指数级的计算量降低为线性级别。<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a><br>（这点是求解归一化因子的关键，最初我在推导时一直卡在这点上）<br>具体的: 将计算到时刻t的归一化因子记为Zt，并将它安装标签分为k个部分，即：</p>
+<p>$$Zt = Zt^1 + Zt^2 + … + Zt^k$$<br>其中$Zt^i$表示以标签i为终点的所有路径的得分指数和，此时，我们写出递归公式：</p>
+<p>$$Z_{t+1}^1 = (Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X)$$</p>
+<p>$$…  $$</p>
+<p>$$Z_{t+1}^k = (Zt^1 T_{1k} + Zt^2 T{2k} + … + Zt^k T_{kk})E_{t+1}(k|X)$$</p>
+<p>其中T是矩阵t的各个元素取指数形式，即$T_{ij} = exp(t_{ij})$, E是e的指数形式，即$E_{ij} = exp(e_{ij})$, 而$e_{ij}$是指时刻i时RNNs对label j的打分。<br><img src="/2019/12/26/from-softmax-to-crf/logz.png" alt="logz"></p>
+<p>上式带有指数形式，我们取对数来简化计算过程。<br>$$<br>log(Z_{t+1}^1) = log((Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X) )  \\<br>=log(exp(log(Zt^1) + t_{11}) + exp(log(Zt^2) + t_{21}) + … + exp(log(Zt^k) + t_{k1}) exp(e_{t+1}(1|X)))  \\<br>= log(exp(log(Zt^1) + t_{11} + e_{t+1}(1|X)) + exp(log(Zt^2) + t_{21} + e_{t+1}(1|X)) + … + exp(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))\\<br>= log(\sum_k(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))<br>$$</p>
+<p>上面的过程比较曲折，对有些同学可能不太好理解，我们用一个简单的例子来帮助理解。<br>我们假设我们现在有一个输入$X=[w_0,w_1, w_2]$, 标签集合为$L=[l_1, l_2]$. RNNs对e完成了建模，即：</p>
+<table>
+<thead>
+<tr>
+<th>&nbsp;</th>
+<th>l1</th>
+<th>l2     </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>w0</td>
+<td>$e_{01}$</td>
+<td>$e_{02}$ </td>
+</tr>
+<tr>
+<td>w1</td>
+<td>$e_{11}$</td>
+<td>$e_{12}$ </td>
+</tr>
+<tr>
+<td>w2</td>
+<td>$e_{21}$</td>
+<td>$e_{22}$ </td>
+</tr>
+</tbody>
+</table>
+<p>其中$e_{ij}$代表第i个字是第j个标签的得分。<br>转移矩阵t:</p>
+<table>
+<thead>
+<tr>
+<th>&nbsp;</th>
+<th>l1</th>
+<th>l2 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>l1</td>
+<td>t11</td>
+<td>t12  </td>
+</tr>
+<tr>
+<td>l2</td>
+<td>t21</td>
+<td>t22  </td>
+</tr>
+</tbody>
+</table>
+<p>其中$t_{ij}$代表第i个标签转换为第j个标签的得分。<br>接下来我们按从$w_0$到$w_2$的方向一步一步来进行计算。首先，我们引入两个变量: states, cur，其中:  </p>
+<ul>
+<li>states代表上一个时刻计算的最终结果，即对应$log(Z_t^i)$</li>
+<li><p>cur代表当前时刻各个标签的得分，即对应$e_t^i$</p>
+</li>
+<li><p><code>$w_0$:</code></p>
+</li>
+<li>states = None</li>
+<li>$cur = [e_{01}, e_{02}]$<br>此时:<br>$$log(Z) = exp(e_{01}) + exp(e_{02})$$</li>
+</ul>
+<ul>
+<li><code>$w_0$ –&gt; $w_1$:</code></li>
+<li>states = $[e_{01}, e_{02}]$</li>
+<li>cur = $[e_{11}, e{12}]$</li>
+</ul>
+<ol>
+<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="2">
+<li>扩展cur:<br>$<br>cur = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="3">
+<li>将cur, states 与转移矩阵t 求和:</li>
+</ol>
+<p>$<br>score = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>t_{11}&amp;t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix}$$<br>$=$ $$\begin{pmatrix}<br>e_{01} + e_{11} + t_{11} &amp; e_{01} + e_{12} + t_{12}\\<br>e_{02} + e_{11} + t_{21} &amp; e_{02} + e_{12} + t_{22}\\<br>\end{pmatrix}$$<br>$</p>
+<ol start="4">
+<li>对score取指数形式然后求和，得到新的states:<br>$$<br>states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))]<br>$$<br>其中，states中的每个元素即对应着式中$logZ_{t}^i$, 此时的$log(Z)= \sum_k(exp(log(Z^k)))$:</li>
+</ol>
+<p>$$<br>log(Z_{0,1}) = log(exp(log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))) + exp(log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22})))) \\<br>= log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}) + exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))<br>$$</p>
+<p>当序列长度为2，标签有两个时，所有可能的标签序列为$(label_1-&gt;label_1, label_2-&gt;label_1, label_1-&gt;label_2, label_2-&gt;label_2)$,而对应的序列得分，即对应上式中的项，即：</p>
+<ul>
+<li>$ S_1: label_1-&gt;label_1:$<br>$ S_1 = e_{01} + e_{11} + t_{11} $</li>
+<li>$S_2: label_2-&gt;label_1:$<br>$ S_2 = e_{02} + e_{11} + t_{21}$</li>
+<li>$S_3 = label_1-&gt;label_2:$<br>$ S_3 = e_{01} + e_{12} + t_{12}$</li>
+<li>$S_4 = label_2-&gt;label_2:$<br>$ S_4 = e_{02} + e_{12} + t_{22}$</li>
+</ul>
+<ul>
+<li><code>$w_0$ -&gt; $w_1$ -&gt; $w_2$:</code></li>
+<li>$states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))] $</li>
+<li>$cur = [e_{21}, e_{22}]$</li>
+</ul>
+<p>与上面的做法一样，也分为4步：</p>
+<ol>
+<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))&amp;log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))\\<br>log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))&amp;log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="2">
+<li>cur：<br>$<br>cur = $$\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="3">
+<li>将states，cur与转义矩阵t求和：</li>
+</ol>
+<p>$$<br>scores = \begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) &amp; log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) \\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) &amp; log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>t_{11}&amp; t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix} \\=<br>\begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11} &amp;log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12}\\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21} &amp;log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22}\\<br>\end{pmatrix}<br>$$</p>
+<ol start="4">
+<li>对score取指数形式然后求和，得到新的states:</li>
+</ol>
+<p>$$ states = [\\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11})+exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21})), \\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12})+ exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22})))] \\<br> = [log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})),\\<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22}))]<br>$$</p>
+<p>现在，我们用states计算一下$(Z_2)$:</p>
+<p>$$<br>log(Z_{(0-&gt;1-&gt;2)}) = log(exp(states[0]) + exp(states[1])) \\<br>=log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})) \\+<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22})) \\<br>= log(exp(e_{01}+e_{11}+t_{11}+e_{21}+t_{11}) + exp(e_{02}+e_{11}+t_{21}+e_{21}+t_{11}) \\ +<br>exp(e_{01}+e_{12}+t_{12} +e_{21}+t_{21}) + exp(e_{02}+e_{12}+t_{22}+e_{21}+t_{21}) \\+<br>exp(e_{01}+e_{11}+t_{11} +e_{22}+t_{12}) + exp(e_{01}+e_{11}+t_{11}+e_{22}+t_{12}) \\+<br>exp(e_{01}+e_{12}+t_{12} +e_{22}+t_{22}) + exp(e_{01}+e_{12}+t_{12}+e_{22}+t_{21}))<br>$$</p>
+<p>上式也就是我们要求的最终结果$log(Z)$,其中指数内对应着所有路径的得分。<br>到此，上例中的整个归一化因子的计算过程也就完成了，而CRF中最难的部分也就解决了。</p>
+<h1><span id="demo">demo</span><a href="#demo" class="header-anchor"></a></h1><p>搞懂了理论部分，下面写一个demo来验证一下。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CRF</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mask_label=False, **kwargs)</span>:</span></span><br><span class="line">        self.mask_label = <span class="number">1</span> <span class="keyword">if</span> mask_label <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        super(CRF, self).__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">build</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        self.num_label = input_shape[<span class="number">-1</span>] - self.mask_label</span><br><span class="line">        self.trans = self.add_weight(name=<span class="string">'crf_trans'</span>,</span><br><span class="line">                                     shape=(self.num_label, self.num_label),</span><br><span class="line">                                     trainable=<span class="literal">True</span>,</span><br><span class="line">                                     initializer=<span class="string">'glorot_uniform'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">path_score</span><span class="params">(self, inputs, labels)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label), obtained from rnn(lstm, bilstm. etc.)</span></span><br><span class="line"><span class="string">        :param labels: one-hot, (batch_size, timesteps, num_label) , real target series</span></span><br><span class="line"><span class="string">        :return:  path score</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        point_score = K.sum(K.sum(inputs * labels, <span class="number">2</span>), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        label_pre = K.expand_dims(labels[:, :<span class="number">-1</span>], <span class="number">3</span>)</span><br><span class="line">        label_next = K.expand_dims(labels[:, <span class="number">1</span>:], <span class="number">2</span>)</span><br><span class="line">        label_trans = label_pre * label_next</span><br><span class="line">        trans = K.expand_dims(K.expand_dims(self.trans, <span class="number">0</span>), <span class="number">0</span>)</span><br><span class="line">        trans_score = K.sum(K.sum(label_trans * trans, [<span class="number">2</span>, <span class="number">3</span>]), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> point_score + trans_score</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">log_norm_pre</span><span class="params">(self, inputs, states)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        expand previous states and inputs, sum with trans</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, num_label), current word emission scores</span></span><br><span class="line"><span class="string">        :param states: (batch_size, num_label), all paths  score of previous word</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        states = K.expand_dims(states[<span class="number">0</span>], <span class="number">2</span>)</span><br><span class="line">        inputs = K.expand_dims(inputs, <span class="number">1</span>)</span><br><span class="line">        trans = K.expand_dims(self.trans, <span class="number">0</span>)</span><br><span class="line">        scores = states + trans + inputs</span><br><span class="line">        output = K.logsumexp(scores, <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> output, [output]</span><br><span class="line">        <span class="comment"># states = K.expand_dims(states[0], 2)  # (batch_size, output_dim, 1)</span></span><br><span class="line">        <span class="comment"># trans = K.expand_dims(self.trans, 0)  # (1, output_dim, output_dim)</span></span><br><span class="line">        <span class="comment"># output = K.logsumexp(states + trans, 1)  # (batch_size, output_dim)</span></span><br><span class="line">        <span class="comment"># return output + inputs, [output + inputs]</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">loss</span><span class="params">(self, y_true, y_pre)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label)</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># mask = 1 - y_true[:, 1: -1] if self.mask_label else None</span></span><br><span class="line">        <span class="comment"># # y_true, y_pred = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span></span><br><span class="line">        <span class="comment"># real_path_score = self.path_score(y_pre, y_true)</span></span><br><span class="line">        <span class="comment"># init_states = [y_pre[:, 0]]</span></span><br><span class="line">        <span class="comment"># log_norm, _ = K.rnn(self.log_norm_pre, initial_states=init_states, inputs=y_pre[:, 1:], mask=mask)  # log(Z)</span></span><br><span class="line">        <span class="comment"># log_norm_score = K.logsumexp(log_norm, 1, keepdims=True)</span></span><br><span class="line">        <span class="comment"># return log_norm_score - real_path_score</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, <span class="number">1</span>:, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pre = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span><br><span class="line">        init_states = [y_pre[:, <span class="number">0</span>]]  <span class="comment"># 初始状态</span></span><br><span class="line">        log_norm, _, _ = K.rnn(self.log_norm_pre, y_pre[:, <span class="number">1</span>:], init_states, mask=mask)  <span class="comment"># 计算Z向量（对数）</span></span><br><span class="line">        log_norm = K.logsumexp(log_norm, <span class="number">1</span>, keepdims=<span class="literal">True</span>)  <span class="comment"># 计算Z（对数）</span></span><br><span class="line">        path_score = self.path_score(y_pre, y_true)  <span class="comment"># 计算分子（对数）</span></span><br><span class="line">        <span class="keyword">return</span> log_norm - path_score  <span class="comment"># 即log(分子/分母)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span>  <span class="comment"># crf 只是loss，不改变inputs</span></span><br><span class="line">        <span class="keyword">return</span> inputs</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accuracy</span><span class="params">(self, y_true, y_pred)</span>:</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, :, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pred = y_true[:, :, :self.num_label], y_pred[:, :, :self.num_label]</span><br><span class="line">        isequal = K.equal(K.argmax(y_true, <span class="number">2</span>), K.argmax(y_pred, <span class="number">2</span>))</span><br><span class="line">        isequal = K.cast(isequal, <span class="string">'float32'</span>)</span><br><span class="line">        <span class="keyword">if</span> mask == <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> K.mean(isequal)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> K.sum(isequal * mask) / K.sum(mask)</span><br></pre></td></tr></table></figure></p>
+<p>结果：<br><img src="/2019/12/26/from-softmax-to-crf/result.png" alt="result"></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>初雪下的红果果</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>CRF</tag>
       </tags>
   </entry>
   <entry>
@@ -1127,166 +1287,6 @@
       <tags>
         <tag>Hexo</tag>
         <tag>MarkDown</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>from softmax to crf</title>
-    <url>/2019/12/26/from-softmax-to-crf/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#xu-lie-biao-zhu">序列标注</a><ul>
-<li><a href="#mo-xing">模型</a></li>
-<li><a href="#shu-xue-xing-shi">数学形式</a></li>
-</ul>
-</li>
-<li><a href="#yan-shi-jian-zhou-softmax">沿时间轴Softmax</a></li>
-<li><a href="#crf">CRF</a></li>
-<li><a href="#xian-xing-lian-crf">线性链CRF</a></li>
-<li><a href="#qiu-jie">求解</a></li>
-<li><a href="#demo">demo</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>又做NER相关东西， 用到了CRF，所以想给组里人从头一步一步的将CRF讲一遍，希望大家看完能明白CRF的数学模型已经工程上的使用。<br>网上关于CRF大多数都是将他与HMM及概率图模型一起对比着讲，但是我觉得这需要一些背景知识，鉴于上次分享发现大家并没有什么背景知识，<br>所以这次希望能尽量减少背景知识就能让人搞懂CRF。</p>
-<h1><span id="xu-lie-biao-zhu">序列标注</span><a href="#xu-lie-biao-zhu" class="header-anchor"></a></h1><h2><span id="mo-xing">模型</span><a href="#mo-xing" class="header-anchor"></a></h2><p>通常CRF出现在序列标注任务中，所以我们先来看看序列标注主要是做什么的。<br>序列标注是NLP中一个重要的任务，它包括分词、词性标注、命名实体识等。下面用一个分词的例子来简单说明。（<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a>)<br>假设我们现在用$bmes$四标签来进行分词，其中b 代表begin即词的开头， m代表middle即词内，e代表end即词的结尾，s代表single即单独成词。<br>现在我们有一个字符串序列 “今天天气不错”，如果对应的分词结果为“今天/天气/不/错”，则其标签序列为“bebess”。由于在序列标注中，我们认为正确的标签序列是唯一的，<br>所以我们的目标就是在所有可能的标签序列中（如bbbbbb,ssssss)挑选出真实的标签序列（bebess), 即最大化概率$P(bebess|今天天气不错）$。<br><img src="/2019/12/26/from-softmax-to-crf/seg.png" alt="4tag分词网络示意图"><br>即在上图中，所有从左至右的连线中，选出黄色的那条。</p>
-<h2><span id="shu-xue-xing-shi">数学形式</span><a href="#shu-xue-xing-shi" class="header-anchor"></a></h2><p>我们假设输入序列是$X=[x_1, x_2, x_3, …, x_n]$,对应的输出序列是 $Y = [y_1, y_2, …, y_n]$,<br>label的集合为$L = [l_1, l_2, … , l_k]$. 任务目标是让真实的输出序列的概率最大，即：<br>$$<br>Max(P(y_1,y_2,..y_n|X))<br>$$</p>
-<h1><span id="yan-shi-jian-zhou-softmax">沿时间轴Softmax</span><a href="#yan-shi-jian-zhou-softmax" class="header-anchor"></a></h1><p>直接对上述模型进行求解比较困难，所以我们先将问题简化，然后在对简化后的问题进行求解。<br>首先，我们引入朴素假设：即标签之间独立不相关，对应的目标就简化为：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>$$<br>为了对$P(y_i|X)$进行建模，通常我们先通过RNNs（LSTM，BiLSTM, etc)来捕获输入X的全局信息，获得隐藏状态序列$\bar{x_1}, \bar{x_2}, …, \bar{x_n}$,<br>此时的$\bar{x_i}$可以看作是$x_i$ 通过X获取的特征，由于RNNs可以捕获全局信息，所以我们认为特征$\bar{x_i}$之间互不相关，对应的<br>$$P(y_i|X) = P(y_i|\bar{x_i})$$<br>我们的目标：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>= Max(P(y_1|\bar{x_1})P(y_2|\bar{x_2})..P(y_n|\bar{x_n}))<br>= Max(\prod(P(y_i|\bar{x_i})))<br>$$<br>此时只需要$Max(P(y_i|\bar{x_i}))$进行求解，即沿时间轴一步一步的对RNNs的隐藏输出通过softmax来最大化对应目标标签概率。<br><img src="/2019/12/26/from-softmax-to-crf/softmax.png" alt="沿时间轴softmax"></p>
-<h1><span id="crf">CRF</span><a href="#crf" class="header-anchor"></a></h1><p>因为在上一个方案中，我们做了朴素建设，将输出序列看作是相互独立的一元模型，这样会引入一些问题，如在分词中（bmes），m- 标签不能出现在s- 后面，<br>s- 标签不能出现在b- 和m-后面等，所以即使在上述方案中，至少也需要人为的设置一个“转移矩阵”，将不合理的转移方式得分置为0，来避免不合理方案的出现。<br>而上述方案出现错误的原因，本质上是因为我们的朴素假设：标签之间相互独立。为了解决上述方案的问题，我们至少需要在输出端显式考虑标签的关联性，即输出标签与上下文相关。<br><img src="/2019/12/26/from-softmax-to-crf/crf_example.png" alt="显式考虑输出端上下文"><br>显式考虑输出端上下文相关</p>
-<p>现在我们回到原始目标上来，原始目标是$Max(P(y_1,y_2,..y_n|X)) $, 上个方案中我们是因为直接对$P(y_1, y_2,…y_n|x_1, x_2, …,x_n)$直接建模很难，<br>所以才做出了假设，简化目标。现在让我们换个思路，为了求解上述概率，我们还可以穷举出输出序列所有的可能结果$Y_1, Y_2, …, Y_{k^n}$,<br>然后如果能计算出当前输入X对应每种可能的输出序列的“值”， 则我们可以通过Softmax计算出真实输出序列的概率，即得到$P(Y_{true}|X)$。<br><code>假设一：我们可以学习一个打分函数f，通过函数f可以得到输出序列关于输入的得分，即$score_i = f(Y_i, X)$</code><br>此时，我们的目标就转化为 $P(Y|X) = \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}$.<br>其中$Z(X) = \sum_{i=1}^{k^n}(exp(f(Y_i, X)))$。即此时的概率P是一个指数分布。<br>此时我们的方案是<code>1</code>个<code>$k^n$</code>多分类问题，即我们是对一个完整的输出序列为单位来计算概率（路径积分），而上一个方案中，是<code>n</code>个<code>k</code>分类问题，<br>这是两个方案的不同点之一。<br>在方案一中我们也说过，直接对完整序列建模比较困难，此时我们直接对$f(Y_i, X)$求解也会面临相同的困难，为了避免方案一的问题，我们不再使用一元模型，改为二元模型。<br><code>引入一阶马尔可夫假设，且其关联性是加性的。即当前输出标签只与前一个输出标签相关，其总得分是对所有得分求和。</code><br>此时的目标就转化为<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= P(y_1|X)P(y_2|y_1;X)…P(y_n|y_{n-1}|X)<br>= P(y_1|X)\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)} P(y_2|X) … \frac{P(y_{n-1}, y_n|X)}{P(y_{n-1}|X)P(y_n|X)} P(y_n|X)<br>$$<br>假设一中我们假设P是一个指数分布，所以此时我们引入两个函数e 和 t：e对$P(y_i|X)$建模, t 对$\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)}$建模，即：<br>$$<br>P(y_i|X) = exp(e(y_i, X))<br>\frac{P(y_{i-1},y_1|X)}{P(y_{i-1}|X)P(y_i|X)} = P(y_i|X)exp(t(y_{i-i}, y_i; X))<br>$$</p>
-<p>此时的目标就化简为：<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}<br>= \frac{1}{Z(X)} exp(e(y_i,X) + t(y_1, y_2; X) + e(y_2, X) + … + t(y_{n-1}, y_n; X) + e(y_n, X))<br>$$<br>此时我们只需要对每个标签和相邻标签打分，然后将所有打分求和，即可得到总得分，然后对目标进行求解。</p>
-<h1><span id="xian-xing-lian-crf">线性链CRF</span><a href="#xian-xing-lian-crf" class="header-anchor"></a></h1><p>虽然上面已经做了大量简化，但是求解时依然比较困难，主要是在求解t中，因为需要同时对输入X与标签$y_i$, $y_{i-1}$同时考虑，而在e中，<br>已经将输入与输出的关联进行了建模，此时我们引入线性链假设：假设t与输入X无关，则此时$ t(y_{i-1}, y_i;X) = t(y_{i-1}, y_i)$，那打分函数f简化为：<br>$$<br>f(y_1, y_2, …, y_n;X)<br>= e(y_1,X) + t(y_1, y_2) + e(y_2, X) + … + t(y_{n-1},y_n;X) + e(y_n,X)<br>$$<br>此时t就是一个待训练的参数矩阵，而e则可以通过RNNs来建模，概率分布也变为：</p>
-<p>$$<br>P(y_1, y_2,…,y_n|x_1, x_2,…,x_n)<br>= exp(e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e(y_{i+1}, X)])) \frac{1}{Z(X)}<br>$$</p>
-<h1><span id="qiu-jie">求解</span><a href="#qiu-jie" class="header-anchor"></a></h1><p>为了求解模型，我们用最大似然法， 即：</p>
-<p>$$loss = -logP(y_1, y_2, …, y_n|x_1, x_2, …, x_n)$$<br>将上式代入：</p>
-<p>$$loss = logZ(X) - (e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e( y_{i+1} , X)]) $$</p>
-<p>减号后面的项通过添加一个待训练的参数矩阵循环计算即可得到结果，难算的前面的归一化因子Z(X)。前面我们也说了，我们此时是以路径为单位，<br>则此时Z(X) 需要我们穷举所有可能的路径比对其打分求和，而此时的路径有 $k^n$条，是指数级的，直接算效率太低，几乎不可能。<br>在假设二中，我们引入了一阶马尔可夫假设，当前标签只与前一个标签有联系，因此我们可以递归的计算归一化因子，这使得原来是指数级的计算量降低为线性级别。<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a><br>（这点是求解归一化因子的关键，最初我在推导时一直卡在这点上）<br>具体的: 将计算到时刻t的归一化因子记为Zt，并将它安装标签分为k个部分，即：</p>
-<p>$$Zt = Zt^1 + Zt^2 + … + Zt^k$$<br>其中$Zt^i$表示以标签i为终点的所有路径的得分指数和，此时，我们写出递归公式：</p>
-<p>$$Z_{t+1}^1 = (Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X)$$</p>
-<p>$$…  $$</p>
-<p>$$Z_{t+1}^k = (Zt^1 T_{1k} + Zt^2 T{2k} + … + Zt^k T_{kk})E_{t+1}(k|X)$$</p>
-<p>其中T是矩阵t的各个元素取指数形式，即$T_{ij} = exp(t_{ij})$, E是e的指数形式，即$E_{ij} = exp(e_{ij})$, 而$e_{ij}$是指时刻i时RNNs对label j的打分。<br><img src="/2019/12/26/from-softmax-to-crf/logz.png" alt="logz"></p>
-<p>上式带有指数形式，我们取对数来简化计算过程。<br>$$<br>log(Z_{t+1}^1) = log((Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X) )  \\<br>=log(exp(log(Zt^1) + t_{11}) + exp(log(Zt^2) + t_{21}) + … + exp(log(Zt^k) + t_{k1}) exp(e_{t+1}(1|X)))  \\<br>= log(exp(log(Zt^1) + t_{11} + e_{t+1}(1|X)) + exp(log(Zt^2) + t_{21} + e_{t+1}(1|X)) + … + exp(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))\\<br>= log(\sum_k(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))<br>$$</p>
-<p>上面的过程比较曲折，对有些同学可能不太好理解，我们用一个简单的例子来帮助理解。<br>我们假设我们现在有一个输入$X=[w_0,w_1, w_2]$, 标签集合为$L=[l_1, l_2]$. RNNs对e完成了建模，即：</p>
-<table>
-<thead>
-<tr>
-<th>&nbsp;</th>
-<th>l1</th>
-<th>l2     </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>w0</td>
-<td>$e_{01}$</td>
-<td>$e_{02}$ </td>
-</tr>
-<tr>
-<td>w1</td>
-<td>$e_{11}$</td>
-<td>$e_{12}$ </td>
-</tr>
-<tr>
-<td>w2</td>
-<td>$e_{21}$</td>
-<td>$e_{22}$ </td>
-</tr>
-</tbody>
-</table>
-<p>其中$e_{ij}$代表第i个字是第j个标签的得分。<br>转移矩阵t:</p>
-<table>
-<thead>
-<tr>
-<th>&nbsp;</th>
-<th>l1</th>
-<th>l2 </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>l1</td>
-<td>t11</td>
-<td>t12  </td>
-</tr>
-<tr>
-<td>l2</td>
-<td>t21</td>
-<td>t22  </td>
-</tr>
-</tbody>
-</table>
-<p>其中$t_{ij}$代表第i个标签转换为第j个标签的得分。<br>接下来我们按从$w_0$到$w_2$的方向一步一步来进行计算。首先，我们引入两个变量: states, cur，其中:  </p>
-<ul>
-<li>states代表上一个时刻计算的最终结果，即对应$log(Z_t^i)$</li>
-<li><p>cur代表当前时刻各个标签的得分，即对应$e_t^i$</p>
-</li>
-<li><p><code>$w_0$:</code></p>
-</li>
-<li>states = None</li>
-<li>$cur = [e_{01}, e_{02}]$<br>此时:<br>$$log(Z) = exp(e_{01}) + exp(e_{02})$$</li>
-</ul>
-<ul>
-<li><code>$w_0$ –&gt; $w_1$:</code></li>
-<li>states = $[e_{01}, e_{02}]$</li>
-<li>cur = $[e_{11}, e{12}]$</li>
-</ul>
-<ol>
-<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="2">
-<li>扩展cur:<br>$<br>cur = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="3">
-<li>将cur, states 与转移矩阵t 求和:</li>
-</ol>
-<p>$<br>score = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>t_{11}&amp;t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix}$$<br>$=$ $$\begin{pmatrix}<br>e_{01} + e_{11} + t_{11} &amp; e_{01} + e_{12} + t_{12}\\<br>e_{02} + e_{11} + t_{21} &amp; e_{02} + e_{12} + t_{22}\\<br>\end{pmatrix}$$<br>$</p>
-<ol start="4">
-<li>对score取指数形式然后求和，得到新的states:<br>$$<br>states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))]<br>$$<br>其中，states中的每个元素即对应着式中$logZ_{t}^i$, 此时的$log(Z)= \sum_k(exp(log(Z^k)))$:</li>
-</ol>
-<p>$$<br>log(Z_{0,1}) = log(exp(log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))) + exp(log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22})))) \\<br>= log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}) + exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))<br>$$</p>
-<p>当序列长度为2，标签有两个时，所有可能的标签序列为$(label_1-&gt;label_1, label_2-&gt;label_1, label_1-&gt;label_2, label_2-&gt;label_2)$,而对应的序列得分，即对应上式中的项，即：</p>
-<ul>
-<li>$ S_1: label_1-&gt;label_1:$<br>$ S_1 = e_{01} + e_{11} + t_{11} $</li>
-<li>$S_2: label_2-&gt;label_1:$<br>$ S_2 = e_{02} + e_{11} + t_{21}$</li>
-<li>$S_3 = label_1-&gt;label_2:$<br>$ S_3 = e_{01} + e_{12} + t_{12}$</li>
-<li>$S_4 = label_2-&gt;label_2:$<br>$ S_4 = e_{02} + e_{12} + t_{22}$</li>
-</ul>
-<ul>
-<li><code>$w_0$ -&gt; $w_1$ -&gt; $w_2$:</code></li>
-<li>$states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))] $</li>
-<li>$cur = [e_{21}, e_{22}]$</li>
-</ul>
-<p>与上面的做法一样，也分为4步：</p>
-<ol>
-<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))&amp;log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))\\<br>log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))&amp;log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="2">
-<li>cur：<br>$<br>cur = $$\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="3">
-<li>将states，cur与转义矩阵t求和：</li>
-</ol>
-<p>$$<br>scores = \begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) &amp; log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) \\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) &amp; log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>t_{11}&amp; t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix} \\=<br>\begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11} &amp;log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12}\\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21} &amp;log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22}\\<br>\end{pmatrix}<br>$$</p>
-<ol start="4">
-<li>对score取指数形式然后求和，得到新的states:</li>
-</ol>
-<p>$$ states = [\\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11})+exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21})), \\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12})+ exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22})))] \\<br> = [log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})),\\<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22}))]<br>$$</p>
-<p>现在，我们用states计算一下$(Z_2)$:</p>
-<p>$$<br>log(Z_{(0-&gt;1-&gt;2)}) = log(exp(states[0]) + exp(states[1])) \\<br>=log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})) \\+<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22})) \\<br>= log(exp(e_{01}+e_{11}+t_{11}+e_{21}+t_{11}) + exp(e_{02}+e_{11}+t_{21}+e_{21}+t_{11}) \\ +<br>exp(e_{01}+e_{12}+t_{12} +e_{21}+t_{21}) + exp(e_{02}+e_{12}+t_{22}+e_{21}+t_{21}) \\+<br>exp(e_{01}+e_{11}+t_{11} +e_{22}+t_{12}) + exp(e_{01}+e_{11}+t_{11}+e_{22}+t_{12}) \\+<br>exp(e_{01}+e_{12}+t_{12} +e_{22}+t_{22}) + exp(e_{01}+e_{12}+t_{12}+e_{22}+t_{21}))<br>$$</p>
-<p>上式也就是我们要求的最终结果$log(Z)$,其中指数内对应着所有路径的得分。<br>到此，上例中的整个归一化因子的计算过程也就完成了，而CRF中最难的部分也就解决了。</p>
-<h1><span id="demo">demo</span><a href="#demo" class="header-anchor"></a></h1><p>搞懂了理论部分，下面写一个demo来验证一下。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CRF</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mask_label=False, **kwargs)</span>:</span></span><br><span class="line">        self.mask_label = <span class="number">1</span> <span class="keyword">if</span> mask_label <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        super(CRF, self).__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">build</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        self.num_label = input_shape[<span class="number">-1</span>] - self.mask_label</span><br><span class="line">        self.trans = self.add_weight(name=<span class="string">'crf_trans'</span>,</span><br><span class="line">                                     shape=(self.num_label, self.num_label),</span><br><span class="line">                                     trainable=<span class="literal">True</span>,</span><br><span class="line">                                     initializer=<span class="string">'glorot_uniform'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">path_score</span><span class="params">(self, inputs, labels)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label), obtained from rnn(lstm, bilstm. etc.)</span></span><br><span class="line"><span class="string">        :param labels: one-hot, (batch_size, timesteps, num_label) , real target series</span></span><br><span class="line"><span class="string">        :return:  path score</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        point_score = K.sum(K.sum(inputs * labels, <span class="number">2</span>), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        label_pre = K.expand_dims(labels[:, :<span class="number">-1</span>], <span class="number">3</span>)</span><br><span class="line">        label_next = K.expand_dims(labels[:, <span class="number">1</span>:], <span class="number">2</span>)</span><br><span class="line">        label_trans = label_pre * label_next</span><br><span class="line">        trans = K.expand_dims(K.expand_dims(self.trans, <span class="number">0</span>), <span class="number">0</span>)</span><br><span class="line">        trans_score = K.sum(K.sum(label_trans * trans, [<span class="number">2</span>, <span class="number">3</span>]), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> point_score + trans_score</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">log_norm_pre</span><span class="params">(self, inputs, states)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        expand previous states and inputs, sum with trans</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, num_label), current word emission scores</span></span><br><span class="line"><span class="string">        :param states: (batch_size, num_label), all paths  score of previous word</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        states = K.expand_dims(states[<span class="number">0</span>], <span class="number">2</span>)</span><br><span class="line">        inputs = K.expand_dims(inputs, <span class="number">1</span>)</span><br><span class="line">        trans = K.expand_dims(self.trans, <span class="number">0</span>)</span><br><span class="line">        scores = states + trans + inputs</span><br><span class="line">        output = K.logsumexp(scores, <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> output, [output]</span><br><span class="line">        <span class="comment"># states = K.expand_dims(states[0], 2)  # (batch_size, output_dim, 1)</span></span><br><span class="line">        <span class="comment"># trans = K.expand_dims(self.trans, 0)  # (1, output_dim, output_dim)</span></span><br><span class="line">        <span class="comment"># output = K.logsumexp(states + trans, 1)  # (batch_size, output_dim)</span></span><br><span class="line">        <span class="comment"># return output + inputs, [output + inputs]</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">loss</span><span class="params">(self, y_true, y_pre)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label)</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># mask = 1 - y_true[:, 1: -1] if self.mask_label else None</span></span><br><span class="line">        <span class="comment"># # y_true, y_pred = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span></span><br><span class="line">        <span class="comment"># real_path_score = self.path_score(y_pre, y_true)</span></span><br><span class="line">        <span class="comment"># init_states = [y_pre[:, 0]]</span></span><br><span class="line">        <span class="comment"># log_norm, _ = K.rnn(self.log_norm_pre, initial_states=init_states, inputs=y_pre[:, 1:], mask=mask)  # log(Z)</span></span><br><span class="line">        <span class="comment"># log_norm_score = K.logsumexp(log_norm, 1, keepdims=True)</span></span><br><span class="line">        <span class="comment"># return log_norm_score - real_path_score</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, <span class="number">1</span>:, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pre = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span><br><span class="line">        init_states = [y_pre[:, <span class="number">0</span>]]  <span class="comment"># 初始状态</span></span><br><span class="line">        log_norm, _, _ = K.rnn(self.log_norm_pre, y_pre[:, <span class="number">1</span>:], init_states, mask=mask)  <span class="comment"># 计算Z向量（对数）</span></span><br><span class="line">        log_norm = K.logsumexp(log_norm, <span class="number">1</span>, keepdims=<span class="literal">True</span>)  <span class="comment"># 计算Z（对数）</span></span><br><span class="line">        path_score = self.path_score(y_pre, y_true)  <span class="comment"># 计算分子（对数）</span></span><br><span class="line">        <span class="keyword">return</span> log_norm - path_score  <span class="comment"># 即log(分子/分母)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span>  <span class="comment"># crf 只是loss，不改变inputs</span></span><br><span class="line">        <span class="keyword">return</span> inputs</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accuracy</span><span class="params">(self, y_true, y_pred)</span>:</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, :, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pred = y_true[:, :, :self.num_label], y_pred[:, :, :self.num_label]</span><br><span class="line">        isequal = K.equal(K.argmax(y_true, <span class="number">2</span>), K.argmax(y_pred, <span class="number">2</span>))</span><br><span class="line">        isequal = K.cast(isequal, <span class="string">'float32'</span>)</span><br><span class="line">        <span class="keyword">if</span> mask == <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> K.mean(isequal)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> K.sum(isequal * mask) / K.sum(mask)</span><br></pre></td></tr></table></figure></p>
-<p>结果：<br><img src="/2019/12/26/from-softmax-to-crf/result.png" alt="result"></p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>初雪下的红果果</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>CRF</tag>
       </tags>
   </entry>
   <entry>
@@ -1934,6 +1934,36 @@
       </tags>
   </entry>
   <entry>
+    <title>一切三段成三角形</title>
+    <url>/2020/10/19/triangle/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#ti-mu">题目</a></li>
+<li><a href="#jie-da">解答</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>听到一个题目，还挺有意思，所以记录一下。</p>
+<h1><span id="ti-mu">题目</span><a href="#ti-mu" class="header-anchor"></a></h1><p>问：一个绳子长<code>a</code>，任意剪两刀变成三段后，可以组成一个三角形的概率是多少？</p>
+<h1><span id="jie-da">解答</span><a href="#jie-da" class="header-anchor"></a></h1><p>分析一下题目，一段长度固定的绳子，切割为三段，则：<br>1.<em> 任意一段绳子的长度大于0小于<code>a</code>；</em><br>2.<em> 任意两段绳子的长度大于0小于<code>a</code>。</em></p>
+<p>而三段绳子可以组成一个三角形，而三角形中两边之和大于第三边，所以意味着：<br>1.<em>任意一段的长度小于<code>a/2</code>；</em><br>2.<em>任意两段的长度和大于<code>a/2</code>.</em></p>
+<p>现在设其中两段的长度分别为 <code>x</code>, <code>y</code>，画出一个直角坐标系，如下图所示。<br><img src="/2020/10/19/triangle/triangle.png" alt></p>
+<p>同时连接<code>(0, a), (a, 0)</code>两点，则切割绳子后其中两段的长度的所有可取的值对应由<code>(0, 0),(a, 0), (0, a)</code>组成的三角形区域。<br>简单证明如下：对于任意一点<code>B</code>,我们做其对<code>y</code>轴的垂线，相交与点<code>P</code>,而点<code>B</code>位于<code>(a, 0) (0, a)</code>的连线时，对应$\angle PAB  = 45^o$,此时<br>$PB=PA \Rightarrow  PB + PO = PA + PO = a$,而当<code>P</code>位于连线外侧，则$\angle PAB  &gt; 45^o$,对应$PO + PB &gt; PO + PA = a$,不满足约束。而$\Delta A O C$ 的面积为 $a^2 / 2$.</p>
+<p>而对于能组成三角形时，首先任意一条长度小于$a/2$，对应<code>(0, a/2),(a/2,a/2)</code>连线与<code>(a/2,0)(a/2,a/2)</code>连线围城的矩形区域，而任意两边之和大于$a/2$,利用之前的方法可以证明是(0,a/2)(a/2, 0)连线右侧区域，两者的交即图中绿色三角形区域，其面积为$(a/2)^2/2 = a^2 / 8$</p>
+<p>所以最后结论是组成三角形的概率为两个面积之比：<br>$$<br>pro = \frac{a^2/8}{a^2/2} = 1/4<br>$$</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
+      <categories>
+        <category>Math</category>
+      </categories>
+      <tags>
+        <tag>Statistics</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>AdaBelief-更稳定的优化器</title>
     <url>/2020/10/25/adabelief/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -1966,36 +1996,6 @@
       </categories>
       <tags>
         <tag>Optimizer</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>一切三段成三角形</title>
-    <url>/2020/10/19/triangle/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#ti-mu">题目</a></li>
-<li><a href="#jie-da">解答</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>听到一个题目，还挺有意思，所以记录一下。</p>
-<h1><span id="ti-mu">题目</span><a href="#ti-mu" class="header-anchor"></a></h1><p>问：一个绳子长<code>a</code>，任意剪两刀变成三段后，可以组成一个三角形的概率是多少？</p>
-<h1><span id="jie-da">解答</span><a href="#jie-da" class="header-anchor"></a></h1><p>分析一下题目，一段长度固定的绳子，切割为三段，则：<br>1.<em> 任意一段绳子的长度大于0小于<code>a</code>；</em><br>2.<em> 任意两段绳子的长度大于0小于<code>a</code>。</em></p>
-<p>而三段绳子可以组成一个三角形，而三角形中两边之和大于第三边，所以意味着：<br>1.<em>任意一段的长度小于<code>a/2</code>；</em><br>2.<em>任意两段的长度和大于<code>a/2</code>.</em></p>
-<p>现在设其中两段的长度分别为 <code>x</code>, <code>y</code>，画出一个直角坐标系，如下图所示。<br><img src="/2020/10/19/triangle/triangle.png" alt></p>
-<p>同时连接<code>(0, a), (a, 0)</code>两点，则切割绳子后其中两段的长度的所有可取的值对应由<code>(0, 0),(a, 0), (0, a)</code>组成的三角形区域。<br>简单证明如下：对于任意一点<code>B</code>,我们做其对<code>y</code>轴的垂线，相交与点<code>P</code>,而点<code>B</code>位于<code>(a, 0) (0, a)</code>的连线时，对应$\angle PAB  = 45^o$,此时<br>$PB=PA \Rightarrow  PB + PO = PA + PO = a$,而当<code>P</code>位于连线外侧，则$\angle PAB  &gt; 45^o$,对应$PO + PB &gt; PO + PA = a$,不满足约束。而$\Delta A O C$ 的面积为 $a^2 / 2$.</p>
-<p>而对于能组成三角形时，首先任意一条长度小于$a/2$，对应<code>(0, a/2),(a/2,a/2)</code>连线与<code>(a/2,0)(a/2,a/2)</code>连线围城的矩形区域，而任意两边之和大于$a/2$,利用之前的方法可以证明是(0,a/2)(a/2, 0)连线右侧区域，两者的交即图中绿色三角形区域，其面积为$(a/2)^2/2 = a^2 / 8$</p>
-<p>所以最后结论是组成三角形的概率为两个面积之比：<br>$$<br>pro = \frac{a^2/8}{a^2/2} = 1/4<br>$$</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
-      <categories>
-        <category>Math</category>
-      </categories>
-      <tags>
-        <tag>Statistics</tag>
       </tags>
   </entry>
   <entry>
@@ -2245,6 +2245,48 @@
       </categories>
   </entry>
   <entry>
+    <title>重新认识矩阵</title>
+    <url>/2021/01/12/matrix/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#shi-me-shi-1">什么是1</a></li>
+<li><a href="#xiang-liang">向量</a></li>
+<li><a href="#ju-zhen">矩阵</a></li>
+<li><a href="#ju-zhen-cheng-fa">矩阵乘法</a></li>
+<li><a href="#xiang-si-ju-zhen">相似矩阵</a></li>
+<li><a href="#xing-lie-shi">行列式</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>最近有篇很火的论文bert-flow，其中的flow是出了GAN和VAE之外的第三种生成模型，我竟然是第一次听说，所以引起了我的好奇心，然而看flow模型时，发现里面有一个很重要的概念就是行列式，数学渣太久没碰过他所以再看到有些陌生，于是就找了一些文章来重新学习一下，后来发现了孟岩的认识矩阵系列博客与苏神的新认识矩阵系列博客，看完感觉对矩阵的认识refresh了一下，所以做一些总结记录。</p>
+<h1><span id="shi-me-shi-1">什么是1</span><a href="#shi-me-shi-1" class="header-anchor"></a></h1><p>首先我们来讨论一下，什么是<code>1</code>，所谓1，就是参照物，或者是基，而其他的数字都是在参考他得到的，比如2,2就是2 个1，也就是1<em>2.<br>而1又是一个抽象的东西，你没法直观感受什么是1，只有在参考系下，才能直观感受到什么是1，如1瓶水，1米长，而1 与一米的关系就像类与对象一样。所以在参考系下，2米的含义就是2个1米，1米 </em> 2，即在以1米为基的坐标系下，他在2的“位置”。而5瓶水，对应的含义是在以1瓶水为基的参考系下，<br>他处在5的“位置”。而不同的坐标系，在不同的情况下也有优劣之分，如同样的酒，当用来统计销售额时，我们用“瓶”来统计就比用“杯”来统计方便，而当用来劝酒时，用“杯”就明显比用“瓶”要合适一些。也就是，酒还是那么多酒，但是当你用不同的方式来度量时，得到的结果也是不同的，是有优劣之分的。</p>
+<h1><span id="xiang-liang">向量</span><a href="#xiang-liang" class="header-anchor"></a></h1><p>对于向量$A(a, b)$,其对应的含义是在直角坐标系（以$\vec{i}=(1,0),\vec{j}=(0,1)$为基）中，A是在x轴上为a,y轴上为b的点。<br>比如，在以x轴为斤y轴为瓶的直角坐标系（以$\vec{i}=(一斤,0瓶), \vec{j}=(0斤,1瓶)$为基）中，三瓶500毫升的肥仔水对应的向量就是B(3,3).所以，<code>所谓向量即在线性空间内，选定一组基后，用来刻画一个对象</code>。</p>
+<h1><span id="ju-zhen">矩阵</span><a href="#ju-zhen" class="header-anchor"></a></h1><p>那何为矩阵呢？比如对于矩阵<br>$$A=\begin{pmatrix}<br>a &amp; c \\<br>b &amp; d<br>\end{pmatrix}$$<br>我们能观察到什么呢？首先，矩阵也是由向量（列向量）组成的，对于当前矩阵A，也就对应着$\vec{i}=(a,b),\vec{j}=(c,d)$ 两个向量，然后将他们按一定的顺序排列就组成了矩阵；此外，这个矩阵又代表了由这两个向量为基组成的坐标系（线性空间），在这个空间内，所有的对象都能通过这两个基来进行刻画，即对应于一个“向量”。这里如何更直观的理解呢？还是考虑之前的例子，同样是酒，我们可以用“杯”来度量，也可以用“瓶”来度量，假如我们用“杯”作为最初的基，<br>那矩阵对应的就是“瓶”作为基构成的坐标系，而构成矩阵的向量又是在以“杯”为基下度量出来的，其对应的向量中的值的含义就是“瓶”的基在“杯”这个基下的表示，<br>同样的酒，假如在“杯”坐标系下为10（杯），通过这个矩阵，就变为了2（瓶），<code>即矩阵是线性空间里变换（运动）的描述。</code></p>
+<h1><span id="ju-zhen-cheng-fa">矩阵乘法</span><a href="#ju-zhen-cheng-fa" class="header-anchor"></a></h1><p>那何为矩阵乘法呢？比如现在有矩阵<br>$$<br>A=\begin{pmatrix}<br>a &amp; c \\<br>b &amp; d<br>\end{pmatrix}<br>$$<br>向量$x=(e,f)$,对于$Ax$这个矩阵与向量的乘法，这个是什么含义呢？上面我们已经提到了，矩阵是由列向量组成的，而列向量又可以看做是对应坐标系下的一组基，那根据之前我们提到向量与基的关系，就是在基确定后，用来刻画其空间内对象的，对应的就是乘法，那这个矩阵与向量的乘法，我们也可以用这种方式来看待，即矩阵与向量的乘法代表的是在矩阵对应的列向量为基组成的空间内，由向量刻画的对象。这也是为什么矩阵乘法要求对应维度要相等，<br>对应的就是需要用所有的基，才能正确刻画在这组基对应坐标系下的位置（对象）。而矩阵与向量乘法就是用新的基来刻画对象，<code>也即矩阵与向量的乘法代表施加变换。</code></p>
+<p>那为什么矩阵的乘法公式里为对应行与列相乘并求和呢？这是因为最终的结果，我们是需要变换到对应的直角坐标系下的，因为我们书写出来的所有向量，都默认是在直角坐标系下的结果，所以我们需要将结果向量在每个轴上进行分解，然后合并得到最终的结果，对应的就是行与列相乘后求和。</p>
+<p>那何为矩阵与矩阵的乘法呢？如$A * B$,同理，矩阵与矩阵的乘法也可以看做是连续变换后，构造的新的坐标系。矩阵是由向量组成的，而矩阵与向量乘法的含义是在新的基下刻画的对象表示，所以矩阵与矩阵的乘法，对应B这个变换在施加了A这个变换后，形成的新的变换，而施加这个变换，对应B中的列向量都是在A坐标下刻画得到的。</p>
+<p>那何为线性方程呢？比如$Ax = y$, 对应的线性方程是什么含义呢？这个方程左侧有向量有矩阵，而右侧缺只有向量，有点不和谐，我们变换一下，让他们形式一样，$Ax = Iy$,这样，等式成立，两边形式也一样。那写成这个变换，我们就能猜到这个方程中等式的意义了：在直角坐标系($I$)下的y向量，在A坐标系下该如何刻画(x)呢？那再来看看这个方程的解，即$x = A^{-1}y$，而这个式子可以理解为将施加的变换“逆”着再变回去，就还原了原始位置。</p>
+<p>普通乘法有交换律、结合律、分配律，那矩阵乘法是否也满足呢？对于交换律，矩阵乘法是不满足的，想象一下，5“瓶”酒换成“杯”可能是25，而5“杯”酒换成“瓶”，可能也就是1了，所以两个变换交换位置，得到的是不同的变换；而结合律与分配律是满足的，结合律可以看做是将变换分成“几步”走，即先进行“子变换a”,在进行“子变换b”，几步走与一步到位的结果是一致的；而分配律也是类似的思路。</p>
+<h1><span id="xiang-si-ju-zhen">相似矩阵</span><a href="#xiang-si-ju-zhen" class="header-anchor"></a></h1><p>那何为相似矩阵呢？假设有一个矩阵A，对应$y=Ax$, 而现在有一个新的坐标系P，对应有${y}’=B{x}’$,在P坐标系下，x与y对应着$P{x}’=x$, $P{y}’=y$,代入后得到：$P{x}’=AP{y}’ = P(P^{-1}AP){x}’$，即在P坐标系下，从${x}’$ 到${y}’$的变换用矩阵$B=P^{-1}AP$来表示，这就是相似矩阵，<a href="https://spaces.ac.cn/archives/1777" target="_blank" rel="noopener">即同一个线性变换在不同坐标系下的一个测量结果而已。</a></p>
+<h1><span id="xing-lie-shi">行列式</span><a href="#xing-lie-shi" class="header-anchor"></a></h1><p>行列式是在通过<a href="https://zhuanlan.zhihu.com/p/37111386" target="_blank" rel="noopener">高斯消元法解线性方程组时引入的数学工具</a>, 对应的定义为：<br>$$<br>D = \sum(-1)^t a_{1p_n}a_{2p_n}…a_{np_n}<br>$$<br>其中$t$为排列$a_{1p_n}a_{2p_n}…a_{np_n}$的逆序数，$\sum$ 为对所有可能的排列求和。<br>这个计算方式看起来好奇怪，还有一个逆序数，无法直观的理解，那怎么才能有个直观印象，让我们知道为什么这里是这么计算的呢？<br>说实话我虽然几年前在网易云课堂重新学了一遍线性代数，但是今天又基本全忘记了，所以这次，我希望找到一些更“直观”的东西。<br>如果按照矩阵就是对应坐标系的变换，也就是对应基的变换的思路，那矩阵的行列式应该是对应着变换的某种度量（实际是对应坐标系的缩放，也就是基的体积变换）。顺着这个思路，苏神的一篇博文<a href="https://kexue.fm/archives/2208" target="_blank" rel="noopener">新理解矩阵5：体积=行列式</a>中，通过两者的性质相同，证明了行列式的几何意义，就是其对应的n维平行n维体的体积。<br>知道了这个，我们就可以尝试通过计算平行n维体的体积来“直观”感受一下了。<br><img src="/2021/01/12/matrix/det.png" alt></p>
+<p>这里我们讨论二维空间，如上图所示，其中$\overrightarrow{A}$与$\overrightarrow{B}$分别代表两个向量，而其围成的面积S 为(O,A,I,B)四个点所围成的图形。而这个图形又可以看成两个部分的组合：一部分为与四边形(O,D，P,G)重叠的部分，另一部分为剩下的部分。而剩下的部分又可以通过$PI$切分为两个三角形：$\bigtriangleup BPI$ $\bigtriangleup API$，<br>我们分别做两个三角形的高（蓝色线）$PJ=b, PK=c$，此时我们将$\bigtriangleup BPI$ 与 $\bigtriangleup ODA$ 进行对比，两者的高都是$b$,而底的差为$c$，也就是$S\bigtriangleup ODA - S\bigtriangleup BPI = S\bigtriangleup OCM$， 类似的，我们可以求出$S\bigtriangleup OBG - S\bigtriangleup API = S\bigtriangleup OFM$,于是，我们就可以得到一个结论：<br>$$<br>S_{\square OAIB} = S_{\square ODPG} - S_{\square OCMF} = ad - bc = \begin{Vmatrix}<br>a &amp;b \\<br>c &amp; d<br>\end{Vmatrix} = det(A,B)<br>$$</p>
+<p>而两个四边形的位置都是由向量在坐标轴上投影后确定的，也就是对应着行列式中的“排列相乘”，而面积不足需要被“减掉”的小面积就对应逆序数，所以完整的过程就是“通过排列求长方形的面积，然后用大面积减去小面积”。<br>以上的思路可以推广到N维空间，思想是一样的。 而理解了矩阵的行列式就是平行N维体的体积后，对应行列式的计算公式也就显得相当“直观”了。如，对行列式的某一列乘上$\alpha$，则对应的行列式的值也乘上$\alpha$，这里就是对应其中的一个基向量放大了$\alpha$倍，所以体积放大了$\alpha$倍。</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文主要是参考了许多文章后，发现将矩阵看做是变换的表述这个视角下，很多相关问题都变得非常直观又容易理解，最后经过思考做的部分总结，如果对矩阵感兴趣或者总觉得不容易理解，推荐孟岩的<a href="http://blog.csdn.net/myan/article/details/647511" target="_blank" rel="noopener">理解矩阵系列</a>、苏神的<a href="[https://kexue.fm/archives/1765">新理解矩阵系列</a>、<a href="https://www.matongxue.com/madocs/247/" target="_blank" rel="noopener">马同学的矩阵与行列式系列</a></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
+      <categories>
+        <category>Math</category>
+      </categories>
+      <tags>
+        <tag>Math</tag>
+        <tag>Matrix</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何提升bert在下游任务中的性能</title>
     <url>/2020/11/24/fine-tune/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -2334,48 +2376,6 @@
       </categories>
       <tags>
         <tag>BERT</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>重新认识矩阵</title>
-    <url>/2021/01/12/matrix/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#shi-me-shi-1">什么是1</a></li>
-<li><a href="#xiang-liang">向量</a></li>
-<li><a href="#ju-zhen">矩阵</a></li>
-<li><a href="#ju-zhen-cheng-fa">矩阵乘法</a></li>
-<li><a href="#xiang-si-ju-zhen">相似矩阵</a></li>
-<li><a href="#xing-lie-shi">行列式</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>最近有篇很火的论文bert-flow，其中的flow是出了GAN和VAE之外的第三种生成模型，我竟然是第一次听说，所以引起了我的好奇心，然而看flow模型时，发现里面有一个很重要的概念就是行列式，数学渣太久没碰过他所以再看到有些陌生，于是就找了一些文章来重新学习一下，后来发现了孟岩的认识矩阵系列博客与苏神的新认识矩阵系列博客，看完感觉对矩阵的认识refresh了一下，所以做一些总结记录。</p>
-<h1><span id="shi-me-shi-1">什么是1</span><a href="#shi-me-shi-1" class="header-anchor"></a></h1><p>首先我们来讨论一下，什么是<code>1</code>，所谓1，就是参照物，或者是基，而其他的数字都是在参考他得到的，比如2,2就是2 个1，也就是1<em>2.<br>而1又是一个抽象的东西，你没法直观感受什么是1，只有在参考系下，才能直观感受到什么是1，如1瓶水，1米长，而1 与一米的关系就像类与对象一样。所以在参考系下，2米的含义就是2个1米，1米 </em> 2，即在以1米为基的坐标系下，他在2的“位置”。而5瓶水，对应的含义是在以1瓶水为基的参考系下，<br>他处在5的“位置”。而不同的坐标系，在不同的情况下也有优劣之分，如同样的酒，当用来统计销售额时，我们用“瓶”来统计就比用“杯”来统计方便，而当用来劝酒时，用“杯”就明显比用“瓶”要合适一些。也就是，酒还是那么多酒，但是当你用不同的方式来度量时，得到的结果也是不同的，是有优劣之分的。</p>
-<h1><span id="xiang-liang">向量</span><a href="#xiang-liang" class="header-anchor"></a></h1><p>对于向量$A(a, b)$,其对应的含义是在直角坐标系（以$\vec{i}=(1,0),\vec{j}=(0,1)$为基）中，A是在x轴上为a,y轴上为b的点。<br>比如，在以x轴为斤y轴为瓶的直角坐标系（以$\vec{i}=(一斤,0瓶), \vec{j}=(0斤,1瓶)$为基）中，三瓶500毫升的肥仔水对应的向量就是B(3,3).所以，<code>所谓向量即在线性空间内，选定一组基后，用来刻画一个对象</code>。</p>
-<h1><span id="ju-zhen">矩阵</span><a href="#ju-zhen" class="header-anchor"></a></h1><p>那何为矩阵呢？比如对于矩阵<br>$$A=\begin{pmatrix}<br>a &amp; c \\<br>b &amp; d<br>\end{pmatrix}$$<br>我们能观察到什么呢？首先，矩阵也是由向量（列向量）组成的，对于当前矩阵A，也就对应着$\vec{i}=(a,b),\vec{j}=(c,d)$ 两个向量，然后将他们按一定的顺序排列就组成了矩阵；此外，这个矩阵又代表了由这两个向量为基组成的坐标系（线性空间），在这个空间内，所有的对象都能通过这两个基来进行刻画，即对应于一个“向量”。这里如何更直观的理解呢？还是考虑之前的例子，同样是酒，我们可以用“杯”来度量，也可以用“瓶”来度量，假如我们用“杯”作为最初的基，<br>那矩阵对应的就是“瓶”作为基构成的坐标系，而构成矩阵的向量又是在以“杯”为基下度量出来的，其对应的向量中的值的含义就是“瓶”的基在“杯”这个基下的表示，<br>同样的酒，假如在“杯”坐标系下为10（杯），通过这个矩阵，就变为了2（瓶），<code>即矩阵是线性空间里变换（运动）的描述。</code></p>
-<h1><span id="ju-zhen-cheng-fa">矩阵乘法</span><a href="#ju-zhen-cheng-fa" class="header-anchor"></a></h1><p>那何为矩阵乘法呢？比如现在有矩阵<br>$$<br>A=\begin{pmatrix}<br>a &amp; c \\<br>b &amp; d<br>\end{pmatrix}<br>$$<br>向量$x=(e,f)$,对于$Ax$这个矩阵与向量的乘法，这个是什么含义呢？上面我们已经提到了，矩阵是由列向量组成的，而列向量又可以看做是对应坐标系下的一组基，那根据之前我们提到向量与基的关系，就是在基确定后，用来刻画其空间内对象的，对应的就是乘法，那这个矩阵与向量的乘法，我们也可以用这种方式来看待，即矩阵与向量的乘法代表的是在矩阵对应的列向量为基组成的空间内，由向量刻画的对象。这也是为什么矩阵乘法要求对应维度要相等，<br>对应的就是需要用所有的基，才能正确刻画在这组基对应坐标系下的位置（对象）。而矩阵与向量乘法就是用新的基来刻画对象，<code>也即矩阵与向量的乘法代表施加变换。</code></p>
-<p>那为什么矩阵的乘法公式里为对应行与列相乘并求和呢？这是因为最终的结果，我们是需要变换到对应的直角坐标系下的，因为我们书写出来的所有向量，都默认是在直角坐标系下的结果，所以我们需要将结果向量在每个轴上进行分解，然后合并得到最终的结果，对应的就是行与列相乘后求和。</p>
-<p>那何为矩阵与矩阵的乘法呢？如$A * B$,同理，矩阵与矩阵的乘法也可以看做是连续变换后，构造的新的坐标系。矩阵是由向量组成的，而矩阵与向量乘法的含义是在新的基下刻画的对象表示，所以矩阵与矩阵的乘法，对应B这个变换在施加了A这个变换后，形成的新的变换，而施加这个变换，对应B中的列向量都是在A坐标下刻画得到的。</p>
-<p>那何为线性方程呢？比如$Ax = y$, 对应的线性方程是什么含义呢？这个方程左侧有向量有矩阵，而右侧缺只有向量，有点不和谐，我们变换一下，让他们形式一样，$Ax = Iy$,这样，等式成立，两边形式也一样。那写成这个变换，我们就能猜到这个方程中等式的意义了：在直角坐标系($I$)下的y向量，在A坐标系下该如何刻画(x)呢？那再来看看这个方程的解，即$x = A^{-1}y$，而这个式子可以理解为将施加的变换“逆”着再变回去，就还原了原始位置。</p>
-<p>普通乘法有交换律、结合律、分配律，那矩阵乘法是否也满足呢？对于交换律，矩阵乘法是不满足的，想象一下，5“瓶”酒换成“杯”可能是25，而5“杯”酒换成“瓶”，可能也就是1了，所以两个变换交换位置，得到的是不同的变换；而结合律与分配律是满足的，结合律可以看做是将变换分成“几步”走，即先进行“子变换a”,在进行“子变换b”，几步走与一步到位的结果是一致的；而分配律也是类似的思路。</p>
-<h1><span id="xiang-si-ju-zhen">相似矩阵</span><a href="#xiang-si-ju-zhen" class="header-anchor"></a></h1><p>那何为相似矩阵呢？假设有一个矩阵A，对应$y=Ax$, 而现在有一个新的坐标系P，对应有${y}’=B{x}’$,在P坐标系下，x与y对应着$P{x}’=x$, $P{y}’=y$,代入后得到：$P{x}’=AP{y}’ = P(P^{-1}AP){x}’$，即在P坐标系下，从${x}’$ 到${y}’$的变换用矩阵$B=P^{-1}AP$来表示，这就是相似矩阵，<a href="https://spaces.ac.cn/archives/1777" target="_blank" rel="noopener">即同一个线性变换在不同坐标系下的一个测量结果而已。</a></p>
-<h1><span id="xing-lie-shi">行列式</span><a href="#xing-lie-shi" class="header-anchor"></a></h1><p>行列式是在通过<a href="https://zhuanlan.zhihu.com/p/37111386" target="_blank" rel="noopener">高斯消元法解线性方程组时引入的数学工具</a>, 对应的定义为：<br>$$<br>D = \sum(-1)^t a_{1p_n}a_{2p_n}…a_{np_n}<br>$$<br>其中$t$为排列$a_{1p_n}a_{2p_n}…a_{np_n}$的逆序数，$\sum$ 为对所有可能的排列求和。<br>这个计算方式看起来好奇怪，还有一个逆序数，无法直观的理解，那怎么才能有个直观印象，让我们知道为什么这里是这么计算的呢？<br>说实话我虽然几年前在网易云课堂重新学了一遍线性代数，但是今天又基本全忘记了，所以这次，我希望找到一些更“直观”的东西。<br>如果按照矩阵就是对应坐标系的变换，也就是对应基的变换的思路，那矩阵的行列式应该是对应着变换的某种度量（实际是对应坐标系的缩放，也就是基的体积变换）。顺着这个思路，苏神的一篇博文<a href="https://kexue.fm/archives/2208" target="_blank" rel="noopener">新理解矩阵5：体积=行列式</a>中，通过两者的性质相同，证明了行列式的几何意义，就是其对应的n维平行n维体的体积。<br>知道了这个，我们就可以尝试通过计算平行n维体的体积来“直观”感受一下了。<br><img src="/2021/01/12/matrix/det.png" alt></p>
-<p>这里我们讨论二维空间，如上图所示，其中$\overrightarrow{A}$与$\overrightarrow{B}$分别代表两个向量，而其围成的面积S 为(O,A,I,B)四个点所围成的图形。而这个图形又可以看成两个部分的组合：一部分为与四边形(O,D，P,G)重叠的部分，另一部分为剩下的部分。而剩下的部分又可以通过$PI$切分为两个三角形：$\bigtriangleup BPI$ $\bigtriangleup API$，<br>我们分别做两个三角形的高（蓝色线）$PJ=b, PK=c$，此时我们将$\bigtriangleup BPI$ 与 $\bigtriangleup ODA$ 进行对比，两者的高都是$b$,而底的差为$c$，也就是$S\bigtriangleup ODA - S\bigtriangleup BPI = S\bigtriangleup OCM$， 类似的，我们可以求出$S\bigtriangleup OBG - S\bigtriangleup API = S\bigtriangleup OFM$,于是，我们就可以得到一个结论：<br>$$<br>S_{\square OAIB} = S_{\square ODPG} - S_{\square OCMF} = ad - bc = \begin{Vmatrix}<br>a &amp;b \\<br>c &amp; d<br>\end{Vmatrix} = det(A,B)<br>$$</p>
-<p>而两个四边形的位置都是由向量在坐标轴上投影后确定的，也就是对应着行列式中的“排列相乘”，而面积不足需要被“减掉”的小面积就对应逆序数，所以完整的过程就是“通过排列求长方形的面积，然后用大面积减去小面积”。<br>以上的思路可以推广到N维空间，思想是一样的。 而理解了矩阵的行列式就是平行N维体的体积后，对应行列式的计算公式也就显得相当“直观”了。如，对行列式的某一列乘上$\alpha$，则对应的行列式的值也乘上$\alpha$，这里就是对应其中的一个基向量放大了$\alpha$倍，所以体积放大了$\alpha$倍。</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文主要是参考了许多文章后，发现将矩阵看做是变换的表述这个视角下，很多相关问题都变得非常直观又容易理解，最后经过思考做的部分总结，如果对矩阵感兴趣或者总觉得不容易理解，推荐孟岩的<a href="http://blog.csdn.net/myan/article/details/647511" target="_blank" rel="noopener">理解矩阵系列</a>、苏神的<a href="[https://kexue.fm/archives/1765">新理解矩阵系列</a>、<a href="https://www.matongxue.com/madocs/247/" target="_blank" rel="noopener">马同学的矩阵与行列式系列</a></p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
-      <categories>
-        <category>Math</category>
-      </categories>
-      <tags>
-        <tag>Math</tag>
-        <tag>Matrix</tag>
       </tags>
   </entry>
   <entry>
@@ -3069,54 +3069,6 @@
       </tags>
   </entry>
   <entry>
-    <title>tokenizers 总结</title>
-    <url>/2022/09/08/tokenizers/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#qian-yan">前言</a><ul>
-<li><a href="#bpe">BPE</a></li>
-<li><a href="#bytes-bpe">Bytes BPE</a></li>
-<li><a href="#wordpiece">WordPiece</a></li>
-<li><a href="#unigram">Unigram</a></li>
-<li><a href="#sentencepiece">SentencePiece</a></li>
-<li><a href="#train-from-scratch">train from scratch</a></li>
-</ul>
-</li>
-<li><a href="#tui-jian">推荐</a></li>
-<li><a href="#bu-chong-yue-du">补充阅读</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-<li><a href="#buy-me-a-coffee">Buy me a coffee</a></li>
-</ul>
-<!-- tocstop -->
-<p></div></p>
-<h1><span id="qian-yan">前言</span><a href="#qian-yan" class="header-anchor"></a></h1><p>tokenizer 目前主流的方式是subword level，至于char level /word level 都由于粒度问题已被主流抛弃。目前subword level 的tokenizer BPE, Bytes BPE, WordPiece, Unigram, SentencePiece,下面简单总结一下各个方法。 </p>
-<h2><span id="bpe">BPE</span><a href="#bpe" class="header-anchor"></a></h2><p>bpe 的方案是通过统计词频来确定两个相邻的pair subwords 要不要合并，具体做法：<br>1.统计pre-tokenize 的word 的词频；<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">(<span class="string">"hug"</span>, 10), (<span class="string">"pug"</span>, 5), (<span class="string">"pun"</span>, 12), (<span class="string">"bun"</span>, 4), (<span class="string">"hugs"</span>, 5)</span><br></pre></td></tr></table></figure></p>
-<p>2.使用词典对word 进行切分：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># base vocabulary: ["b", "g", "h", "n", "p", "s", "u"]</span></span><br><span class="line">(<span class="string">"h"</span> <span class="string">"u"</span> <span class="string">"g"</span>, 10), (<span class="string">"p"</span> <span class="string">"u"</span> <span class="string">"g"</span>, 5), (<span class="string">"p"</span> <span class="string">"u"</span> <span class="string">"n"</span>, 12), (<span class="string">"b"</span> <span class="string">"u"</span> <span class="string">"n"</span>, 4), (<span class="string">"h"</span> <span class="string">"u"</span> <span class="string">"g"</span> <span class="string">"s"</span>, 5)</span><br></pre></td></tr></table></figure></p>
-<p>3.统计相邻两个subword pair 词频，将top-k 高的pair 合并生成新的subword，添加进vocabulary，同时，如果当前的subword  只会同pair 一起出现，则同时将vocabulary 中对应subword 删除。<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># count pair</span></span><br><span class="line">h + u = 10 + 5 = 15</span><br><span class="line">u + g = 10 + 5 +  = 20</span><br><span class="line">...</span><br><span class="line"><span class="comment"># merge top k</span></span><br><span class="line"><span class="built_in">set</span> k = 1</span><br><span class="line">ug -&gt; vocabulary</span><br><span class="line">base vocabulary: [<span class="string">"b"</span>, <span class="string">"g"</span>, <span class="string">"h"</span>, <span class="string">"n"</span>, <span class="string">"p"</span>, <span class="string">"s"</span>, <span class="string">"u"</span>, <span class="string">"ug"</span>]</span><br><span class="line">​</span><br><span class="line">loop until vocabulary match vocab_size</span><br><span class="line">​</span><br></pre></td></tr></table></figure></p>
-<h2><span id="bytes-bpe">Bytes BPE</span><a href="#bytes-bpe" class="header-anchor"></a></h2><p>Bytes BPE 与BPE基本相同，唯一不同的是：BPE 中会存在UNK 的情况，为了解决unk 的问题，一个非常天才的想法是将所有text 先转为<code>bytes</code> ，这样就不会存在unk 的问题，尤其是在多语言中，这种方式可以大大缩减词表大小;此外即使不是目标语言训练的模型也可以拿来使用。通常词表大小包括256 个基本bytes + &lt;end|of|text&gt; + vocab-size,如gpt2 的词表为50257: 256 base bytes tokens + &lt;end|of|text&gt; + 50,000 merges.<br>此外，训练bytes bpe 时，通常我们还会选择先将文本进行normalize，这部分后面会进一步说明。</p>
-<h2><span id="wordpiece">WordPiece</span><a href="#wordpiece" class="header-anchor"></a></h2><p>WordPiece 与BPE 也非常相似，区别主要在于merge 的策略：BPE 中选择频率最高的pair 进行合并，WordPiece 则选择使用语言模型来进行选择：<br>$$<br>L = logP(S) = \sum^Nlog(P_i)<br>$$<br>对于两个subword： $t_x$, $t_y$ ，合并后为 $t_z$ ，则合并前后的增益：<br>$$<br>Loss = logP(t_z) - (logP(t_x) + logP(t_y))<br>$$<br>通过计算合并增益是否增大来决定是否合并subword pair.</p>
-<h2><span id="unigram">Unigram</span><a href="#unigram" class="header-anchor"></a></h2><p>Unigram 与 上述的方法都略有不同：Unigram 不再是通过合并base vocabulary 中的subword 来新增，他选择在初始化时初始化一个非常大的subword set，通过计算是否需要将一个subword 切分为多个base subword （remove 这个subword）来减小vocabulary size 直到达到vocab size。<br>这里有一个假设：句子之间是独立的，subword 与 subword 之间是独立的。对应的句子的语言模型似然值就是其subword 的概率的乘积。目标是保存vocab size 的同时语言模型似然值最大。<br>$$<br>x^* = argmax_{x \in U}P(\overrightarrow{x})<br>$$<br>整个求解过程是一个简单的EM 或者说一个迭代过程：<br>0.建立一个足够大的种子subword vocabulary，可以用字典树构建可以是所有字符的组合，也可以用bpe 构建；<br>1.（期望E）统计vocabulary 中每个subword 的频率，计算其对应概率值；<br>2.（最大化M）根据其概率，使用维特比算法返回其语言模型似然值最大化下的最佳分割方案；<br>3.计算最佳分割方案下每个新子词的loss，这里的loss 是指将当前subword 从vocabulary 中移除时，对应的语言模型似然值，即<br>$$<br>L = − \sum^Nlog (\sum_{x∈S(x_i)}p(x))<br>$$<br>4.丢弃掉loss 前x% 对应的subword；<br>5.重复2-4阶段，直到vocabulary 达到指定的vocab size。</p>
-<h2><span id="sentencepiece">SentencePiece</span><a href="#sentencepiece" class="header-anchor"></a></h2><p>SentencePiece 其实并不是一个新的tokenizer 方法，他其实是一个实现了BPE/Unigram tokenizer 的一个集合，不过他有一些创新的地方。<br>上述方法中有一些问题：<br>1.都有字，子词或词的概念，然而在很多语言中并没有这样的概念；<br>2.都默认需要自己进行pre-tokenize，如英语则利用“空格”作为词的分割符，中文则一般选择jieba 进行pre-tokenize，这个过程不同的语言有自己的一套做法，不统一；<br>3.token 格式不统一。以英文为例，表示token 时会有 ##xx, xx/s 这种，表示subword 是否出现在词的首尾，然而中文中是没有这种概念的；<br>4.解码困难，如BPE解码时需要进行一些标准化，最常见的是去除标点符号。而我们解码后是 [new] [york]两个token，我们并不知道原来的词是 newyork/new york/new-york 中的哪一个.<br>SentencePiece 的做法：<br><a href="https://github.com/google/sentencepiece" target="_blank" rel="noopener"><br>SentencePiece treats the input text just as a sequence of Unicode characters. Whitespace is also handled as a normal symbol. To handle the whitespace as a basic token explicitly, SentencePiece first escapes the whitespace with a meta symbol “▁” (U+2581) as follows.</a></p>
-<p>即首先将空格转换为一个标准的字符”▁”,然后将text 转换为unicode，其实这里的unicode 是NFKC-based normalization后的unicode，至于unicode 标准化，可以参考<a href="https://blog.csdn.net/weixin_43866211/article/details/98384017" target="_blank" rel="noopener">unicode文本标准化</a> ，虽然通常我们使用NFKC 标准化，但sentencepiece 内部四种方法都实现了。<br>通过上述的空格转换加normalize，所有的语言经过转换后就有统一的格式了，这样多语言的问题就彻底的与token 切分解偶了，tokenizer 就有了一个完全端到端的解决方案。</p>
-<h2><span id="train-from-scratch">train from scratch</span><a href="#train-from-scratch" class="header-anchor"></a></h2><p>训练一个tokenizer model 主要有两个仓库可以参考： <a href="https://github.com/huggingface/tokenizers" target="_blank" rel="noopener">huggingface/tokenizers</a>   和  <a href="https://github.com/google/sentencepiece" target="_blank" rel="noopener">google/sentencepiece</a>.<br>其中tokenizers 支持bpe/bytes bpe/unigram/wordpiece, sentencepiece 支持bpe/unigram.两者都支持四种标注化方法。<br>此外，tokenizers 不支持自定义的pre_tokenizer的保存，如中文时我们常用的jieba.lcut ；bytes bpe不支持big dataset 的训练，1T  内存训练100G 文本也会因内存不足被killed，（一个办法是缩小语料训练，因为没有oov 的问题，基本上小语料下训练也能用）。<br>在实际使用时，通常会结合huggingface/transformers 一起使用，这里也看了一下transformers/tokenizers 的实现。原始的GPT2 中的tokenizer 是没有做normalize 的，所以 transformers中的GPT2Tokenizer 也是没有做normalize 的，而通常我们自己训练的bytes bpe 是会加一个normalize 的过程，所以如果是通过huggingface/tokenizers 训练的tokenier，迁移到transformers 时需要注意normalize 是否实现。</p>
-<h1><span id="tui-jian">推荐</span><a href="#tui-jian" class="header-anchor"></a></h1><p>当目标语言为中文时，推荐使用WordPiece + jieba 的方案；而是多语言场景时，推荐使用SentencePieceBPE/SentencePieceUnigram.<br>无论哪种合并/切分 subword 的策略，我们的初衷是:<br><code>尽量不切分常用词，而是将不常用词切分为常用的子词.</code><br>而中文中，有明确的字/词概念，却没有子词的概念（如英文中有”app”, “##le”, 中文却没有”苹” “##果”），而转bytes 后对子词更友好，此外，中文通常需要3个bytes（GBK）或者4个bytes（Chinese-Japanese character set），对于一个中文的字，很有可能需要大于1个token 来表示，反而会增加tokenize 后序列的长度，对模型的训练与使用不利；此外，中文中空格也没有切分词/句子 的语义，保留空格反而会由于各种空格的错误使用带来问题，最终的推荐方案就是jieba +  Word Piece/SentencePieceUnigram。<br>而多语言场景下，推荐使用SentencePieceBPE，他提供一个端到端的方案，而不需要再根据不同语言进行不同的pre-tokenize/subword 格式，此外，SentencePiece 都是bytes 粒度的，这样既能大大缩减词表又能避免unk 的情况。</p>
-<h1><span id="bu-chong-yue-du">补充阅读</span><a href="#bu-chong-yue-du" class="header-anchor"></a></h1><p><a href="https://huggingface.co/docs/transformers/tokenizer_summary" target="_blank" rel="noopener">tokenizer summary-huggingface</a><br><a href="https://towardsdatascience.com/difference-between-nfd-nfc-nfkd-and-nfkc-explained-with-python-code-e2631f96ae6c" target="_blank" rel="noopener">Difference Between NFD, NFC, NFKD, and NFKC Explained with Python Code-medium</a><br><a href="https://zhuanlan.zhihu.com/p/86965595" target="_blank" rel="noopener">深入理解NLP Subword算法：BPE、WordPiece、ULM-知乎</a><br><a href="https://everdark.github.io/k9/notebooks/ml/natural_language_understanding/subword_units/subword_units.nb.html#121_expectation-maximization" target="_blank" rel="noopener">natural_language_understanding/subword_units/subword_units-github.io</a></p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>本人真实写照🐶</p>
-<h1><span id="buy-me-a-coffee">Buy me a coffee</span><a href="#buy-me-a-coffee" class="header-anchor"></a></h1><p>如果觉得这篇文章不错，对你有帮助，欢迎打赏一杯蜜雪冰城。</p>
-<p><img src="/img/sponsor.JPG" alt="赞赏"></p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>BPE</tag>
-        <tag>WordPiece</tag>
-        <tag>Unigram</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>训练加速篇（3）horovod之多机多卡</title>
     <url>/2022/07/06/horovod-multi-nodes/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -3144,7 +3096,55 @@
 <h2><span id="qi-dong-xun-lian">启动训练</span><a href="#qi-dong-xun-lian" class="header-anchor"></a></h2><p>启动训练时，需要根据节点信息和通信方案调整参数，如在支持RDMA 下的启动命令：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mpirun -np 16 -H gpu1:8,gpu2:8 --allow-run-as-root -<span class="built_in">bind</span>-to none -map-by slot -x NCCL_DEBUG=INFO -x NCCL_IB_DISABLE=0 -x NCCL_SOCKET_IFNAME=bond0 -x NCCL_IB_GID_INDEX=3 -x NCCL_NET_GDR_LEVEL=0 -x LD_LIBRARY_PATH -x PATH -mca pml ob1 -mca btl_tcp_if_include bond0 -mca btl ^openib python3 train.py</span><br></pre></td></tr></table></figure></p>
 <p>其中 ：<br><code>-H</code> 后面指定节点及显卡数；<br><code>-np</code> 需要根据 <code>-H</code> 调整为其总计worker 数量；<br><code>btl_tcp_if_include</code> RDMA 下为bond0，普通网络则为eth0；<br><code>NCCL_SOCKET_IFNAME</code> 为网络接口，RDMA 下为bond0，普通网络则需切换为 eth0<br><code>NCCL_NET_GDR_LEVEL</code> 为GDR 相关，GDR的概念是运行GPU 与RDMA 直接通信，开启后进一步降低通信延迟。不过GDR需要配合RDMA 一起使用；</p>
 <p>NCCL 相关变量含义可以参考<a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/env.html" target="_blank" rel="noopener">Environment Variables</a></p>
-<h1><span id="xing-neng-dui-bi">性能对比</span><a href="#xing-neng-dui-bi" class="header-anchor"></a></h1><p>在bert-base 规模的模型上进行测试，其结果如下：<br>|  GPU | batch size per GPU |   net  |  node           | speed<br>| ————- |:————-:|:————-:|:————-:|:————-:|<br>| A100-40g    | 16 | vpc | single | 430 me/step |<br>| V100        | 8  | vpc | single | 485 ms/step |<br>| V100        | 8  | vpc | multi  | 617 ms/step |<br>| V100        | 8  | rdma | single | 485 ms/step |<br>| V100        | 8  | rdma | multi | 510 ms/step |</p>
+<h1><span id="xing-neng-dui-bi">性能对比</span><a href="#xing-neng-dui-bi" class="header-anchor"></a></h1><p>在bert-base 规模的模型上进行测试，其结果如下：</p>
+<table>
+<thead>
+<tr>
+<th>GPU</th>
+<th style="text-align:center">batch size per GPU</th>
+<th style="text-align:center">net</th>
+<th style="text-align:center">node</th>
+<th style="text-align:center">speed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A100-40g</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">vpc</td>
+<td style="text-align:center">single</td>
+<td style="text-align:center">430 me/step</td>
+</tr>
+<tr>
+<td>V100</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">vpc</td>
+<td style="text-align:center">single</td>
+<td style="text-align:center">485 ms/step</td>
+</tr>
+<tr>
+<td>V100</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">vpc</td>
+<td style="text-align:center">multi</td>
+<td style="text-align:center">617 ms/step</td>
+</tr>
+<tr>
+<td>V100</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">rdma</td>
+<td style="text-align:center">single</td>
+<td style="text-align:center">485 ms/step</td>
+</tr>
+<tr>
+<td>V100</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">rdma</td>
+<td style="text-align:center">multi</td>
+<td style="text-align:center">510 ms/step</td>
+</tr>
+</tbody>
+</table>
 <p>可以看到，通过RDMA 进一步降低网络延迟后，多机多卡的加速效果接近线性加速了。如果开启GDR 网络延迟能进一步降低，加速效果应该会更解决线性加速。</p>
 <h1><span id="ref">ref</span><a href="#ref" class="header-anchor"></a></h1><p><a href="https://zhuanlan.zhihu.com/p/55142557" target="_blank" rel="noopener">RDMA技术详解（一）：RDMA概述</a></p>
 <p><a href="https://zh.m.wikipedia.org/zh-hans/%E8%BF%9C%E7%A8%8B%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98%E8%AE%BF%E9%97%AE" target="_blank" rel="noopener">远程直接内存访问</a></p>
@@ -3157,6 +3157,51 @@
       <tags>
         <tag>speed-up</tag>
         <tag>horovod</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>tokenizers 总结</title>
+    <url>/2022/09/08/tokenizers/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#qian-yan">前言</a><ul>
+<li><a href="#bpe">BPE</a></li>
+<li><a href="#bytes-bpe">Bytes BPE</a></li>
+<li><a href="#wordpiece">WordPiece</a></li>
+<li><a href="#unigram">Unigram</a></li>
+<li><a href="#sentencepiece">SentencePiece</a></li>
+<li><a href="#train-from-scratch">train from scratch</a></li>
+</ul>
+</li>
+<li><a href="#tui-jian">推荐</a></li>
+<li><a href="#bu-chong-yue-du">补充阅读</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div></p>
+<h1><span id="qian-yan">前言</span><a href="#qian-yan" class="header-anchor"></a></h1><p>tokenizer 目前主流的方式是subword level，至于char level /word level 都由于粒度问题已被主流抛弃。目前subword level 的tokenizer BPE, Bytes BPE, WordPiece, Unigram, SentencePiece,下面简单总结一下各个方法。 </p>
+<h2><span id="bpe">BPE</span><a href="#bpe" class="header-anchor"></a></h2><p>bpe 的方案是通过统计词频来确定两个相邻的pair subwords 要不要合并，具体做法：<br>1.统计pre-tokenize 的word 的词频；<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">(<span class="string">"hug"</span>, 10), (<span class="string">"pug"</span>, 5), (<span class="string">"pun"</span>, 12), (<span class="string">"bun"</span>, 4), (<span class="string">"hugs"</span>, 5)</span><br></pre></td></tr></table></figure></p>
+<p>2.使用词典对word 进行切分：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># base vocabulary: ["b", "g", "h", "n", "p", "s", "u"]</span></span><br><span class="line">(<span class="string">"h"</span> <span class="string">"u"</span> <span class="string">"g"</span>, 10), (<span class="string">"p"</span> <span class="string">"u"</span> <span class="string">"g"</span>, 5), (<span class="string">"p"</span> <span class="string">"u"</span> <span class="string">"n"</span>, 12), (<span class="string">"b"</span> <span class="string">"u"</span> <span class="string">"n"</span>, 4), (<span class="string">"h"</span> <span class="string">"u"</span> <span class="string">"g"</span> <span class="string">"s"</span>, 5)</span><br></pre></td></tr></table></figure></p>
+<p>3.统计相邻两个subword pair 词频，将top-k 高的pair 合并生成新的subword，添加进vocabulary，同时，如果当前的subword  只会同pair 一起出现，则同时将vocabulary 中对应subword 删除。<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># count pair</span></span><br><span class="line">h + u = 10 + 5 = 15</span><br><span class="line">u + g = 10 + 5 +  = 20</span><br><span class="line">...</span><br><span class="line"><span class="comment"># merge top k</span></span><br><span class="line"><span class="built_in">set</span> k = 1</span><br><span class="line">ug -&gt; vocabulary</span><br><span class="line">base vocabulary: [<span class="string">"b"</span>, <span class="string">"g"</span>, <span class="string">"h"</span>, <span class="string">"n"</span>, <span class="string">"p"</span>, <span class="string">"s"</span>, <span class="string">"u"</span>, <span class="string">"ug"</span>]</span><br><span class="line">​</span><br><span class="line">loop until vocabulary match vocab_size</span><br><span class="line">​</span><br></pre></td></tr></table></figure></p>
+<h2><span id="bytes-bpe">Bytes BPE</span><a href="#bytes-bpe" class="header-anchor"></a></h2><p>Bytes BPE 与BPE基本相同，唯一不同的是：BPE 中会存在UNK 的情况，为了解决unk 的问题，一个非常天才的想法是将所有text 先转为<code>bytes</code> ，这样就不会存在unk 的问题，尤其是在多语言中，这种方式可以大大缩减词表大小;此外即使不是目标语言训练的模型也可以拿来使用。通常词表大小包括256 个基本bytes + &lt;end|of|text&gt; + vocab-size,如gpt2 的词表为50257: 256 base bytes tokens + &lt;end|of|text&gt; + 50,000 merges.<br>此外，训练bytes bpe 时，通常我们还会选择先将文本进行normalize，这部分后面会进一步说明。</p>
+<h2><span id="wordpiece">WordPiece</span><a href="#wordpiece" class="header-anchor"></a></h2><p>WordPiece 与BPE 也非常相似，区别主要在于merge 的策略：BPE 中选择频率最高的pair 进行合并，WordPiece 则选择使用语言模型来进行选择：<br>$$<br>L = logP(S) = \sum^Nlog(P_i)<br>$$<br>对于两个subword： $t_x$, $t_y$ ，合并后为 $t_z$ ，则合并前后的增益：<br>$$<br>Loss = logP(t_z) - (logP(t_x) + logP(t_y))<br>$$<br>通过计算合并增益是否增大来决定是否合并subword pair.</p>
+<h2><span id="unigram">Unigram</span><a href="#unigram" class="header-anchor"></a></h2><p>Unigram 与 上述的方法都略有不同：Unigram 不再是通过合并base vocabulary 中的subword 来新增，他选择在初始化时初始化一个非常大的subword set，通过计算是否需要将一个subword 切分为多个base subword （remove 这个subword）来减小vocabulary size 直到达到vocab size。<br>这里有一个假设：句子之间是独立的，subword 与 subword 之间是独立的。对应的句子的语言模型似然值就是其subword 的概率的乘积。目标是保存vocab size 的同时语言模型似然值最大。<br>$$<br>x^* = argmax_{x \in U}P(\overrightarrow{x})<br>$$<br>整个求解过程是一个简单的EM 或者说一个迭代过程：<br>0.建立一个足够大的种子subword vocabulary，可以用字典树构建可以是所有字符的组合，也可以用bpe 构建；<br>1.（期望E）统计vocabulary 中每个subword 的频率，计算其对应概率值；<br>2.（最大化M）根据其概率，使用维特比算法返回其语言模型似然值最大化下的最佳分割方案；<br>3.计算最佳分割方案下每个新子词的loss，这里的loss 是指将当前subword 从vocabulary 中移除时，对应的语言模型似然值，即<br>$$<br>L = − \sum^Nlog (\sum_{x∈S(x_i)}p(x))<br>$$<br>4.丢弃掉loss 前x% 对应的subword；<br>5.重复2-4阶段，直到vocabulary 达到指定的vocab size。</p>
+<h2><span id="sentencepiece">SentencePiece</span><a href="#sentencepiece" class="header-anchor"></a></h2><p>SentencePiece 其实并不是一个新的tokenizer 方法，他其实是一个实现了BPE/Unigram tokenizer 的一个集合，不过他有一些创新的地方。<br>上述方法中有一些问题：<br>1.都有字，子词或词的概念，然而在很多语言中并没有这样的概念；<br>2.都默认需要自己进行pre-tokenize，如英语则利用“空格”作为词的分割符，中文则一般选择jieba 进行pre-tokenize，这个过程不同的语言有自己的一套做法，不统一；<br>3.token 格式不统一。以英文为例，表示token 时会有 ##xx, xx/s 这种，表示subword 是否出现在词的首尾，然而中文中是没有这种概念的；<br>4.解码困难，如BPE解码时需要进行一些标准化，最常见的是去除标点符号。而我们解码后是 [new] [york]两个token，我们并不知道原来的词是 newyork/new york/new-york 中的哪一个.<br>SentencePiece 的做法：<br><a href="https://github.com/google/sentencepiece" target="_blank" rel="noopener"><br>SentencePiece treats the input text just as a sequence of Unicode characters. Whitespace is also handled as a normal symbol. To handle the whitespace as a basic token explicitly, SentencePiece first escapes the whitespace with a meta symbol “▁” (U+2581) as follows.</a></p>
+<p>即首先将空格转换为一个标准的字符”▁”,然后将text 转换为unicode，其实这里的unicode 是NFKC-based normalization后的unicode，至于unicode 标准化，可以参考<a href="https://blog.csdn.net/weixin_43866211/article/details/98384017" target="_blank" rel="noopener">unicode文本标准化</a> ，虽然通常我们使用NFKC 标准化，但sentencepiece 内部四种方法都实现了。<br>通过上述的空格转换加normalize，所有的语言经过转换后就有统一的格式了，这样多语言的问题就彻底的与token 切分解偶了，tokenizer 就有了一个完全端到端的解决方案。</p>
+<h2><span id="train-from-scratch">train from scratch</span><a href="#train-from-scratch" class="header-anchor"></a></h2><p>训练一个tokenizer model 主要有两个仓库可以参考： <a href="https://github.com/huggingface/tokenizers" target="_blank" rel="noopener">huggingface/tokenizers</a>   和  <a href="https://github.com/google/sentencepiece" target="_blank" rel="noopener">google/sentencepiece</a>.<br>其中tokenizers 支持bpe/bytes bpe/unigram/wordpiece, sentencepiece 支持bpe/unigram.两者都支持四种标注化方法。<br>此外，tokenizers 不支持自定义的pre_tokenizer的保存，如中文时我们常用的jieba.lcut ；bytes bpe不支持big dataset 的训练，1T  内存训练100G 文本也会因内存不足被killed，（一个办法是缩小语料训练，因为没有oov 的问题，基本上小语料下训练也能用）。<br>在实际使用时，通常会结合huggingface/transformers 一起使用，这里也看了一下transformers/tokenizers 的实现。原始的GPT2 中的tokenizer 是没有做normalize 的，所以 transformers中的GPT2Tokenizer 也是没有做normalize 的，而通常我们自己训练的bytes bpe 是会加一个normalize 的过程，所以如果是通过huggingface/tokenizers 训练的tokenier，迁移到transformers 时需要注意normalize 是否实现。</p>
+<h1><span id="tui-jian">推荐</span><a href="#tui-jian" class="header-anchor"></a></h1><p>当目标语言为中文时，推荐使用WordPiece + jieba 的方案；而是多语言场景时，推荐使用SentencePieceBPE/SentencePieceUnigram.<br>无论哪种合并/切分 subword 的策略，我们的初衷是:<br><code>尽量不切分常用词，而是将不常用词切分为常用的子词.</code><br>而中文中，有明确的字/词概念，却没有子词的概念（如英文中有”app”, “##le”, 中文却没有”苹” “##果”），而转bytes 后对子词更友好，此外，中文通常需要3个bytes（GBK）或者4个bytes（Chinese-Japanese character set），对于一个中文的字，很有可能需要大于1个token 来表示，反而会增加tokenize 后序列的长度，对模型的训练与使用不利；此外，中文中空格也没有切分词/句子 的语义，保留空格反而会由于各种空格的错误使用带来问题，最终的推荐方案就是jieba +  Word Piece/SentencePieceUnigram。<br>而多语言场景下，推荐使用SentencePieceBPE，他提供一个端到端的方案，而不需要再根据不同语言进行不同的pre-tokenize/subword 格式，此外，SentencePiece 都是bytes 粒度的，这样既能大大缩减词表又能避免unk 的情况。</p>
+<h1><span id="bu-chong-yue-du">补充阅读</span><a href="#bu-chong-yue-du" class="header-anchor"></a></h1><p><a href="https://huggingface.co/docs/transformers/tokenizer_summary" target="_blank" rel="noopener">tokenizer summary-huggingface</a><br><a href="https://towardsdatascience.com/difference-between-nfd-nfc-nfkd-and-nfkc-explained-with-python-code-e2631f96ae6c" target="_blank" rel="noopener">Difference Between NFD, NFC, NFKD, and NFKC Explained with Python Code-medium</a><br><a href="https://zhuanlan.zhihu.com/p/86965595" target="_blank" rel="noopener">深入理解NLP Subword算法：BPE、WordPiece、ULM-知乎</a><br><a href="https://everdark.github.io/k9/notebooks/ml/natural_language_understanding/subword_units/subword_units.nb.html#121_expectation-maximization" target="_blank" rel="noopener">natural_language_understanding/subword_units/subword_units-github.io</a></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>本人真实写照🐶</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>BPE</tag>
+        <tag>WordPiece</tag>
+        <tag>Unigram</tag>
       </tags>
   </entry>
 </search>

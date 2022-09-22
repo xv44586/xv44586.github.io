@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://xv44586.github.io/2022/07/06/horovod-multi-nodes/</loc>
+    
+    <lastmod>2022-09-22T12:32:14.838Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://xv44586.github.io/2022/09/08/tokenizers/</loc>
     
-    <lastmod>2022-09-09T06:45:34.819Z</lastmod>
+    <lastmod>2022-09-22T12:14:57.523Z</lastmod>
     
   </url>
   
@@ -12,13 +19,6 @@
     <loc>https://xv44586.github.io/2021/07/06/cl2rdrop/</loc>
     
     <lastmod>2022-09-08T08:50:09.975Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2022/07/06/horovod-multi-nodes/</loc>
-    
-    <lastmod>2022-07-07T09:35:59.557Z</lastmod>
     
   </url>
   
