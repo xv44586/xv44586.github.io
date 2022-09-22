@@ -1,0 +1,34 @@
+/**
+ * blog theme 
+ */
+
+$main-color: #5b6daa                                !default;
+$main-color--hover: #98a5c8                         !default;
+
+$font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,"PingFang SC","Lantinghei SC","Microsoft Yahei","Hiragino Sans GB","Microsoft Sans Serif","WenQuanYi Micro Hei",sans           !default;
+
+$main-fc: #666                                      !default;
+$main-fs: 14px                                      !default;
+$main-lh: 1.7                                       !default;
+
+$title-fc: #242f35                                  !default;
+
+$hint-fc: #405474                                   !default;
+
+$bgc--main: #fff                                    !default;
+$bgc--bottom: #2d383e                               !default;
+$bgc--footer: #242f35                               !default;
+
+$border-c: #d8e5f3                                  !default;
+
+$transition: .3s                                    !default;
+
+$mq-desktop--wide: 1280px                           !default;
+$mq-desktop: 980px                                  !default;
+$mq-mobile: 736px                                   !default;
+
+$pad: 15px                                          !default;
+
+$z-index--bottom: 1                                 !default;
+$z-index--center: 50                                !default;
+$z-index--top: 100                                  !default;

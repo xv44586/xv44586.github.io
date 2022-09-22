@@ -73,6 +73,7 @@ NCCL 相关变量含义可以参考[Environment Variables](https://docs.nvidia.c
 
 # 性能对比
 在bert-base 规模的模型上进行测试，其结果如下：
+
 |  GPU | batch size per GPU |   net  |  node           | speed
 | ------------- |:-------------:|:-------------:|:-------------:|:-------------:|
 | A100-40g    | 16 | vpc | single | 430 me/step |

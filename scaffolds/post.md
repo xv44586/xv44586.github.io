@@ -12,8 +12,3 @@ cover:
 
 # 关于头图
 
-
-# Buy me a coffee
-如果觉得这篇文章不错，对你有帮助，欢迎打赏一杯蜜雪冰城。
-      
-![赞赏](/img/sponsor.JPG)
