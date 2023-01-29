@@ -17,7 +17,7 @@ cover: /2023/01/09/zero-to-chatgpt/chatgpt-bg.jpeg
 长期一来，人类一直梦想着让机器替代人来完成各种工作，其中也包括语言相关工作，如翻译文字，识别语言，检索、生成文字等。为了完成这些目标，就需要机器理解语言。最早人们想到的办法是让机器模拟人类进行学习，如学习人类通过学习语法规则、词性、构词法、分析语句等学习语言。尤其是在乔姆斯基（Noam Chomsky 有史以来最伟大的语言学家）提出 “形式语言” 以后，人们更坚定了利用语法规则的办法进行文字处理的信念。遗憾的是，几十年过去了，在计算机处理语言领域，基于这个语法规则的方法几乎毫无突破。
 ## 统计语言模型
 另一个对自然语言感兴趣的就是香农，他在很早就提出了用数学的方法来处理自然语言的想法。但是当时即使使用计算机技术，也无法进行大量的信息处理。不过随着计算机技术的发展，这个思路成了一种可能。
-首先成功利用数学方法解决自然语言问题的是贾里尼克 (Fred Jelinek) 及他领导的IBM Wason实验室。贾里尼克提出的方法也十分简单：判断一个词序列（短语，句子，文档等）是否合理，就看他的可能性有多大。举个例子：判断“I have a pen" 翻译为中文”我有个笔“是否合理，只需要判断”I have a apple.我有个笔" 这个序列的可能性有多大。而如何判断一个词序列的可能性，就需要对这个词序列的概率进行建模，也就是统计语言模型：$S$ 表示一连串特定顺序排列的词$w_1$,$w_2$, ..., $w_n$，n 是序列的长度，则$S$出现的概率$P(S)=P(w_1,w_2,…w_n)$.
+首先成功利用数学方法解决自然语言问题的是贾里尼克 (Fred Jelinek) 及他领导的IBM Wason实验室。贾里尼克提出的方法也十分简单：判断一个词序列（短语，句子，文档等）是否合理，就看他的可能性有多大。举个例子：判断“I have a pen" 翻译为中文”我有个笔“是否合理，只需要判断”I have a pen.我有个笔" 这个序列的可能性有多大。而如何判断一个词序列的可能性，就需要对这个词序列的概率进行建模，也就是统计语言模型：$S$ 表示一连串特定顺序排列的词$w_1$,$w_2$, ..., $w_n$，n 是序列的长度，则$S$出现的概率$P(S)=P(w_1,w_2,…w_n)$.
 但是这个概率$P(S)$ 很难估算，所以这里我们转化一下。首先，利用条件概率公式将其展开:
 $$
 P(S)=P(w_1,w_2,..w_n)=P(w_1)∗P(w_2|w_1)∗P(w_3|w_1,w_2)∗…∗P(w_n|w_1,w_2,..w_{n−1})
@@ -27,18 +27,18 @@ $$
 P(w_{1}^{n})=\prod_{i=1}^{n}P(w_i|w_{1}^{i-1})
 $$
 
-接着，我们利用马尔可夫假设，即任意一个词$w_i$ 出现的概率只与其前一个词$w_{i-1})$（或有限的几个） 有关。于是，问题就变的简单了许多。对应的S 的概率就变为:
+接着，我们利用马尔可夫假设，即任意一个词$w_i$ 出现的概率只与其前一个词$w_{i-1})$（或有限的几个） 有关。于是，问题就变的简单了许多。对应的$S$ 的概率就变为:
 $$
-P(w_{1}^{n})=\prod_{i=1}^{n}P(w_i|w_{1}^{i-1})\approx\prod_{i=1}^{n}P(w_i|w_{i-1})
+P(S)=P(w_{1}^{n})=\prod_{i=1}^{n}P(w_i|w_{1}^{i-1})\approx\prod_{i=1}^{n}P(w_i|w_{i-1})
 $$
-以上对应的便是一个二元模型，当然，如果词由其前面的N-1 个词决定，则对应的是N元模型。
+以上对应的便是一个二元模型，当然，如果词由其前面的$N-1$ 个词决定，则对应的是N元模型。
 
 ## 神经网络语言模型
 统计语言模型有很多问题：1.训练语料中未出现过的词（句子）如何处理(OOV);2.长尾低频词如何平滑；3.one-hot 向量带来的维度灾难；4.未考虑词之间的相似性等。
 为了解决上述问题，Yoshua Bengio(深度学习三巨头之一）在2003年提出用神经网络来建模语言模型，同时学习词的低纬度的分布式表征(distributed representation),具体的：
-不直接对$P(w_{1}^{n})$ 建模，而是对$P(w_i|w_{1}^{i-1})$进行建模;
-简化求解时，不限制只能是左边的词，也可以含右边的词，即可以是一个上下文窗口(context) 内的所有词；
-共享网络参数。
+1.不直接对$P(w_{1}^{n})$ 建模，而是对$P(w_i|w_{1}^{i-1})$进行建模;
+2.简化求解时，不限制只能是左边的词，也可以含右边的词，即可以是一个上下文窗口(context) 内的所有词；
+3.共享网络参数。
 
 具体形式如下：
 $$
@@ -65,15 +65,15 @@ GPT：left-to-right, autoregressive, LM, decoder
 
 ![In-context learning vs Fine-tuning](/2023/01/09/zero-to-chatgpt/in-context.png)
 
-虽然in-context learning 被证明具有一定的有效性，但是其结果相比fine-tuing 还有一定的距离。而随着预训练语言模型(PTM)的扩大(scaling up),对应的在下游task 上的表现也在逐步上升，所以OpenAI就猜想：PTM的进一步scaling up,对应的in-context learning 的能力也会进一步提升。于是他们做了GPT-3 系列模型，最大的为GPT-3 175B。
+虽然in-context learning 被证明具有一定的有效性，但是其结果相比fine-tuing 还有一定的距离。而随着预训练语言模型(PTM)规模的扩大(scaling up),对应的在下游task 上的表现也在逐步上升，所以OpenAI就猜想：PTM的进一步scaling up,对应的in-context learning 的能力是不是也会进一步提升？于是他们做了GPT-3 系列模型，最大的为GPT-3 175B。
 ![gpt3 abstract](/2023/01/09/zero-to-chatgpt/abstract.jpeg)
 
 最终的模型效果简单总结一下：一些任务上few-shot (zero-shot)能赶上甚至超过之前fine-tuned SOTA(如：PIQA),有些任务上还达不到之前的SOTA(如：OpenBookQA)；能做一些新task，如3位数算数。
-不过他们也发现了模型存在的一些问题，并提出了一些可能的解决方案。
+不过他们也发现了模型存在的一些问题，并提出了一些可能的解决方案。（所以OpenAI 在2020 年就定下了未来的方向，持续投入至今）
 ![limitation and future directions](/2023/01/09/zero-to-chatgpt/limits.jpeg)
 
 # Prompt engineering
-zero-shot/few-shot 这种设定确实给NLP 社区带来了新的思路，但是175B 的模型实在是太大了，即不好训练又不好微调也不好部署上线，如何在小模型上应用呢？此外，不同的pattern(prompt)下同一个task 的效果差距也非常大，如何找到效果最好的prompt 呢？于是大家就开始花式探索prompt，NLPer 也变成了prompt-engineer (误).PS：prompt 的语义目前即可以指模型的输入，也可以指输入的一部分。
+zero-shot/few-shot 这种设定确实给NLP 社区带来了新的思路，但是$175B$ 的模型实在是太大了，即不好训练又不好微调也不好部署上线，如何在小模型上应用呢？此外，不同的pattern(prompt)下同一个task 的效果差距也非常大，如何找到效果最好的prompt 呢？于是大家就开始花式探索prompt，NLPer 也变成了prompt-engineer (误).PS：prompt 的语义目前即可以指模型的输入，也可以指输入的一部分。
 ![prompt methods](/2023/01/09/zero-to-chatgpt/prompt.jpeg)
 
 ## PET
@@ -283,7 +283,7 @@ Dialog-Prompted Gopher: few-shot
 ![Popularity vs retrieval](/2023/01/09/zero-to-chatgpt/popular.png)
 
 ### Prompt Engineering
-在CoT 出来之前，我们一度认为LLM 可能需要继续进行指数级的扩大才能线性提升其推理能力，而CoT 的出现解锁了模型的推理能力。所以，一个可能的方案可能是在特定任务上继续寻找他的“般若波罗蜜”。
+在CoT 出来之前，我们一度认为LLM 可能需要继续进行指数级的扩大才能线性提升其推理能力，而CoT 的出现解锁了模型的推理能力。所以，一个可能的方案可能是在特定任务上继续寻找他的“般若波罗蜜”。不过笔者认为，这只是一个过渡期而非常态，随着RLHF/Instruction-tuning 等方法的发展，未来模型的使用一定会越来越简单便捷。
 
 ### Instruction-tuning
 instruction-tuning 已经证明了他的有效性，如flan-t5,flan-PaLM 经过instruction-tuning 后，其性能都得到了提升。
@@ -341,4 +341,4 @@ instruction-tuning 已经证明了他的有效性，如flan-t5,flan-PaLM 经过i
 
 [Evaluating Large Language Models Trained on Code](https://arxiv.org/pdf/2107.03374.pdf)
 # 关于头图
-蒙娜丽柴
+ChatGPT BG from https://openai.com/blog/chatgpt/
