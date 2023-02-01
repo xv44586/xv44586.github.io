@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://xv44586.github.io/"/>
-  <updated>2023-01-29T08:59:02.489Z</updated>
+  <updated>2023-02-01T05:15:08.804Z</updated>
   <id>https://xv44586.github.io/</id>
   
   <author>
@@ -15,6 +15,36 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>fine-tuning-at-few-shot</title>
+    <link href="https://xv44586.github.io/2023/02/01/fine-tuning-at-few-shot/"/>
+    <id>https://xv44586.github.io/2023/02/01/fine-tuning-at-few-shot/</id>
+    <published>2023-02-01T04:46:43.000Z</published>
+    <updated>2023-02-01T05:15:08.804Z</updated>
+    
+    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#few-shot">few-shot</a></li><li><a href="#fine-tuning">fine-tuning</a><ul><li><a href="#supervised-fine-tuning">supervised fine-tuning</a></li><li><a href="#instruction-tuning">instruction-tuning</a></li><li><a href="#prompt-tuning">prompt tuning</a></li><li><a href="#reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</a></li></ul></li><li><a href="#qi-fa">启发</a></li><li><a href="#zong-jie">总结</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --><p></div><br>LLM 目前的使用方式主要是zero-shot/few-shot,其是从context中的examle 数量来区分，如果按这个角度进一步概括目前的fine-tuning 方案，感觉是个有趣的视角。<br><img src="/2023/02/01/fine-tuning-at-few-shot/few-shot.PNG" alt></p><h1><span id="few-shot">few-shot</span><a href="#few-shot" class="header-anchor"></a></h1><p>目前LLM 的使用方式主要是zero-shot/few-shot，而通常few-shot 的性能也比zero-shot 要好，而且随着example 的数量的增加，few-shot 的性能也可能进一步提升；zero-shot 时只给出task input 效果可能不佳，通常需要给出对应的task description，而更”精准“ 的task description 通常也能得到更好的zero-shot 效果。<br>所以，提升LLM zero-shot /few-shot 的性能，主要的方式有两个：</p><ol><li>给出更”好“的task description</li><li>给出更多的example</li></ol><h1><span id="fine-tuning">fine-tuning</span><a href="#fine-tuning" class="header-anchor"></a></h1><h2><span id="supervised-fine-tuning">supervised fine-tuning</span><a href="#supervised-fine-tuning" class="header-anchor"></a></h2><p>对于小模型来说，其in-context learning 能力较弱，性能不理想。为了提升模型的性能，一个可以尝试的方向是增加context 中的example 数量，但是由于模型的context 窗口有限，不支持我们无限制的将更多的example 塞进context 中，所以我们变通一下，采用通过更新参数的方式将example 塞进“context”。此时可以看作是无限example（inf-shot)；</p><h2><span id="instruction-tuning">instruction-tuning</span><a href="#instruction-tuning" class="header-anchor"></a></h2><p>通常在supervised fine-tuning 时，我们是将一个任务的example “塞”进context，而instruction-tuning 可以看作是同时将多个任务的example “塞”进context，为了在使用时区分应该当前context 里应该使用哪些example，我们在不同的task 前面增加对应的description，作为判断依据。即：同时将多个任务的多个example 塞进模型的context 中，使用时通过不同的task description 来区分当前context 内的example 应该是哪些。</p><h2><span id="prompt-tuning">prompt tuning</span><a href="#prompt-tuning" class="header-anchor"></a></h2><p>由于pretrain model 的任务是预测下一个token，而非处理用户的指令（instruction），为了提升模型zero-shot 的性能，一个可以尝试的方法就是找到模型视角下更好的task description（pattern），prompt-tuning 的思路即通过大量的监督样本，尝试寻找到更适应模型的task description，然后期望这个task description 能提高模型的zero-shot 的性能。</p><h2><span id="reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</span><a href="#reinforcement-learning-with-human-feedback" class="header-anchor"></a></h2><p>prompt-tuning 时，我们尝试找到模型视角下更好的task description，而这个方法显然是不利于交互的，更好的方式是让模型理解人类视角下的task description。rlhf 就是按照这个思路，让模型反过来更好的理解人类视角下的task description，使得交互更方便。</p><h1><span id="qi-fa">启发</span><a href="#qi-fa" class="header-anchor"></a></h1><p>从这个视角看，我们发现即使是小模型，也是有一定的in-context learning 的能力的，只是不够强，所以我们需要更多的example 他才能发挥出更好的效果；<br>pretrain+fine-tuning 的模式之所以能work，是因为pretrain 后的model 有in-context learning 的能力，in-context learning 并不要求task 的形式与pretrain 的一致，所以我们才能在pretrain 的基础上根据下游任务的不同，来构造不同的fine-tuning 过程，在few-shot 视角下，其对应的是在context 中”塞“进更多的example；<br>in-context learning 的增强，对应的是所需的样本逐渐减少，从supervised fine-tuning 的大量样本到few-shot 的少量样本最终到zero-shot 的不需要提供样本，只需提供任务描述。</p><h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文是笔者最近思考pretrain + fine-tuning 模式为什么能work 时，通过在few-shot 视角下的一个解释。通过该思路，笔者尝试将目前的fine-tuning 主流思路统一起来。</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>太空视角下的喜马拉雅山脉</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
+      
+    
+    </summary>
+    
+    
+      <category term="NLP" scheme="https://xv44586.github.io/categories/NLP/"/>
+    
+    
+      <category term="LLM" scheme="https://xv44586.github.io/tags/LLM/"/>
+    
+      <category term="In-context learning" scheme="https://xv44586.github.io/tags/In-context-learning/"/>
+    
+      <category term="fine-tuning" scheme="https://xv44586.github.io/tags/fine-tuning/"/>
+    
+  </entry>
   
   <entry>
     <title>From zero to ChatGPT</title>
@@ -38,11 +68,11 @@
       <category term="NLP" scheme="https://xv44586.github.io/categories/NLP/"/>
     
     
-      <category term="GPT-3" scheme="https://xv44586.github.io/tags/GPT-3/"/>
+      <category term="LLM" scheme="https://xv44586.github.io/tags/LLM/"/>
     
       <category term="In-context learning" scheme="https://xv44586.github.io/tags/In-context-learning/"/>
     
-      <category term="LLM" scheme="https://xv44586.github.io/tags/LLM/"/>
+      <category term="GPT-3" scheme="https://xv44586.github.io/tags/GPT-3/"/>
     
       <category term="ChatGPT" scheme="https://xv44586.github.io/tags/ChatGPT/"/>
     
@@ -539,32 +569,6 @@
     
     
       <category term="Optimizer" scheme="https://xv44586.github.io/tags/Optimizer/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>一切三段成三角形</title>
-    <link href="https://xv44586.github.io/2020/10/19/triangle/"/>
-    <id>https://xv44586.github.io/2020/10/19/triangle/</id>
-    <published>2020-10-19T13:23:48.000Z</published>
-    <updated>2020-10-20T15:11:24.993Z</updated>
-    
-    <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc"><!-- toc --><ul><li><a href="#ti-mu">题目</a></li><li><a href="#jie-da">解答</a></li><li><a href="#guan-yu-tou-tu">关于头图</a></li></ul><!-- tocstop --></div><p>听到一个题目，还挺有意思，所以记录一下。</p><h1><span id="ti-mu">题目</span><a href="#ti-mu" class="header-anchor"></a></h1><p>问：一个绳子长<code>a</code>，任意剪两刀变成三段后，可以组成一个三角形的概率是多少？</p><h1><span id="jie-da">解答</span><a href="#jie-da" class="header-anchor"></a></h1><p>分析一下题目，一段长度固定的绳子，切割为三段，则：<br>1.<em> 任意一段绳子的长度大于0小于<code>a</code>；</em><br>2.<em> 任意两段绳子的长度大于0小于<code>a</code>。</em></p><p>而三段绳子可以组成一个三角形，而三角形中两边之和大于第三边，所以意味着：<br>1.<em>任意一段的长度小于<code>a/2</code>；</em><br>2.<em>任意两段的长度和大于<code>a/2</code>.</em></p><p>现在设其中两段的长度分别为 <code>x</code>, <code>y</code>，画出一个直角坐标系，如下图所示。<br><img src="/2020/10/19/triangle/triangle.png" alt></p><p>同时连接<code>(0, a), (a, 0)</code>两点，则切割绳子后其中两段的长度的所有可取的值对应由<code>(0, 0),(a, 0), (0, a)</code>组成的三角形区域。<br>简单证明如下：对于任意一点<code>B</code>,我们做其对<code>y</code>轴的垂线，相交与点<code>P</code>,而点<code>B</code>位于<code>(a, 0) (0, a)</code>的连线时，对应$\angle PAB  = 45^o$,此时<br>$PB=PA \Rightarrow  PB + PO = PA + PO = a$,而当<code>P</code>位于连线外侧，则$\angle PAB  &gt; 45^o$,对应$PO + PB &gt; PO + PA = a$,不满足约束。而$\Delta A O C$ 的面积为 $a^2 / 2$.</p><p>而对于能组成三角形时，首先任意一条长度小于$a/2$，对应<code>(0, a/2),(a/2,a/2)</code>连线与<code>(a/2,0)(a/2,a/2)</code>连线围城的矩形区域，而任意两边之和大于$a/2$,利用之前的方法可以证明是(0,a/2)(a/2, 0)连线右侧区域，两者的交即图中绿色三角形区域，其面积为$(a/2)^2/2 = a^2 / 8$</p><p>所以最后结论是组成三角形的概率为两个面积之比：<br>$$<br>pro = \frac{a^2/8}{a^2/2} = 1/4<br>$$</p><h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;link rel=&quot;stylesheet&quot; class=&quot;aplayer-secondary-style-marker&quot; href=&quot;/assets/css/APlayer.min.css&quot;&gt;&lt;script src=&quot;/assets/js/APlayer.min.js&quot; cla
-      
-    
-    </summary>
-    
-    
-      <category term="Math" scheme="https://xv44586.github.io/categories/Math/"/>
-    
-    
-      <category term="Statistics" scheme="https://xv44586.github.io/tags/Statistics/"/>
     
   </entry>
   
