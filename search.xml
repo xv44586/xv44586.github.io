@@ -200,45 +200,109 @@
       </tags>
   </entry>
   <entry>
-    <title>Bagging为什么能降低过拟合</title>
-    <url>/2019/10/16/bagging/</url>
+    <title>python中实现单例模式</title>
+    <url>/2019/10/13/singleton/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<!-- tocstop -->
+</div>
+
+<p>python中实现单例模式的方式大致有四种：<br>1.模块<br>2.改写类的<strong>new</strong>方法，控制实例生成<br>3.装饰器<br>4.元类</p>
+<p>1.模块<br>python中的模块是天然的单例模式，并且是线程安全的，所有的模块只会在运行时加载一次。<br>所以，利用模块就可以实现一个线程安全的单例。如：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># my singleton.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">My_singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">my_singleton = My_singleton()</span><br></pre></td></tr></table></figure></p>
+<ol start="2">
+<li><strong>new</strong>方法<br>python中每个类在实例化对象时，首先会调用<strong>new</strong>方法创建一个实例，然后再调用<strong>init</strong>方法动态绑定其他属性.如：<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    _instance = <span class="literal">None</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(cls, *args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> cls._instance:</span><br><span class="line">            cls._instance = super(Singleton, cls).__new__(cls, *args, **kw)  </span><br><span class="line">        <span class="keyword">return</span> cls._instance  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(Singleton)</span>:</span>  </span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>3.装饰器<br>装饰器可以动态的修改一个类或方法的表现，利用装饰器生成单例<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">singleton</span><span class="params">(cls)</span>:</span></span><br><span class="line">    instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @wraps(cls)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getinstance</span><span class="params">(*args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> instances:</span><br><span class="line">            instances[cls] = cls(*args, **kw)</span><br><span class="line">        <span class="keyword">return</span> instances[cls]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> getinstance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@singleton</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>4.元类<br>元类可以控制其子类的类对象(<strong>new</strong>)及类实例对象(<strong>call</strong>)的创建。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(type)</span>:</span></span><br><span class="line">    _instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(cls, *args, **kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> cls._instances:</span><br><span class="line">            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> cls._instances[cls]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Python2</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    __metaclass__ = Singleton</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Python3</span></span><br><span class="line">    <span class="comment"># class MyClass(metaclass=Singleton):</span></span><br><span class="line">    <span class="comment">#    pass</span></span><br></pre></td></tr></table></figure></p>
+<p>最著名的就是Django中的ORM，其model中就使用了元类来控制所有model的表现</p>
+<p><strong>关于头图</strong></p>
+<p>摄于内蒙古乌兰布统草原</p>
+]]></content>
+      <categories>
+        <category>Programming</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Word2Vec之skip-gram</title>
+    <url>/2019/10/13/skipgram/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
 
 <!-- toc -->
 <ul>
-<li><a href="#pian-chai-yu-fang-chai">偏差与方差</a></li>
-<li><a href="#jiang-di-mo-xing-guo-ni-he">降低模型过拟合</a><ul>
-<li><a href="#ji-cheng-mo-xing">集成模型</a></li>
-<li><a href="#bagging">Bagging</a></li>
-<li><a href="#sui-ji-sen-lin">随机森林</a></li>
-</ul>
-</li>
+<li><a href="#word2vec">Word2Vec</a></li>
+<li><a href="#fake-task">Fake Task</a></li>
+<li><a href="#train">Train</a></li>
+<li><a href="#shu-ru">输入</a></li>
+<li><a href="#yin-ceng">隐层</a></li>
+<li><a href="#shu-chu-ceng">输出层</a></li>
 <li><a href="#guan-yu-tou-tu">关于头图</a></li>
 </ul>
 <!-- tocstop -->
 </div>
 
-<h1><span id="pian-chai-yu-fang-chai">偏差与方差</span><a href="#pian-chai-yu-fang-chai" class="header-anchor"></a></h1><p><strong>偏差 (bias)</strong><br><img src="/2019/10/16/bagging/fx.png" alt><br>即模型的期望预测与真实值之间的差异。</p>
-<p><strong>方差 (variance)</strong><br><img src="/2019/10/156/bagging/var.png" alt><br>方差通常衡量模型对<strong>不同数据集</strong>的敏感程度，也可以认为是衡量模型的不稳定性。若方差大，则表示数据的微小变动就能导致学习出的模型产生较大差异，即对应的模型结构风险更高。</p>
-<p>有了偏差和方差的定义，我们就能推导出模型的期望泛化误差：</p>
-<p><img src="/2019/10/16/bagging/ed.png" alt><br>如果我们能在保持bias基本不变时，降低variance，则模型的期望泛化误差降低，从而降低模型过拟合风险。</p>
-<h1><span id="jiang-di-mo-xing-guo-ni-he">降低模型过拟合</span><a href="#jiang-di-mo-xing-guo-ni-he" class="header-anchor"></a></h1><h2><span id="ji-cheng-mo-xing">集成模型</span><a href="#ji-cheng-mo-xing" class="header-anchor"></a></h2><p>假设我们现在有一个集成模型，其过程为从整体样本中进行采样，得到n份独立且与整体同分布的样本集，然后选择同样的模型进行训练，最后取平均。由于单个模型对应数据同分布，模型相同，则对应的bias和variance相同，而</p>
-<p><img src="/2019/10/16/bagging/exi.png" alt></p>
-<p>所以最终模型的bias与单模型的bias相同；另一方面，由于各个子模型独立，则</p>
-<p><img src="/2019/10/16/bagging/varn.png" alt></p>
-<p>此时可以显著降低模型的variance，根据模型泛化误差期望公式，此时的集成模型的期望泛化误差将小于单模型的期望泛化误差，从而降低了模型的过拟合。</p>
-<h2><span id="bagging">Bagging</span><a href="#bagging" class="header-anchor"></a></h2><p>针对上述集成模型，当各个子模型相同时，</p>
-<p><img src="/2019/10/16/bagging/varxi.png" alt><br>此时不会降低variance。</p>
-<p>对应公式：设有n个随机变量，两两变量之间的相关性为𝜌，则方差为</p>
-<p><img src="/2019/10/16/bagging/p.png" alt><br>Bagging对样本重采样，对每一重采样得到的子样本集训练一个模型，最后取平均。由于子样本集有相似性，同时也使用同种模型，则各个子模型有相似的bias和variance，由上面结论可知，此时的bias与单模型近似相同，所以bagging不能显著降低bias。（因此在选择模型时，需要选择bias小的模型）子模型介于相同与独立两个极端情况之间，所以对应variance会处于var(x) 与 var(x)/n之间，即通过降低上述公式中的第二项降低整体方差。<br>而根据模型期望泛化误差公式，由于方差的降低，也能带来最终模型的期望泛化误差的降低，从而降低过拟合。</p>
-<h2><span id="sui-ji-sen-lin">随机森林</span><a href="#sui-ji-sen-lin" class="header-anchor"></a></h2><p>随机森林是一种常用的Bagging模型，其通过对样本进行有放回的采样，构造n个样本集，同时对特征列进行采样后进行模型训练，即同时降低上述公式中的两项，来降低方差，从而降低过拟合。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于杭州青芝坞</p>
+<h1><span id="word2vec">Word2Vec</span><a href="#word2vec" class="header-anchor"></a></h1><p><img src="/2019/10/13/skipgram/w2v.jpeg" alt="Word2Vec"><br><code>Word2vec</code> 主要有两种形式，<code>CBOW</code> 和<code>Skip-gram</code>，其中<code>CBOW</code>是通过上下文context来预测当前位置词，<code>SKip-gram</code>则是通过当前词来预测上下文</p>
+<h1><span id="fake-task">Fake Task</span><a href="#fake-task" class="header-anchor"></a></h1><p>word2vec 实际上分为两部分，1，建立模型，2，通过模型获取词的嵌入向量（隐层参数）。整个过程与自编码器的思想类似，即基于训练数据训练一个神经网络，模型训练好后，并不会用这个模型处理后续的任务，真正需要的是这个模型学到的参数，如隐层的权重矩阵，基于训练数据建模的过程叫“Fake Task”，意味着建模并不是我们最终的目的。</p>
+<h1><span id="train">Train</span><a href="#train" class="header-anchor"></a></h1><p>如何训练我们的神经网络模型？假如我们有一个句子“ The dog barked at the mailman”:</p>
+<ul>
+<li>首先，我们选择句子中一个词作为我们的input word， 如 dog</li>
+<li>然后，我们需要定义一个skip_window参数，来指定上下文的大小，即input word 一侧选取词的数量，假如skip_window=2,那将从dog出发向左右两个方向取最近的两个word，即（the, dog,barked,at)，此时的$span = skip_window * 2 + 1 = 5$<br>另一个需要定义的参数是num_skips，即从上下文中选取多少个word来作为output word，这个参数应该小于等于$2 * skip_window$，即最多将所有上下文都作为output，但是不能重复。如设置num_skips = 2,此时从上下文选取2个词作为output，如（the， barked），最终我们将得到两组训练数据（dog, the) (dog, barked)</li>
+</ul>
+<p>神经网络将基于这些训练数据输出一个概率分布，这个概率分布代表着在输入数据下，词典中每个词是output的概率。如拿数据（dog， barked）来训练，则模型将会告诉我们每个单词是’barked’的概率大小。<br>模型的输出概率代表着词典中每个单词有多大可能性跟input word同时出现。举个栗子，如果我们向神经网络模型中输入一个单词“Soviet“，那么最终模型的输出概率中，像“Union”， ”Russia“这种相关词的概率将远高于像”watermelon“，”kangaroo“非相关词的概率。因为”Union“，”Russia“在文本中更大可能在”Soviet“的窗口中出现。<br>我们将通过给神经网络输入文本中成对的单词来训练它完成上面所说的概率计算。下面的图中给出了一些我们的训练样本的例子。我们选定句子“The quick brown fox jumps over lazy dog”，设定我们的窗口大小为2（window_size = 2），也就是说我们仅选输入词前后各两个词和输入词进行组合。下图中，蓝色代表input word，方框内代表位于窗口内的单词。</p>
+<p><img src="/2019/10/13/skipgram/train.png" alt><br>模型将会从每队单词出现的次数中习得统计结果，模型可能会得到更多的（’soviet’， ‘union’）样本对，而（soviet， dog）这样的组合看到的很少。因此，当模型训练完成后，给定一个单词 soviet，输出结果中union 或者russia会比dog有更高的概率。</p>
+<h1><span id="shu-ru">输入</span><a href="#shu-ru" class="header-anchor"></a></h1><p>常用做法是用训练文档构建词汇表，然后再对单词进行one-hot编码。编码后的向量，形如$dog = [0, 0, 1, 0, …0]$, 如果词汇表大小为10000， 那这个向量包含了10000的概率，即为当前词为输入的概率<br>下图是神经网络结构：</p>
+<p><img src="/2019/10/13/skipgram/arc.png" alt><br>我们基于成对的单词来对神经网络进行训练， 训练样本是（input word， output word）这样的单词对，input word 和 output word都是one-hot编码的向量，最终的模型输出是一个概率分布。</p>
+<h1><span id="yin-ceng">隐层</span><a href="#yin-ceng" class="header-anchor"></a></h1><p>如果我们想要用300个特征来表示一个词（即每个词是300维的向量），即隐层有300个神经元，隐层的权重为$10000 * 300$的矩阵，下图中的左右两个图代表了不同角度看隐层权重，左图中每列代表一个10000维的词向量与隐层单个神经元的连接权重，右图每行代表了一个单词的词向量。<br><img src="/2019/10/13/skipgram/weights.png" alt><br>我们最终的目标就是学习这个隐层权重矩阵。<br>输入被one-hot编码后，实际上只有一个位置不为0，所以这个向量相当稀疏，那如果我们将$1*10000$的向量与$10000*300$的矩阵相乘，相当消耗计算资源，为了高效计算，仅仅会选择矩阵中对应的向量中纬度为1的索引行<br><img src="/2019/10/13/skipgram/lookup.png" alt="lookup table"><br>即实际不会进行矩阵乘法计算，而是根据输入向量中不为0 的维度去索引。这样模型中的隐层权重矩阵便成了一个查找表（lookup table），输出就是输入单词的嵌入词向量</p>
+<h1><span id="shu-chu-ceng">输出层</span><a href="#shu-chu-ceng" class="header-anchor"></a></h1><p>隐层的输出是一个1*300的向量，而输出层是一个softmax回归分类器，他的每个结点将会输出一个0-1之间的值（概率），而结点的概率之和为1.<br><img src="/2019/10/13/skipgram/softmax.png" alt><br>我们会发现Word2Vec模型是一个超级大的神经网络（权重矩阵规模非常大）。<br>举个栗子，我们拥有10000个单词的词汇表，我们如果想嵌入300维的词向量，那么我们的输入-隐层权重矩阵和隐层-输出层的权重矩阵都会有 10000 x 300 = 300万个权重，在如此庞大的神经网络中进行梯度下降是相当慢的。更糟糕的是，你需要大量的训练数据来调整这些权重并且避免过拟合。百万数量级的权重矩阵和亿万数量级的训练样本意味着训练这个模型将会是个灾难（太凶残了）。<br>Word2Vec的作者在它的第二篇论文中强调了这些问题，下面是作者在第二篇论文中的三个创新：</p>
+<ul>
+<li><ol>
+<li>将常见的单词组合（word pairs）或者词组作为单个“words”来处理。</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>对高频次单词进行抽样来减少训练样本的个数。</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>对优化目标采用“negative sampling”方法，这样每个训练样本的训练只会更新一小部分的模型权重，从而降低计算负担。<br>事实证明，对常用词抽样并且对优化目标采用“negative sampling”不仅降低了训练过程中的计算负担，还提高了训练的词向量的质量。</li>
+</ol>
+</li>
+</ul>
+<p><strong>word pairs and phases</strong><br>一些单词组合的含义和拆开以后具有完全不同的意义，比如 New York，单独的New 和York无法表达这个词组的含义。因此，应该把New York作为一个单独的词组来生成其词向量。<br><strong>对高频词抽样</strong><br>对于高频词，如 the ，按上面的处理方式会有两个问题：</p>
+<ul>
+<li><ol>
+<li>当我们得到成对的单词训练样本时，（dog， the）这样的样本并不会提供更多关于dog的语义信息，因为the 在每个单词的上下文几乎都会出现</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>由于the 这样的高频词出现的概率很大，因此为们将会有大量的（the ， 。。。）这样的训练样本，而这些样本的数量远远超过我们学习the这个单词所需的训练样本数。</li>
+</ol>
+</li>
+</ul>
+<p>如果直接删除掉这些高频词，会有两个问题:</p>
+<ul>
+<li>1.删除后，the这个单词永远也不会出现在我们的上下文窗口</li>
+<li>2.训练样本会减少</li>
+</ul>
+<p>所以word2vec 采用抽样的方式来解决这种高频词问题。他的基本思想是：对于我们在训练原始文本中遇到的每一个单词，他们都有一定概率被我们从文本中删除掉，而这个被删除的概率与单词的频率有关。<br><img src="/2019/10/13/skipgram/del.png" alt><br>wi 是一个单词，$Z(w_i)$是这个单词在所有预料中出现的频次。$P(w_i)$是被保留的概率。</p>
+<ul>
+<li>当$Z(w_i) &lt;= 0.0026$时,$P(w_i) = 1.0$。当单词在语料中出现的频率小于0.0026时，它是100%被保留的，这意味着只有那些在语料中出现频率超过0.26%的单词才会被采样。</li>
+<li>当$Z(w_i) = 0.00746$ 时，$P(w_i) = 0.5$，意味着这一部分的单词有50%的概率被保留。</li>
+<li>当$Z(w_i) = 1.0$ 时，$P(w_i) = 0.033$，意味着这部分单词以3.3%的概率被保留</li>
+</ul>
+<p><strong>负采样</strong><br>训练一个神经网络意味着要输入训练样本并且不断的调整神经元的权重，不断提高对目标的准确预测。而vocabulary的大小决定了skip-gram神经网络将拥有大规模的权重矩阵，所有的这些权重需要通过我们数以亿计的样本来训练调整，非常消耗计算资源，并且实际中会非常慢。<br>负采样解决了这个问题，不同于原本每个训练样本更新所有权重，负采样每次让一个训练样本仅仅更新一部分权重，减小计算量。<br>对于训练样本（fox，quick），都是经过one-hot编码的，当vocabulary的大小为10000时，我们期望输出对应的quick单词的那个神经元的输出是1，其余9999个都是0，这9999个输出为0的神经元所对应的单词称为negative word<br>隐层-输出层拥有$300 *10000$的权重，而负采样时，我们仅仅更新quick 和我们选择的其他5个negative word的结点对应的权重，共6个神经元，$300* 6 = 1800$ 个权重，相当于只计算了0.06%的权重，计算效率大大提高。<br><img src="/2019/10/13/skipgram/sample.png" alt><br>其中f(wi)代表每个单词出现的频次，p(wi)代表被选中的概率。<br>负采样的C语言实现非常的有趣。unigram table有一个包含了一亿个元素的数组，这个数组是由词汇表中每个单词的索引号填充的，并且这个数组中有重复，也就是说有些单词会出现多次。那么每个单词的索引在这个数组中出现的次数该如何决定呢，由公式$P(w_i) * table_size$，也就是说计算出的负采样概率*1亿=单词在表中出现的次数。<br>有了这张表以后，每次去我们进行负采样时，只需要在0-1亿范围内生成一个随机数，然后选择表中索引号为这个随机数的那个单词作为我们的negative word即可。一个单词的负采样概率越大，那么它在这个表中出现的次数就越多，它被选中的概率就越大。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于内蒙古乌兰布统</p>
 ]]></content>
       <categories>
-        <category>MachineLearning</category>
+        <category>NLP</category>
       </categories>
       <tags>
-        <tag>Bagging</tag>
+        <tag>word2vec</tag>
+        <tag>skipgram</tag>
       </tags>
   </entry>
   <entry>
@@ -311,6 +375,48 @@
       </tags>
   </entry>
   <entry>
+    <title>Bagging为什么能降低过拟合</title>
+    <url>/2019/10/16/bagging/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#pian-chai-yu-fang-chai">偏差与方差</a></li>
+<li><a href="#jiang-di-mo-xing-guo-ni-he">降低模型过拟合</a><ul>
+<li><a href="#ji-cheng-mo-xing">集成模型</a></li>
+<li><a href="#bagging">Bagging</a></li>
+<li><a href="#sui-ji-sen-lin">随机森林</a></li>
+</ul>
+</li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<h1><span id="pian-chai-yu-fang-chai">偏差与方差</span><a href="#pian-chai-yu-fang-chai" class="header-anchor"></a></h1><p><strong>偏差 (bias)</strong><br><img src="/2019/10/16/bagging/fx.png" alt><br>即模型的期望预测与真实值之间的差异。</p>
+<p><strong>方差 (variance)</strong><br><img src="/2019/10/156/bagging/var.png" alt><br>方差通常衡量模型对<strong>不同数据集</strong>的敏感程度，也可以认为是衡量模型的不稳定性。若方差大，则表示数据的微小变动就能导致学习出的模型产生较大差异，即对应的模型结构风险更高。</p>
+<p>有了偏差和方差的定义，我们就能推导出模型的期望泛化误差：</p>
+<p><img src="/2019/10/16/bagging/ed.png" alt><br>如果我们能在保持bias基本不变时，降低variance，则模型的期望泛化误差降低，从而降低模型过拟合风险。</p>
+<h1><span id="jiang-di-mo-xing-guo-ni-he">降低模型过拟合</span><a href="#jiang-di-mo-xing-guo-ni-he" class="header-anchor"></a></h1><h2><span id="ji-cheng-mo-xing">集成模型</span><a href="#ji-cheng-mo-xing" class="header-anchor"></a></h2><p>假设我们现在有一个集成模型，其过程为从整体样本中进行采样，得到n份独立且与整体同分布的样本集，然后选择同样的模型进行训练，最后取平均。由于单个模型对应数据同分布，模型相同，则对应的bias和variance相同，而</p>
+<p><img src="/2019/10/16/bagging/exi.png" alt></p>
+<p>所以最终模型的bias与单模型的bias相同；另一方面，由于各个子模型独立，则</p>
+<p><img src="/2019/10/16/bagging/varn.png" alt></p>
+<p>此时可以显著降低模型的variance，根据模型泛化误差期望公式，此时的集成模型的期望泛化误差将小于单模型的期望泛化误差，从而降低了模型的过拟合。</p>
+<h2><span id="bagging">Bagging</span><a href="#bagging" class="header-anchor"></a></h2><p>针对上述集成模型，当各个子模型相同时，</p>
+<p><img src="/2019/10/16/bagging/varxi.png" alt><br>此时不会降低variance。</p>
+<p>对应公式：设有n个随机变量，两两变量之间的相关性为𝜌，则方差为</p>
+<p><img src="/2019/10/16/bagging/p.png" alt><br>Bagging对样本重采样，对每一重采样得到的子样本集训练一个模型，最后取平均。由于子样本集有相似性，同时也使用同种模型，则各个子模型有相似的bias和variance，由上面结论可知，此时的bias与单模型近似相同，所以bagging不能显著降低bias。（因此在选择模型时，需要选择bias小的模型）子模型介于相同与独立两个极端情况之间，所以对应variance会处于var(x) 与 var(x)/n之间，即通过降低上述公式中的第二项降低整体方差。<br>而根据模型期望泛化误差公式，由于方差的降低，也能带来最终模型的期望泛化误差的降低，从而降低过拟合。</p>
+<h2><span id="sui-ji-sen-lin">随机森林</span><a href="#sui-ji-sen-lin" class="header-anchor"></a></h2><p>随机森林是一种常用的Bagging模型，其通过对样本进行有放回的采样，构造n个样本集，同时对特征列进行采样后进行模型训练，即同时降低上述公式中的两项，来降低方差，从而降低过拟合。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于杭州青芝坞</p>
+]]></content>
+      <categories>
+        <category>MachineLearning</category>
+      </categories>
+      <tags>
+        <tag>Bagging</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Dropout--深度神经网络中的Bagging</title>
     <url>/2019/10/17/dropout/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -342,29 +448,6 @@
       </categories>
       <tags>
         <tag>Deep Learning</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>随机森林模型中是不是树越多越好</title>
-    <url>/2019/10/17/randomForest/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao">随机森林中树越多越好？</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao">随机森林中树越多越好？</span><a href="#sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao" class="header-anchor"></a></h1><p>面试时被问到在随机森林的树是否数量越多越好？开始只考虑构建更多的树一来浪费资源，二来数量一定后模型的性能基本保持稳定，随着树的增加提升非常小。<br>回来后又想了想，随机森林中通过引入随机抽样和随机抽列，使模型对异常点有更好的鲁棒性，模型的泛化能力更强。如果是无限颗树，那其实会抵消随机性的引入，最后的模型会是一个过拟合的模型，其泛化性能也会降低。此外，噪音较大时，模型也会学习到更多噪音相关的信息，发生过拟合，降低泛化性能。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于玉渊潭公园</p>
-]]></content>
-      <categories>
-        <category>MachineLearning</category>
-      </categories>
-      <tags>
-        <tag>Random Forest</tag>
       </tags>
   </entry>
   <entry>
@@ -422,31 +505,26 @@
       </tags>
   </entry>
   <entry>
-    <title>python中实现单例模式</title>
-    <url>/2019/10/13/singleton/</url>
+    <title>随机森林模型中是不是树越多越好</title>
+    <url>/2019/10/17/randomForest/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
 
 <!-- toc -->
+<ul>
+<li><a href="#sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao">随机森林中树越多越好？</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
 <!-- tocstop -->
 </div>
 
-<p>python中实现单例模式的方式大致有四种：<br>1.模块<br>2.改写类的<strong>new</strong>方法，控制实例生成<br>3.装饰器<br>4.元类</p>
-<p>1.模块<br>python中的模块是天然的单例模式，并且是线程安全的，所有的模块只会在运行时加载一次。<br>所以，利用模块就可以实现一个线程安全的单例。如：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># my singleton.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">My_singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">my_singleton = My_singleton()</span><br></pre></td></tr></table></figure></p>
-<ol start="2">
-<li><strong>new</strong>方法<br>python中每个类在实例化对象时，首先会调用<strong>new</strong>方法创建一个实例，然后再调用<strong>init</strong>方法动态绑定其他属性.如：<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    _instance = <span class="literal">None</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(cls, *args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> cls._instance:</span><br><span class="line">            cls._instance = super(Singleton, cls).__new__(cls, *args, **kw)  </span><br><span class="line">        <span class="keyword">return</span> cls._instance  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(Singleton)</span>:</span>  </span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>3.装饰器<br>装饰器可以动态的修改一个类或方法的表现，利用装饰器生成单例<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">singleton</span><span class="params">(cls)</span>:</span></span><br><span class="line">    instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @wraps(cls)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getinstance</span><span class="params">(*args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> instances:</span><br><span class="line">            instances[cls] = cls(*args, **kw)</span><br><span class="line">        <span class="keyword">return</span> instances[cls]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> getinstance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@singleton</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
-<p>4.元类<br>元类可以控制其子类的类对象(<strong>new</strong>)及类实例对象(<strong>call</strong>)的创建。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(type)</span>:</span></span><br><span class="line">    _instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(cls, *args, **kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> cls._instances:</span><br><span class="line">            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> cls._instances[cls]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Python2</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    __metaclass__ = Singleton</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Python3</span></span><br><span class="line">    <span class="comment"># class MyClass(metaclass=Singleton):</span></span><br><span class="line">    <span class="comment">#    pass</span></span><br></pre></td></tr></table></figure></p>
-<p>最著名的就是Django中的ORM，其model中就使用了元类来控制所有model的表现</p>
-<p><strong>关于头图</strong></p>
-<p>摄于内蒙古乌兰布统草原</p>
+<h1><span id="sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao">随机森林中树越多越好？</span><a href="#sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao" class="header-anchor"></a></h1><p>面试时被问到在随机森林的树是否数量越多越好？开始只考虑构建更多的树一来浪费资源，二来数量一定后模型的性能基本保持稳定，随着树的增加提升非常小。<br>回来后又想了想，随机森林中通过引入随机抽样和随机抽列，使模型对异常点有更好的鲁棒性，模型的泛化能力更强。如果是无限颗树，那其实会抵消随机性的引入，最后的模型会是一个过拟合的模型，其泛化性能也会降低。此外，噪音较大时，模型也会学习到更多噪音相关的信息，发生过拟合，降低泛化性能。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于玉渊潭公园</p>
 ]]></content>
       <categories>
-        <category>Programming</category>
+        <category>MachineLearning</category>
       </categories>
       <tags>
-        <tag>Python</tag>
+        <tag>Random Forest</tag>
       </tags>
   </entry>
   <entry>
@@ -706,8 +784,8 @@
         <category>NLP</category>
       </categories>
       <tags>
-        <tag>Glove</tag>
         <tag>word2vec</tag>
+        <tag>Glove</tag>
       </tags>
   </entry>
   <entry>
@@ -783,33 +861,6 @@
       </tags>
   </entry>
   <entry>
-    <title>有趣的概率统计题</title>
-    <url>/2019/11/30/statistics/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-
-<p>昨晚下雪了，开心😄！</p>
-<h1><span id="fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</span><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti" class="header-anchor"></a></h1><p>一段线段上，任意取两不重合的点，将这条线段切分成三段，问，这三条线段组成三角形点概率是多少？</p>
-<p>现在我们将问题转化一下，假设原始线段长度为1，即$(0，1)$表示原始线段，此时，随机在$(0，1)$范围内选两个点a，b，组成$(0，a)$，$(a，b)$，$(b，1)$三个线段，<br>此时原始问题等价于现在的三个线段组成三角形的概率。<br>现在我们来考虑一下，三条线段分别为$A$， $B$，$C$，其中$A &gt;= B &gt;= C$,则A的长度必定在$[1/3, 1)$,而要组成三角形，则需要 $B + C &gt; A$,所以 B + C 的长度为$(1/2, 1)$,<br>而对应的A的长度也就在[1/3, 1/2)内，所以，最终能构成三角形的概率即为 $A_{triangle} / A_{all} = (1/2 - 1/3) / (1 - 1/3) = 1/4$</p>
-<p>看似非常复杂的问题，从最基本的数学知识就能解答，还真是有趣！ </p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>2019年的第一场雪，摄于望京地铁站</p>
-]]></content>
-      <categories>
-        <category>Math</category>
-      </categories>
-      <tags>
-        <tag>Statistics</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>带约束的领域词挖掘</title>
     <url>/2019/11/28/domain-words/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -852,6 +903,33 @@
       </tags>
   </entry>
   <entry>
+    <title>有趣的概率统计题</title>
+    <url>/2019/11/30/statistics/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+
+<p>昨晚下雪了，开心😄！</p>
+<h1><span id="fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</span><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti" class="header-anchor"></a></h1><p>一段线段上，任意取两不重合的点，将这条线段切分成三段，问，这三条线段组成三角形点概率是多少？</p>
+<p>现在我们将问题转化一下，假设原始线段长度为1，即$(0，1)$表示原始线段，此时，随机在$(0，1)$范围内选两个点a，b，组成$(0，a)$，$(a，b)$，$(b，1)$三个线段，<br>此时原始问题等价于现在的三个线段组成三角形的概率。<br>现在我们来考虑一下，三条线段分别为$A$， $B$，$C$，其中$A &gt;= B &gt;= C$,则A的长度必定在$[1/3, 1)$,而要组成三角形，则需要 $B + C &gt; A$,所以 B + C 的长度为$(1/2, 1)$,<br>而对应的A的长度也就在[1/3, 1/2)内，所以，最终能构成三角形的概率即为 $A_{triangle} / A_{all} = (1/2 - 1/3) / (1 - 1/3) = 1/4$</p>
+<p>看似非常复杂的问题，从最基本的数学知识就能解答，还真是有趣！ </p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>2019年的第一场雪，摄于望京地铁站</p>
+]]></content>
+      <categories>
+        <category>Math</category>
+      </categories>
+      <tags>
+        <tag>Statistics</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>分享一个有趣的游戏</title>
     <url>/2019/12/09/longton/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -876,6 +954,166 @@
       </categories>
       <tags>
         <tag>Game</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>from softmax to crf</title>
+    <url>/2019/12/26/from-softmax-to-crf/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#xu-lie-biao-zhu">序列标注</a><ul>
+<li><a href="#mo-xing">模型</a></li>
+<li><a href="#shu-xue-xing-shi">数学形式</a></li>
+</ul>
+</li>
+<li><a href="#yan-shi-jian-zhou-softmax">沿时间轴Softmax</a></li>
+<li><a href="#crf">CRF</a></li>
+<li><a href="#xian-xing-lian-crf">线性链CRF</a></li>
+<li><a href="#qiu-jie">求解</a></li>
+<li><a href="#demo">demo</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>又做NER相关东西， 用到了CRF，所以想给组里人从头一步一步的将CRF讲一遍，希望大家看完能明白CRF的数学模型已经工程上的使用。<br>网上关于CRF大多数都是将他与HMM及概率图模型一起对比着讲，但是我觉得这需要一些背景知识，鉴于上次分享发现大家并没有什么背景知识，<br>所以这次希望能尽量减少背景知识就能让人搞懂CRF。</p>
+<h1><span id="xu-lie-biao-zhu">序列标注</span><a href="#xu-lie-biao-zhu" class="header-anchor"></a></h1><h2><span id="mo-xing">模型</span><a href="#mo-xing" class="header-anchor"></a></h2><p>通常CRF出现在序列标注任务中，所以我们先来看看序列标注主要是做什么的。<br>序列标注是NLP中一个重要的任务，它包括分词、词性标注、命名实体识等。下面用一个分词的例子来简单说明。（<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a>)<br>假设我们现在用$bmes$四标签来进行分词，其中b 代表begin即词的开头， m代表middle即词内，e代表end即词的结尾，s代表single即单独成词。<br>现在我们有一个字符串序列 “今天天气不错”，如果对应的分词结果为“今天/天气/不/错”，则其标签序列为“bebess”。由于在序列标注中，我们认为正确的标签序列是唯一的，<br>所以我们的目标就是在所有可能的标签序列中（如bbbbbb,ssssss)挑选出真实的标签序列（bebess), 即最大化概率$P(bebess|今天天气不错）$。<br><img src="/2019/12/26/from-softmax-to-crf/seg.png" alt="4tag分词网络示意图"><br>即在上图中，所有从左至右的连线中，选出黄色的那条。</p>
+<h2><span id="shu-xue-xing-shi">数学形式</span><a href="#shu-xue-xing-shi" class="header-anchor"></a></h2><p>我们假设输入序列是$X=[x_1, x_2, x_3, …, x_n]$,对应的输出序列是 $Y = [y_1, y_2, …, y_n]$,<br>label的集合为$L = [l_1, l_2, … , l_k]$. 任务目标是让真实的输出序列的概率最大，即：<br>$$<br>Max(P(y_1,y_2,..y_n|X))<br>$$</p>
+<h1><span id="yan-shi-jian-zhou-softmax">沿时间轴Softmax</span><a href="#yan-shi-jian-zhou-softmax" class="header-anchor"></a></h1><p>直接对上述模型进行求解比较困难，所以我们先将问题简化，然后在对简化后的问题进行求解。<br>首先，我们引入朴素假设：即标签之间独立不相关，对应的目标就简化为：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>$$<br>为了对$P(y_i|X)$进行建模，通常我们先通过RNNs（LSTM，BiLSTM, etc)来捕获输入X的全局信息，获得隐藏状态序列$\bar{x_1}, \bar{x_2}, …, \bar{x_n}$,<br>此时的$\bar{x_i}$可以看作是$x_i$ 通过X获取的特征，由于RNNs可以捕获全局信息，所以我们认为特征$\bar{x_i}$之间互不相关，对应的<br>$$P(y_i|X) = P(y_i|\bar{x_i})$$<br>我们的目标：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>= Max(P(y_1|\bar{x_1})P(y_2|\bar{x_2})..P(y_n|\bar{x_n}))<br>= Max(\prod(P(y_i|\bar{x_i})))<br>$$<br>此时只需要$Max(P(y_i|\bar{x_i}))$进行求解，即沿时间轴一步一步的对RNNs的隐藏输出通过softmax来最大化对应目标标签概率。<br><img src="/2019/12/26/from-softmax-to-crf/softmax.png" alt="沿时间轴softmax"></p>
+<h1><span id="crf">CRF</span><a href="#crf" class="header-anchor"></a></h1><p>因为在上一个方案中，我们做了朴素建设，将输出序列看作是相互独立的一元模型，这样会引入一些问题，如在分词中（bmes），m- 标签不能出现在s- 后面，<br>s- 标签不能出现在b- 和m-后面等，所以即使在上述方案中，至少也需要人为的设置一个“转移矩阵”，将不合理的转移方式得分置为0，来避免不合理方案的出现。<br>而上述方案出现错误的原因，本质上是因为我们的朴素假设：标签之间相互独立。为了解决上述方案的问题，我们至少需要在输出端显式考虑标签的关联性，即输出标签与上下文相关。<br><img src="/2019/12/26/from-softmax-to-crf/crf_example.png" alt="显式考虑输出端上下文"><br>显式考虑输出端上下文相关</p>
+<p>现在我们回到原始目标上来，原始目标是$Max(P(y_1,y_2,..y_n|X)) $, 上个方案中我们是因为直接对$P(y_1, y_2,…y_n|x_1, x_2, …,x_n)$直接建模很难，<br>所以才做出了假设，简化目标。现在让我们换个思路，为了求解上述概率，我们还可以穷举出输出序列所有的可能结果$Y_1, Y_2, …, Y_{k^n}$,<br>然后如果能计算出当前输入X对应每种可能的输出序列的“值”， 则我们可以通过Softmax计算出真实输出序列的概率，即得到$P(Y_{true}|X)$。<br><code>假设一：我们可以学习一个打分函数f，通过函数f可以得到输出序列关于输入的得分，即$score_i = f(Y_i, X)$</code><br>此时，我们的目标就转化为 $P(Y|X) = \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}$.<br>其中$Z(X) = \sum_{i=1}^{k^n}(exp(f(Y_i, X)))$。即此时的概率P是一个指数分布。<br>此时我们的方案是<code>1</code>个<code>$k^n$</code>多分类问题，即我们是对一个完整的输出序列为单位来计算概率（路径积分），而上一个方案中，是<code>n</code>个<code>k</code>分类问题，<br>这是两个方案的不同点之一。<br>在方案一中我们也说过，直接对完整序列建模比较困难，此时我们直接对$f(Y_i, X)$求解也会面临相同的困难，为了避免方案一的问题，我们不再使用一元模型，改为二元模型。<br><code>引入一阶马尔可夫假设，且其关联性是加性的。即当前输出标签只与前一个输出标签相关，其总得分是对所有得分求和。</code><br>此时的目标就转化为<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= P(y_1|X)P(y_2|y_1;X)…P(y_n|y_{n-1}|X)<br>= P(y_1|X)\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)} P(y_2|X) … \frac{P(y_{n-1}, y_n|X)}{P(y_{n-1}|X)P(y_n|X)} P(y_n|X)<br>$$<br>假设一中我们假设P是一个指数分布，所以此时我们引入两个函数e 和 t：e对$P(y_i|X)$建模, t 对$\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)}$建模，即：<br>$$<br>P(y_i|X) = exp(e(y_i, X))<br>\frac{P(y_{i-1},y_1|X)}{P(y_{i-1}|X)P(y_i|X)} = P(y_i|X)exp(t(y_{i-i}, y_i; X))<br>$$</p>
+<p>此时的目标就化简为：<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}<br>= \frac{1}{Z(X)} exp(e(y_i,X) + t(y_1, y_2; X) + e(y_2, X) + … + t(y_{n-1}, y_n; X) + e(y_n, X))<br>$$<br>此时我们只需要对每个标签和相邻标签打分，然后将所有打分求和，即可得到总得分，然后对目标进行求解。</p>
+<h1><span id="xian-xing-lian-crf">线性链CRF</span><a href="#xian-xing-lian-crf" class="header-anchor"></a></h1><p>虽然上面已经做了大量简化，但是求解时依然比较困难，主要是在求解t中，因为需要同时对输入X与标签$y_i$, $y_{i-1}$同时考虑，而在e中，<br>已经将输入与输出的关联进行了建模，此时我们引入线性链假设：假设t与输入X无关，则此时$ t(y_{i-1}, y_i;X) = t(y_{i-1}, y_i)$，那打分函数f简化为：<br>$$<br>f(y_1, y_2, …, y_n;X)<br>= e(y_1,X) + t(y_1, y_2) + e(y_2, X) + … + t(y_{n-1},y_n;X) + e(y_n,X)<br>$$<br>此时t就是一个待训练的参数矩阵，而e则可以通过RNNs来建模，概率分布也变为：</p>
+<p>$$<br>P(y_1, y_2,…,y_n|x_1, x_2,…,x_n)<br>= exp(e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e(y_{i+1}, X)])) \frac{1}{Z(X)}<br>$$</p>
+<h1><span id="qiu-jie">求解</span><a href="#qiu-jie" class="header-anchor"></a></h1><p>为了求解模型，我们用最大似然法， 即：</p>
+<p>$$loss = -logP(y_1, y_2, …, y_n|x_1, x_2, …, x_n)$$<br>将上式代入：</p>
+<p>$$loss = logZ(X) - (e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e( y_{i+1} , X)]) $$</p>
+<p>减号后面的项通过添加一个待训练的参数矩阵循环计算即可得到结果，难算的前面的归一化因子Z(X)。前面我们也说了，我们此时是以路径为单位，<br>则此时Z(X) 需要我们穷举所有可能的路径比对其打分求和，而此时的路径有 $k^n$条，是指数级的，直接算效率太低，几乎不可能。<br>在假设二中，我们引入了一阶马尔可夫假设，当前标签只与前一个标签有联系，因此我们可以递归的计算归一化因子，这使得原来是指数级的计算量降低为线性级别。<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a><br>（这点是求解归一化因子的关键，最初我在推导时一直卡在这点上）<br>具体的: 将计算到时刻t的归一化因子记为Zt，并将它安装标签分为k个部分，即：</p>
+<p>$$Zt = Zt^1 + Zt^2 + … + Zt^k$$<br>其中$Zt^i$表示以标签i为终点的所有路径的得分指数和，此时，我们写出递归公式：</p>
+<p>$$Z_{t+1}^1 = (Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X)$$</p>
+<p>$$…  $$</p>
+<p>$$Z_{t+1}^k = (Zt^1 T_{1k} + Zt^2 T{2k} + … + Zt^k T_{kk})E_{t+1}(k|X)$$</p>
+<p>其中T是矩阵t的各个元素取指数形式，即$T_{ij} = exp(t_{ij})$, E是e的指数形式，即$E_{ij} = exp(e_{ij})$, 而$e_{ij}$是指时刻i时RNNs对label j的打分。<br><img src="/2019/12/26/from-softmax-to-crf/logz.png" alt="logz"></p>
+<p>上式带有指数形式，我们取对数来简化计算过程。<br>$$<br>log(Z_{t+1}^1) = log((Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X) )  \\<br>=log(exp(log(Zt^1) + t_{11}) + exp(log(Zt^2) + t_{21}) + … + exp(log(Zt^k) + t_{k1}) exp(e_{t+1}(1|X)))  \\<br>= log(exp(log(Zt^1) + t_{11} + e_{t+1}(1|X)) + exp(log(Zt^2) + t_{21} + e_{t+1}(1|X)) + … + exp(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))\\<br>= log(\sum_k(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))<br>$$</p>
+<p>上面的过程比较曲折，对有些同学可能不太好理解，我们用一个简单的例子来帮助理解。<br>我们假设我们现在有一个输入$X=[w_0,w_1, w_2]$, 标签集合为$L=[l_1, l_2]$. RNNs对e完成了建模，即：</p>
+<table>
+<thead>
+<tr>
+<th>&nbsp;</th>
+<th>l1</th>
+<th>l2     </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>w0</td>
+<td>$e_{01}$</td>
+<td>$e_{02}$ </td>
+</tr>
+<tr>
+<td>w1</td>
+<td>$e_{11}$</td>
+<td>$e_{12}$ </td>
+</tr>
+<tr>
+<td>w2</td>
+<td>$e_{21}$</td>
+<td>$e_{22}$ </td>
+</tr>
+</tbody>
+</table>
+<p>其中$e_{ij}$代表第i个字是第j个标签的得分。<br>转移矩阵t:</p>
+<table>
+<thead>
+<tr>
+<th>&nbsp;</th>
+<th>l1</th>
+<th>l2 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>l1</td>
+<td>t11</td>
+<td>t12  </td>
+</tr>
+<tr>
+<td>l2</td>
+<td>t21</td>
+<td>t22  </td>
+</tr>
+</tbody>
+</table>
+<p>其中$t_{ij}$代表第i个标签转换为第j个标签的得分。<br>接下来我们按从$w_0$到$w_2$的方向一步一步来进行计算。首先，我们引入两个变量: states, cur，其中:  </p>
+<ul>
+<li>states代表上一个时刻计算的最终结果，即对应$log(Z_t^i)$</li>
+<li><p>cur代表当前时刻各个标签的得分，即对应$e_t^i$</p>
+</li>
+<li><p><code>$w_0$:</code></p>
+</li>
+<li>states = None</li>
+<li>$cur = [e_{01}, e_{02}]$<br>此时:<br>$$log(Z) = exp(e_{01}) + exp(e_{02})$$</li>
+</ul>
+<ul>
+<li><code>$w_0$ –&gt; $w_1$:</code></li>
+<li>states = $[e_{01}, e_{02}]$</li>
+<li>cur = $[e_{11}, e{12}]$</li>
+</ul>
+<ol>
+<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="2">
+<li>扩展cur:<br>$<br>cur = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="3">
+<li>将cur, states 与转移矩阵t 求和:</li>
+</ol>
+<p>$<br>score = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>t_{11}&amp;t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix}$$<br>$=$ $$\begin{pmatrix}<br>e_{01} + e_{11} + t_{11} &amp; e_{01} + e_{12} + t_{12}\\<br>e_{02} + e_{11} + t_{21} &amp; e_{02} + e_{12} + t_{22}\\<br>\end{pmatrix}$$<br>$</p>
+<ol start="4">
+<li>对score取指数形式然后求和，得到新的states:<br>$$<br>states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))]<br>$$<br>其中，states中的每个元素即对应着式中$logZ_{t}^i$, 此时的$log(Z)= \sum_k(exp(log(Z^k)))$:</li>
+</ol>
+<p>$$<br>log(Z_{0,1}) = log(exp(log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))) + exp(log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22})))) \\<br>= log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}) + exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))<br>$$</p>
+<p>当序列长度为2，标签有两个时，所有可能的标签序列为$(label_1-&gt;label_1, label_2-&gt;label_1, label_1-&gt;label_2, label_2-&gt;label_2)$,而对应的序列得分，即对应上式中的项，即：</p>
+<ul>
+<li>$ S_1: label_1-&gt;label_1:$<br>$ S_1 = e_{01} + e_{11} + t_{11} $</li>
+<li>$S_2: label_2-&gt;label_1:$<br>$ S_2 = e_{02} + e_{11} + t_{21}$</li>
+<li>$S_3 = label_1-&gt;label_2:$<br>$ S_3 = e_{01} + e_{12} + t_{12}$</li>
+<li>$S_4 = label_2-&gt;label_2:$<br>$ S_4 = e_{02} + e_{12} + t_{22}$</li>
+</ul>
+<ul>
+<li><code>$w_0$ -&gt; $w_1$ -&gt; $w_2$:</code></li>
+<li>$states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))] $</li>
+<li>$cur = [e_{21}, e_{22}]$</li>
+</ul>
+<p>与上面的做法一样，也分为4步：</p>
+<ol>
+<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))&amp;log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))\\<br>log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))&amp;log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="2">
+<li>cur：<br>$<br>cur = $$\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="3">
+<li>将states，cur与转义矩阵t求和：</li>
+</ol>
+<p>$$<br>scores = \begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) &amp; log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) \\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) &amp; log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>t_{11}&amp; t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix} \\=<br>\begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11} &amp;log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12}\\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21} &amp;log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22}\\<br>\end{pmatrix}<br>$$</p>
+<ol start="4">
+<li>对score取指数形式然后求和，得到新的states:</li>
+</ol>
+<p>$$ states = [\\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11})+exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21})), \\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12})+ exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22})))] \\<br> = [log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})),\\<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22}))]<br>$$</p>
+<p>现在，我们用states计算一下$(Z_2)$:</p>
+<p>$$<br>log(Z_{(0-&gt;1-&gt;2)}) = log(exp(states[0]) + exp(states[1])) \\<br>=log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})) \\+<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22})) \\<br>= log(exp(e_{01}+e_{11}+t_{11}+e_{21}+t_{11}) + exp(e_{02}+e_{11}+t_{21}+e_{21}+t_{11}) \\ +<br>exp(e_{01}+e_{12}+t_{12} +e_{21}+t_{21}) + exp(e_{02}+e_{12}+t_{22}+e_{21}+t_{21}) \\+<br>exp(e_{01}+e_{11}+t_{11} +e_{22}+t_{12}) + exp(e_{01}+e_{11}+t_{11}+e_{22}+t_{12}) \\+<br>exp(e_{01}+e_{12}+t_{12} +e_{22}+t_{22}) + exp(e_{01}+e_{12}+t_{12}+e_{22}+t_{21}))<br>$$</p>
+<p>上式也就是我们要求的最终结果$log(Z)$,其中指数内对应着所有路径的得分。<br>到此，上例中的整个归一化因子的计算过程也就完成了，而CRF中最难的部分也就解决了。</p>
+<h1><span id="demo">demo</span><a href="#demo" class="header-anchor"></a></h1><p>搞懂了理论部分，下面写一个demo来验证一下。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CRF</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mask_label=False, **kwargs)</span>:</span></span><br><span class="line">        self.mask_label = <span class="number">1</span> <span class="keyword">if</span> mask_label <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        super(CRF, self).__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">build</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        self.num_label = input_shape[<span class="number">-1</span>] - self.mask_label</span><br><span class="line">        self.trans = self.add_weight(name=<span class="string">'crf_trans'</span>,</span><br><span class="line">                                     shape=(self.num_label, self.num_label),</span><br><span class="line">                                     trainable=<span class="literal">True</span>,</span><br><span class="line">                                     initializer=<span class="string">'glorot_uniform'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">path_score</span><span class="params">(self, inputs, labels)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label), obtained from rnn(lstm, bilstm. etc.)</span></span><br><span class="line"><span class="string">        :param labels: one-hot, (batch_size, timesteps, num_label) , real target series</span></span><br><span class="line"><span class="string">        :return:  path score</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        point_score = K.sum(K.sum(inputs * labels, <span class="number">2</span>), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        label_pre = K.expand_dims(labels[:, :<span class="number">-1</span>], <span class="number">3</span>)</span><br><span class="line">        label_next = K.expand_dims(labels[:, <span class="number">1</span>:], <span class="number">2</span>)</span><br><span class="line">        label_trans = label_pre * label_next</span><br><span class="line">        trans = K.expand_dims(K.expand_dims(self.trans, <span class="number">0</span>), <span class="number">0</span>)</span><br><span class="line">        trans_score = K.sum(K.sum(label_trans * trans, [<span class="number">2</span>, <span class="number">3</span>]), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> point_score + trans_score</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">log_norm_pre</span><span class="params">(self, inputs, states)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        expand previous states and inputs, sum with trans</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, num_label), current word emission scores</span></span><br><span class="line"><span class="string">        :param states: (batch_size, num_label), all paths  score of previous word</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        states = K.expand_dims(states[<span class="number">0</span>], <span class="number">2</span>)</span><br><span class="line">        inputs = K.expand_dims(inputs, <span class="number">1</span>)</span><br><span class="line">        trans = K.expand_dims(self.trans, <span class="number">0</span>)</span><br><span class="line">        scores = states + trans + inputs</span><br><span class="line">        output = K.logsumexp(scores, <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> output, [output]</span><br><span class="line">        <span class="comment"># states = K.expand_dims(states[0], 2)  # (batch_size, output_dim, 1)</span></span><br><span class="line">        <span class="comment"># trans = K.expand_dims(self.trans, 0)  # (1, output_dim, output_dim)</span></span><br><span class="line">        <span class="comment"># output = K.logsumexp(states + trans, 1)  # (batch_size, output_dim)</span></span><br><span class="line">        <span class="comment"># return output + inputs, [output + inputs]</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">loss</span><span class="params">(self, y_true, y_pre)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label)</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># mask = 1 - y_true[:, 1: -1] if self.mask_label else None</span></span><br><span class="line">        <span class="comment"># # y_true, y_pred = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span></span><br><span class="line">        <span class="comment"># real_path_score = self.path_score(y_pre, y_true)</span></span><br><span class="line">        <span class="comment"># init_states = [y_pre[:, 0]]</span></span><br><span class="line">        <span class="comment"># log_norm, _ = K.rnn(self.log_norm_pre, initial_states=init_states, inputs=y_pre[:, 1:], mask=mask)  # log(Z)</span></span><br><span class="line">        <span class="comment"># log_norm_score = K.logsumexp(log_norm, 1, keepdims=True)</span></span><br><span class="line">        <span class="comment"># return log_norm_score - real_path_score</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, <span class="number">1</span>:, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pre = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span><br><span class="line">        init_states = [y_pre[:, <span class="number">0</span>]]  <span class="comment"># 初始状态</span></span><br><span class="line">        log_norm, _, _ = K.rnn(self.log_norm_pre, y_pre[:, <span class="number">1</span>:], init_states, mask=mask)  <span class="comment"># 计算Z向量（对数）</span></span><br><span class="line">        log_norm = K.logsumexp(log_norm, <span class="number">1</span>, keepdims=<span class="literal">True</span>)  <span class="comment"># 计算Z（对数）</span></span><br><span class="line">        path_score = self.path_score(y_pre, y_true)  <span class="comment"># 计算分子（对数）</span></span><br><span class="line">        <span class="keyword">return</span> log_norm - path_score  <span class="comment"># 即log(分子/分母)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span>  <span class="comment"># crf 只是loss，不改变inputs</span></span><br><span class="line">        <span class="keyword">return</span> inputs</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accuracy</span><span class="params">(self, y_true, y_pred)</span>:</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, :, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pred = y_true[:, :, :self.num_label], y_pred[:, :, :self.num_label]</span><br><span class="line">        isequal = K.equal(K.argmax(y_true, <span class="number">2</span>), K.argmax(y_pred, <span class="number">2</span>))</span><br><span class="line">        isequal = K.cast(isequal, <span class="string">'float32'</span>)</span><br><span class="line">        <span class="keyword">if</span> mask == <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> K.mean(isequal)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> K.sum(isequal * mask) / K.sum(mask)</span><br></pre></td></tr></table></figure></p>
+<p>结果：<br><img src="/2019/12/26/from-softmax-to-crf/result.png" alt="result"></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>初雪下的红果果</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>CRF</tag>
       </tags>
   </entry>
   <entry>
@@ -1095,166 +1333,6 @@
       </categories>
       <tags>
         <tag>npm</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>from softmax to crf</title>
-    <url>/2019/12/26/from-softmax-to-crf/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#xu-lie-biao-zhu">序列标注</a><ul>
-<li><a href="#mo-xing">模型</a></li>
-<li><a href="#shu-xue-xing-shi">数学形式</a></li>
-</ul>
-</li>
-<li><a href="#yan-shi-jian-zhou-softmax">沿时间轴Softmax</a></li>
-<li><a href="#crf">CRF</a></li>
-<li><a href="#xian-xing-lian-crf">线性链CRF</a></li>
-<li><a href="#qiu-jie">求解</a></li>
-<li><a href="#demo">demo</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>又做NER相关东西， 用到了CRF，所以想给组里人从头一步一步的将CRF讲一遍，希望大家看完能明白CRF的数学模型已经工程上的使用。<br>网上关于CRF大多数都是将他与HMM及概率图模型一起对比着讲，但是我觉得这需要一些背景知识，鉴于上次分享发现大家并没有什么背景知识，<br>所以这次希望能尽量减少背景知识就能让人搞懂CRF。</p>
-<h1><span id="xu-lie-biao-zhu">序列标注</span><a href="#xu-lie-biao-zhu" class="header-anchor"></a></h1><h2><span id="mo-xing">模型</span><a href="#mo-xing" class="header-anchor"></a></h2><p>通常CRF出现在序列标注任务中，所以我们先来看看序列标注主要是做什么的。<br>序列标注是NLP中一个重要的任务，它包括分词、词性标注、命名实体识等。下面用一个分词的例子来简单说明。（<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a>)<br>假设我们现在用$bmes$四标签来进行分词，其中b 代表begin即词的开头， m代表middle即词内，e代表end即词的结尾，s代表single即单独成词。<br>现在我们有一个字符串序列 “今天天气不错”，如果对应的分词结果为“今天/天气/不/错”，则其标签序列为“bebess”。由于在序列标注中，我们认为正确的标签序列是唯一的，<br>所以我们的目标就是在所有可能的标签序列中（如bbbbbb,ssssss)挑选出真实的标签序列（bebess), 即最大化概率$P(bebess|今天天气不错）$。<br><img src="/2019/12/26/from-softmax-to-crf/seg.png" alt="4tag分词网络示意图"><br>即在上图中，所有从左至右的连线中，选出黄色的那条。</p>
-<h2><span id="shu-xue-xing-shi">数学形式</span><a href="#shu-xue-xing-shi" class="header-anchor"></a></h2><p>我们假设输入序列是$X=[x_1, x_2, x_3, …, x_n]$,对应的输出序列是 $Y = [y_1, y_2, …, y_n]$,<br>label的集合为$L = [l_1, l_2, … , l_k]$. 任务目标是让真实的输出序列的概率最大，即：<br>$$<br>Max(P(y_1,y_2,..y_n|X))<br>$$</p>
-<h1><span id="yan-shi-jian-zhou-softmax">沿时间轴Softmax</span><a href="#yan-shi-jian-zhou-softmax" class="header-anchor"></a></h1><p>直接对上述模型进行求解比较困难，所以我们先将问题简化，然后在对简化后的问题进行求解。<br>首先，我们引入朴素假设：即标签之间独立不相关，对应的目标就简化为：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>$$<br>为了对$P(y_i|X)$进行建模，通常我们先通过RNNs（LSTM，BiLSTM, etc)来捕获输入X的全局信息，获得隐藏状态序列$\bar{x_1}, \bar{x_2}, …, \bar{x_n}$,<br>此时的$\bar{x_i}$可以看作是$x_i$ 通过X获取的特征，由于RNNs可以捕获全局信息，所以我们认为特征$\bar{x_i}$之间互不相关，对应的<br>$$P(y_i|X) = P(y_i|\bar{x_i})$$<br>我们的目标：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>= Max(P(y_1|\bar{x_1})P(y_2|\bar{x_2})..P(y_n|\bar{x_n}))<br>= Max(\prod(P(y_i|\bar{x_i})))<br>$$<br>此时只需要$Max(P(y_i|\bar{x_i}))$进行求解，即沿时间轴一步一步的对RNNs的隐藏输出通过softmax来最大化对应目标标签概率。<br><img src="/2019/12/26/from-softmax-to-crf/softmax.png" alt="沿时间轴softmax"></p>
-<h1><span id="crf">CRF</span><a href="#crf" class="header-anchor"></a></h1><p>因为在上一个方案中，我们做了朴素建设，将输出序列看作是相互独立的一元模型，这样会引入一些问题，如在分词中（bmes），m- 标签不能出现在s- 后面，<br>s- 标签不能出现在b- 和m-后面等，所以即使在上述方案中，至少也需要人为的设置一个“转移矩阵”，将不合理的转移方式得分置为0，来避免不合理方案的出现。<br>而上述方案出现错误的原因，本质上是因为我们的朴素假设：标签之间相互独立。为了解决上述方案的问题，我们至少需要在输出端显式考虑标签的关联性，即输出标签与上下文相关。<br><img src="/2019/12/26/from-softmax-to-crf/crf_example.png" alt="显式考虑输出端上下文"><br>显式考虑输出端上下文相关</p>
-<p>现在我们回到原始目标上来，原始目标是$Max(P(y_1,y_2,..y_n|X)) $, 上个方案中我们是因为直接对$P(y_1, y_2,…y_n|x_1, x_2, …,x_n)$直接建模很难，<br>所以才做出了假设，简化目标。现在让我们换个思路，为了求解上述概率，我们还可以穷举出输出序列所有的可能结果$Y_1, Y_2, …, Y_{k^n}$,<br>然后如果能计算出当前输入X对应每种可能的输出序列的“值”， 则我们可以通过Softmax计算出真实输出序列的概率，即得到$P(Y_{true}|X)$。<br><code>假设一：我们可以学习一个打分函数f，通过函数f可以得到输出序列关于输入的得分，即$score_i = f(Y_i, X)$</code><br>此时，我们的目标就转化为 $P(Y|X) = \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}$.<br>其中$Z(X) = \sum_{i=1}^{k^n}(exp(f(Y_i, X)))$。即此时的概率P是一个指数分布。<br>此时我们的方案是<code>1</code>个<code>$k^n$</code>多分类问题，即我们是对一个完整的输出序列为单位来计算概率（路径积分），而上一个方案中，是<code>n</code>个<code>k</code>分类问题，<br>这是两个方案的不同点之一。<br>在方案一中我们也说过，直接对完整序列建模比较困难，此时我们直接对$f(Y_i, X)$求解也会面临相同的困难，为了避免方案一的问题，我们不再使用一元模型，改为二元模型。<br><code>引入一阶马尔可夫假设，且其关联性是加性的。即当前输出标签只与前一个输出标签相关，其总得分是对所有得分求和。</code><br>此时的目标就转化为<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= P(y_1|X)P(y_2|y_1;X)…P(y_n|y_{n-1}|X)<br>= P(y_1|X)\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)} P(y_2|X) … \frac{P(y_{n-1}, y_n|X)}{P(y_{n-1}|X)P(y_n|X)} P(y_n|X)<br>$$<br>假设一中我们假设P是一个指数分布，所以此时我们引入两个函数e 和 t：e对$P(y_i|X)$建模, t 对$\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)}$建模，即：<br>$$<br>P(y_i|X) = exp(e(y_i, X))<br>\frac{P(y_{i-1},y_1|X)}{P(y_{i-1}|X)P(y_i|X)} = P(y_i|X)exp(t(y_{i-i}, y_i; X))<br>$$</p>
-<p>此时的目标就化简为：<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}<br>= \frac{1}{Z(X)} exp(e(y_i,X) + t(y_1, y_2; X) + e(y_2, X) + … + t(y_{n-1}, y_n; X) + e(y_n, X))<br>$$<br>此时我们只需要对每个标签和相邻标签打分，然后将所有打分求和，即可得到总得分，然后对目标进行求解。</p>
-<h1><span id="xian-xing-lian-crf">线性链CRF</span><a href="#xian-xing-lian-crf" class="header-anchor"></a></h1><p>虽然上面已经做了大量简化，但是求解时依然比较困难，主要是在求解t中，因为需要同时对输入X与标签$y_i$, $y_{i-1}$同时考虑，而在e中，<br>已经将输入与输出的关联进行了建模，此时我们引入线性链假设：假设t与输入X无关，则此时$ t(y_{i-1}, y_i;X) = t(y_{i-1}, y_i)$，那打分函数f简化为：<br>$$<br>f(y_1, y_2, …, y_n;X)<br>= e(y_1,X) + t(y_1, y_2) + e(y_2, X) + … + t(y_{n-1},y_n;X) + e(y_n,X)<br>$$<br>此时t就是一个待训练的参数矩阵，而e则可以通过RNNs来建模，概率分布也变为：</p>
-<p>$$<br>P(y_1, y_2,…,y_n|x_1, x_2,…,x_n)<br>= exp(e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e(y_{i+1}, X)])) \frac{1}{Z(X)}<br>$$</p>
-<h1><span id="qiu-jie">求解</span><a href="#qiu-jie" class="header-anchor"></a></h1><p>为了求解模型，我们用最大似然法， 即：</p>
-<p>$$loss = -logP(y_1, y_2, …, y_n|x_1, x_2, …, x_n)$$<br>将上式代入：</p>
-<p>$$loss = logZ(X) - (e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e( y_{i+1} , X)]) $$</p>
-<p>减号后面的项通过添加一个待训练的参数矩阵循环计算即可得到结果，难算的前面的归一化因子Z(X)。前面我们也说了，我们此时是以路径为单位，<br>则此时Z(X) 需要我们穷举所有可能的路径比对其打分求和，而此时的路径有 $k^n$条，是指数级的，直接算效率太低，几乎不可能。<br>在假设二中，我们引入了一阶马尔可夫假设，当前标签只与前一个标签有联系，因此我们可以递归的计算归一化因子，这使得原来是指数级的计算量降低为线性级别。<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a><br>（这点是求解归一化因子的关键，最初我在推导时一直卡在这点上）<br>具体的: 将计算到时刻t的归一化因子记为Zt，并将它安装标签分为k个部分，即：</p>
-<p>$$Zt = Zt^1 + Zt^2 + … + Zt^k$$<br>其中$Zt^i$表示以标签i为终点的所有路径的得分指数和，此时，我们写出递归公式：</p>
-<p>$$Z_{t+1}^1 = (Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X)$$</p>
-<p>$$…  $$</p>
-<p>$$Z_{t+1}^k = (Zt^1 T_{1k} + Zt^2 T{2k} + … + Zt^k T_{kk})E_{t+1}(k|X)$$</p>
-<p>其中T是矩阵t的各个元素取指数形式，即$T_{ij} = exp(t_{ij})$, E是e的指数形式，即$E_{ij} = exp(e_{ij})$, 而$e_{ij}$是指时刻i时RNNs对label j的打分。<br><img src="/2019/12/26/from-softmax-to-crf/logz.png" alt="logz"></p>
-<p>上式带有指数形式，我们取对数来简化计算过程。<br>$$<br>log(Z_{t+1}^1) = log((Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X) )  \\<br>=log(exp(log(Zt^1) + t_{11}) + exp(log(Zt^2) + t_{21}) + … + exp(log(Zt^k) + t_{k1}) exp(e_{t+1}(1|X)))  \\<br>= log(exp(log(Zt^1) + t_{11} + e_{t+1}(1|X)) + exp(log(Zt^2) + t_{21} + e_{t+1}(1|X)) + … + exp(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))\\<br>= log(\sum_k(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))<br>$$</p>
-<p>上面的过程比较曲折，对有些同学可能不太好理解，我们用一个简单的例子来帮助理解。<br>我们假设我们现在有一个输入$X=[w_0,w_1, w_2]$, 标签集合为$L=[l_1, l_2]$. RNNs对e完成了建模，即：</p>
-<table>
-<thead>
-<tr>
-<th>&nbsp;</th>
-<th>l1</th>
-<th>l2     </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>w0</td>
-<td>$e_{01}$</td>
-<td>$e_{02}$ </td>
-</tr>
-<tr>
-<td>w1</td>
-<td>$e_{11}$</td>
-<td>$e_{12}$ </td>
-</tr>
-<tr>
-<td>w2</td>
-<td>$e_{21}$</td>
-<td>$e_{22}$ </td>
-</tr>
-</tbody>
-</table>
-<p>其中$e_{ij}$代表第i个字是第j个标签的得分。<br>转移矩阵t:</p>
-<table>
-<thead>
-<tr>
-<th>&nbsp;</th>
-<th>l1</th>
-<th>l2 </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>l1</td>
-<td>t11</td>
-<td>t12  </td>
-</tr>
-<tr>
-<td>l2</td>
-<td>t21</td>
-<td>t22  </td>
-</tr>
-</tbody>
-</table>
-<p>其中$t_{ij}$代表第i个标签转换为第j个标签的得分。<br>接下来我们按从$w_0$到$w_2$的方向一步一步来进行计算。首先，我们引入两个变量: states, cur，其中:  </p>
-<ul>
-<li>states代表上一个时刻计算的最终结果，即对应$log(Z_t^i)$</li>
-<li><p>cur代表当前时刻各个标签的得分，即对应$e_t^i$</p>
-</li>
-<li><p><code>$w_0$:</code></p>
-</li>
-<li>states = None</li>
-<li>$cur = [e_{01}, e_{02}]$<br>此时:<br>$$log(Z) = exp(e_{01}) + exp(e_{02})$$</li>
-</ul>
-<ul>
-<li><code>$w_0$ –&gt; $w_1$:</code></li>
-<li>states = $[e_{01}, e_{02}]$</li>
-<li>cur = $[e_{11}, e{12}]$</li>
-</ul>
-<ol>
-<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="2">
-<li>扩展cur:<br>$<br>cur = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="3">
-<li>将cur, states 与转移矩阵t 求和:</li>
-</ol>
-<p>$<br>score = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>t_{11}&amp;t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix}$$<br>$=$ $$\begin{pmatrix}<br>e_{01} + e_{11} + t_{11} &amp; e_{01} + e_{12} + t_{12}\\<br>e_{02} + e_{11} + t_{21} &amp; e_{02} + e_{12} + t_{22}\\<br>\end{pmatrix}$$<br>$</p>
-<ol start="4">
-<li>对score取指数形式然后求和，得到新的states:<br>$$<br>states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))]<br>$$<br>其中，states中的每个元素即对应着式中$logZ_{t}^i$, 此时的$log(Z)= \sum_k(exp(log(Z^k)))$:</li>
-</ol>
-<p>$$<br>log(Z_{0,1}) = log(exp(log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))) + exp(log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22})))) \\<br>= log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}) + exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))<br>$$</p>
-<p>当序列长度为2，标签有两个时，所有可能的标签序列为$(label_1-&gt;label_1, label_2-&gt;label_1, label_1-&gt;label_2, label_2-&gt;label_2)$,而对应的序列得分，即对应上式中的项，即：</p>
-<ul>
-<li>$ S_1: label_1-&gt;label_1:$<br>$ S_1 = e_{01} + e_{11} + t_{11} $</li>
-<li>$S_2: label_2-&gt;label_1:$<br>$ S_2 = e_{02} + e_{11} + t_{21}$</li>
-<li>$S_3 = label_1-&gt;label_2:$<br>$ S_3 = e_{01} + e_{12} + t_{12}$</li>
-<li>$S_4 = label_2-&gt;label_2:$<br>$ S_4 = e_{02} + e_{12} + t_{22}$</li>
-</ul>
-<ul>
-<li><code>$w_0$ -&gt; $w_1$ -&gt; $w_2$:</code></li>
-<li>$states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))] $</li>
-<li>$cur = [e_{21}, e_{22}]$</li>
-</ul>
-<p>与上面的做法一样，也分为4步：</p>
-<ol>
-<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))&amp;log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))\\<br>log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))&amp;log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="2">
-<li>cur：<br>$<br>cur = $$\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="3">
-<li>将states，cur与转义矩阵t求和：</li>
-</ol>
-<p>$$<br>scores = \begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) &amp; log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) \\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) &amp; log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>t_{11}&amp; t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix} \\=<br>\begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11} &amp;log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12}\\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21} &amp;log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22}\\<br>\end{pmatrix}<br>$$</p>
-<ol start="4">
-<li>对score取指数形式然后求和，得到新的states:</li>
-</ol>
-<p>$$ states = [\\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11})+exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21})), \\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12})+ exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22})))] \\<br> = [log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})),\\<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22}))]<br>$$</p>
-<p>现在，我们用states计算一下$(Z_2)$:</p>
-<p>$$<br>log(Z_{(0-&gt;1-&gt;2)}) = log(exp(states[0]) + exp(states[1])) \\<br>=log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})) \\+<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22})) \\<br>= log(exp(e_{01}+e_{11}+t_{11}+e_{21}+t_{11}) + exp(e_{02}+e_{11}+t_{21}+e_{21}+t_{11}) \\ +<br>exp(e_{01}+e_{12}+t_{12} +e_{21}+t_{21}) + exp(e_{02}+e_{12}+t_{22}+e_{21}+t_{21}) \\+<br>exp(e_{01}+e_{11}+t_{11} +e_{22}+t_{12}) + exp(e_{01}+e_{11}+t_{11}+e_{22}+t_{12}) \\+<br>exp(e_{01}+e_{12}+t_{12} +e_{22}+t_{22}) + exp(e_{01}+e_{12}+t_{12}+e_{22}+t_{21}))<br>$$</p>
-<p>上式也就是我们要求的最终结果$log(Z)$,其中指数内对应着所有路径的得分。<br>到此，上例中的整个归一化因子的计算过程也就完成了，而CRF中最难的部分也就解决了。</p>
-<h1><span id="demo">demo</span><a href="#demo" class="header-anchor"></a></h1><p>搞懂了理论部分，下面写一个demo来验证一下。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CRF</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mask_label=False, **kwargs)</span>:</span></span><br><span class="line">        self.mask_label = <span class="number">1</span> <span class="keyword">if</span> mask_label <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        super(CRF, self).__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">build</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        self.num_label = input_shape[<span class="number">-1</span>] - self.mask_label</span><br><span class="line">        self.trans = self.add_weight(name=<span class="string">'crf_trans'</span>,</span><br><span class="line">                                     shape=(self.num_label, self.num_label),</span><br><span class="line">                                     trainable=<span class="literal">True</span>,</span><br><span class="line">                                     initializer=<span class="string">'glorot_uniform'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">path_score</span><span class="params">(self, inputs, labels)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label), obtained from rnn(lstm, bilstm. etc.)</span></span><br><span class="line"><span class="string">        :param labels: one-hot, (batch_size, timesteps, num_label) , real target series</span></span><br><span class="line"><span class="string">        :return:  path score</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        point_score = K.sum(K.sum(inputs * labels, <span class="number">2</span>), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        label_pre = K.expand_dims(labels[:, :<span class="number">-1</span>], <span class="number">3</span>)</span><br><span class="line">        label_next = K.expand_dims(labels[:, <span class="number">1</span>:], <span class="number">2</span>)</span><br><span class="line">        label_trans = label_pre * label_next</span><br><span class="line">        trans = K.expand_dims(K.expand_dims(self.trans, <span class="number">0</span>), <span class="number">0</span>)</span><br><span class="line">        trans_score = K.sum(K.sum(label_trans * trans, [<span class="number">2</span>, <span class="number">3</span>]), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> point_score + trans_score</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">log_norm_pre</span><span class="params">(self, inputs, states)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        expand previous states and inputs, sum with trans</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, num_label), current word emission scores</span></span><br><span class="line"><span class="string">        :param states: (batch_size, num_label), all paths  score of previous word</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        states = K.expand_dims(states[<span class="number">0</span>], <span class="number">2</span>)</span><br><span class="line">        inputs = K.expand_dims(inputs, <span class="number">1</span>)</span><br><span class="line">        trans = K.expand_dims(self.trans, <span class="number">0</span>)</span><br><span class="line">        scores = states + trans + inputs</span><br><span class="line">        output = K.logsumexp(scores, <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> output, [output]</span><br><span class="line">        <span class="comment"># states = K.expand_dims(states[0], 2)  # (batch_size, output_dim, 1)</span></span><br><span class="line">        <span class="comment"># trans = K.expand_dims(self.trans, 0)  # (1, output_dim, output_dim)</span></span><br><span class="line">        <span class="comment"># output = K.logsumexp(states + trans, 1)  # (batch_size, output_dim)</span></span><br><span class="line">        <span class="comment"># return output + inputs, [output + inputs]</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">loss</span><span class="params">(self, y_true, y_pre)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label)</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># mask = 1 - y_true[:, 1: -1] if self.mask_label else None</span></span><br><span class="line">        <span class="comment"># # y_true, y_pred = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span></span><br><span class="line">        <span class="comment"># real_path_score = self.path_score(y_pre, y_true)</span></span><br><span class="line">        <span class="comment"># init_states = [y_pre[:, 0]]</span></span><br><span class="line">        <span class="comment"># log_norm, _ = K.rnn(self.log_norm_pre, initial_states=init_states, inputs=y_pre[:, 1:], mask=mask)  # log(Z)</span></span><br><span class="line">        <span class="comment"># log_norm_score = K.logsumexp(log_norm, 1, keepdims=True)</span></span><br><span class="line">        <span class="comment"># return log_norm_score - real_path_score</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, <span class="number">1</span>:, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pre = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span><br><span class="line">        init_states = [y_pre[:, <span class="number">0</span>]]  <span class="comment"># 初始状态</span></span><br><span class="line">        log_norm, _, _ = K.rnn(self.log_norm_pre, y_pre[:, <span class="number">1</span>:], init_states, mask=mask)  <span class="comment"># 计算Z向量（对数）</span></span><br><span class="line">        log_norm = K.logsumexp(log_norm, <span class="number">1</span>, keepdims=<span class="literal">True</span>)  <span class="comment"># 计算Z（对数）</span></span><br><span class="line">        path_score = self.path_score(y_pre, y_true)  <span class="comment"># 计算分子（对数）</span></span><br><span class="line">        <span class="keyword">return</span> log_norm - path_score  <span class="comment"># 即log(分子/分母)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span>  <span class="comment"># crf 只是loss，不改变inputs</span></span><br><span class="line">        <span class="keyword">return</span> inputs</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accuracy</span><span class="params">(self, y_true, y_pred)</span>:</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, :, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pred = y_true[:, :, :self.num_label], y_pred[:, :, :self.num_label]</span><br><span class="line">        isequal = K.equal(K.argmax(y_true, <span class="number">2</span>), K.argmax(y_pred, <span class="number">2</span>))</span><br><span class="line">        isequal = K.cast(isequal, <span class="string">'float32'</span>)</span><br><span class="line">        <span class="keyword">if</span> mask == <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> K.mean(isequal)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> K.sum(isequal * mask) / K.sum(mask)</span><br></pre></td></tr></table></figure></p>
-<p>结果：<br><img src="/2019/12/26/from-softmax-to-crf/result.png" alt="result"></p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>初雪下的红果果</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>CRF</tag>
       </tags>
   </entry>
   <entry>
@@ -1569,120 +1647,6 @@
       </tags>
   </entry>
   <entry>
-    <title>模型增强（2）&amp;#58; 从label下手</title>
-    <url>/2020/09/13/classification-label-augment/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#gou-zao-xin-label">构造新label</a><ul>
-<li><a href="#zi-jian-du">自监督</a></li>
-<li><a href="#xiang-si-xing">相似性</a></li>
-</ul>
-</li>
-<li><a href="#shi-yan-jie-guo">实验结果</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>上篇<a href="https://xv44586.github.io/2020/08/31/bert-01/">Knowledge Distillation (2): distilling knowledge of bert</a>中我们提到，模型压缩时一个很重要的知识是soft labels，<br>并且提出了一种简单的方式：自蒸馏（self-distillation），而从label 的角度来看，可以看作是一种label augmentation，即构造了一个新的label，为模型新增了一个任务，通过新任务的学习，来提高模型对原来任务的性能。本文就label augmentation 继续脑洞。</p>
-<h1><span id="gou-zao-xin-label">构造新label</span><a href="#gou-zao-xin-label" class="header-anchor"></a></h1><p>构造新label，其实本质上是构造一个与当前任务相关的新的任务，而对应的label则是通过当前样本通过某种方式获得，获得的label至少要比随机好，否则只会帮倒忙。</p>
-<h2><span id="zi-jian-du">自监督</span><a href="#zi-jian-du" class="header-anchor"></a></h2><p>构造新label，我们可以借鉴自监督的方式，如Mask Language Model，AutoRegressive，而BERT中已使用来MLM，UniLM中也告诉我们增加Seq2Seq的AR 任务对NLU任务提高不显著，不过今年的论文<a href="http://arxiv.org/abs/2004.10964" target="_blank" rel="noopener">Don’t Stop Pretraining: Adapt Language Models to Domains and Tasks</a> 实验证明了进一步预训练是能进一步提升下游任务的性能。而当前任务是文本分类，MLM也许不是很合适，所以Seq2Seq 的方式可以尝试。<br>具体的，我们让模型学习目标类别的同时，希望模型能同时生成样本的描述字段（或者人为给定的某种相关性短语），即利用类别对应描述字段构造一个seq2seq任务。</p>
-<h2><span id="xiang-si-xing">相似性</span><a href="#xiang-si-xing" class="header-anchor"></a></h2><p>对于同一个类别的样本，他们必然有某种相似性，至少比与其他类别的样本更相似。而何如构造样本呢？<br>一种简单的方式是对每个样本都从类当中抽取一个样本与他组成一对，然后让每个<code>i</code>样本与<code>i+1</code>样本相似。这种方式由于每次样本都是shuffle 的，只要让batch size 小于label number，一个batch 内同时出现多个同一类别的样本概率就会很小。<br>既然在构造seq2seq任务时，我们使用来label对应的描述，此时我们也可以继续尝试使用：每个样本构造一个新的样本，新样本由label对应描述与label id组成。</p>
-<h1><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h1><p>两组实验结果如下：</p>
-<p>$$<br>\begin{array}{c|c|c}<br>\hline \\<br>\text{seq2seq} &amp; \text{similarity} \\<br>\hline \\<br>59.91\% &amp; 56.9\%<br>\end{array}<br>$$</p>
-<p>可以看到，对于构造seq2seq 任务，其结果与直接fine-tuning 结果基本一致，这也符合预期。而构造相似性任务，其结果直接fine-tuning 结果相比反而更差了。原因可能是样本不均衡，所以同一batch 内有较高概率出现同一类别的样本，同时通过让样本与同一样本相似来间接相似，这种方式可能有些曲折了，不过最根本的原因应该还是batch 内同一类别样本的出现干扰了学习。<br>具体实验代码可以查阅<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_auxiliary_seq2seq_task.py" target="_blank" rel="noopener">classification_ifytek_auxiliary_seq2seq_task</a> 和<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_with_similarity.py" target="_blank" rel="noopener">classification_ifytek_with_similarity</a></p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文只是由于之前实验想到的尝试对label 做增强来实现模型增强的尝试，最后两组实验都没取得什么好的结果。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于翠湖湿地</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>Classification</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Word2Vec之skip-gram</title>
-    <url>/2019/10/13/skipgram/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#word2vec">Word2Vec</a></li>
-<li><a href="#fake-task">Fake Task</a></li>
-<li><a href="#train">Train</a></li>
-<li><a href="#shu-ru">输入</a></li>
-<li><a href="#yin-ceng">隐层</a></li>
-<li><a href="#shu-chu-ceng">输出层</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="word2vec">Word2Vec</span><a href="#word2vec" class="header-anchor"></a></h1><p><img src="/2019/10/13/skipgram/w2v.jpeg" alt="Word2Vec"><br><code>Word2vec</code> 主要有两种形式，<code>CBOW</code> 和<code>Skip-gram</code>，其中<code>CBOW</code>是通过上下文context来预测当前位置词，<code>SKip-gram</code>则是通过当前词来预测上下文</p>
-<h1><span id="fake-task">Fake Task</span><a href="#fake-task" class="header-anchor"></a></h1><p>word2vec 实际上分为两部分，1，建立模型，2，通过模型获取词的嵌入向量（隐层参数）。整个过程与自编码器的思想类似，即基于训练数据训练一个神经网络，模型训练好后，并不会用这个模型处理后续的任务，真正需要的是这个模型学到的参数，如隐层的权重矩阵，基于训练数据建模的过程叫“Fake Task”，意味着建模并不是我们最终的目的。</p>
-<h1><span id="train">Train</span><a href="#train" class="header-anchor"></a></h1><p>如何训练我们的神经网络模型？假如我们有一个句子“ The dog barked at the mailman”:</p>
-<ul>
-<li>首先，我们选择句子中一个词作为我们的input word， 如 dog</li>
-<li>然后，我们需要定义一个skip_window参数，来指定上下文的大小，即input word 一侧选取词的数量，假如skip_window=2,那将从dog出发向左右两个方向取最近的两个word，即（the, dog,barked,at)，此时的$span = skip_window * 2 + 1 = 5$<br>另一个需要定义的参数是num_skips，即从上下文中选取多少个word来作为output word，这个参数应该小于等于$2 * skip_window$，即最多将所有上下文都作为output，但是不能重复。如设置num_skips = 2,此时从上下文选取2个词作为output，如（the， barked），最终我们将得到两组训练数据（dog, the) (dog, barked)</li>
-</ul>
-<p>神经网络将基于这些训练数据输出一个概率分布，这个概率分布代表着在输入数据下，词典中每个词是output的概率。如拿数据（dog， barked）来训练，则模型将会告诉我们每个单词是’barked’的概率大小。<br>模型的输出概率代表着词典中每个单词有多大可能性跟input word同时出现。举个栗子，如果我们向神经网络模型中输入一个单词“Soviet“，那么最终模型的输出概率中，像“Union”， ”Russia“这种相关词的概率将远高于像”watermelon“，”kangaroo“非相关词的概率。因为”Union“，”Russia“在文本中更大可能在”Soviet“的窗口中出现。<br>我们将通过给神经网络输入文本中成对的单词来训练它完成上面所说的概率计算。下面的图中给出了一些我们的训练样本的例子。我们选定句子“The quick brown fox jumps over lazy dog”，设定我们的窗口大小为2（window_size = 2），也就是说我们仅选输入词前后各两个词和输入词进行组合。下图中，蓝色代表input word，方框内代表位于窗口内的单词。</p>
-<p><img src="/2019/10/13/skipgram/train.png" alt><br>模型将会从每队单词出现的次数中习得统计结果，模型可能会得到更多的（’soviet’， ‘union’）样本对，而（soviet， dog）这样的组合看到的很少。因此，当模型训练完成后，给定一个单词 soviet，输出结果中union 或者russia会比dog有更高的概率。</p>
-<h1><span id="shu-ru">输入</span><a href="#shu-ru" class="header-anchor"></a></h1><p>常用做法是用训练文档构建词汇表，然后再对单词进行one-hot编码。编码后的向量，形如$dog = [0, 0, 1, 0, …0]$, 如果词汇表大小为10000， 那这个向量包含了10000的概率，即为当前词为输入的概率<br>下图是神经网络结构：</p>
-<p><img src="/2019/10/13/skipgram/arc.png" alt><br>我们基于成对的单词来对神经网络进行训练， 训练样本是（input word， output word）这样的单词对，input word 和 output word都是one-hot编码的向量，最终的模型输出是一个概率分布。</p>
-<h1><span id="yin-ceng">隐层</span><a href="#yin-ceng" class="header-anchor"></a></h1><p>如果我们想要用300个特征来表示一个词（即每个词是300维的向量），即隐层有300个神经元，隐层的权重为$10000 * 300$的矩阵，下图中的左右两个图代表了不同角度看隐层权重，左图中每列代表一个10000维的词向量与隐层单个神经元的连接权重，右图每行代表了一个单词的词向量。<br><img src="/2019/10/13/skipgram/weights.png" alt><br>我们最终的目标就是学习这个隐层权重矩阵。<br>输入被one-hot编码后，实际上只有一个位置不为0，所以这个向量相当稀疏，那如果我们将$1*10000$的向量与$10000*300$的矩阵相乘，相当消耗计算资源，为了高效计算，仅仅会选择矩阵中对应的向量中纬度为1的索引行<br><img src="/2019/10/13/skipgram/lookup.png" alt="lookup table"><br>即实际不会进行矩阵乘法计算，而是根据输入向量中不为0 的维度去索引。这样模型中的隐层权重矩阵便成了一个查找表（lookup table），输出就是输入单词的嵌入词向量</p>
-<h1><span id="shu-chu-ceng">输出层</span><a href="#shu-chu-ceng" class="header-anchor"></a></h1><p>隐层的输出是一个1*300的向量，而输出层是一个softmax回归分类器，他的每个结点将会输出一个0-1之间的值（概率），而结点的概率之和为1.<br><img src="/2019/10/13/skipgram/softmax.png" alt><br>我们会发现Word2Vec模型是一个超级大的神经网络（权重矩阵规模非常大）。<br>举个栗子，我们拥有10000个单词的词汇表，我们如果想嵌入300维的词向量，那么我们的输入-隐层权重矩阵和隐层-输出层的权重矩阵都会有 10000 x 300 = 300万个权重，在如此庞大的神经网络中进行梯度下降是相当慢的。更糟糕的是，你需要大量的训练数据来调整这些权重并且避免过拟合。百万数量级的权重矩阵和亿万数量级的训练样本意味着训练这个模型将会是个灾难（太凶残了）。<br>Word2Vec的作者在它的第二篇论文中强调了这些问题，下面是作者在第二篇论文中的三个创新：</p>
-<ul>
-<li><ol>
-<li>将常见的单词组合（word pairs）或者词组作为单个“words”来处理。</li>
-</ol>
-</li>
-<li><ol start="2">
-<li>对高频次单词进行抽样来减少训练样本的个数。</li>
-</ol>
-</li>
-<li><ol start="3">
-<li>对优化目标采用“negative sampling”方法，这样每个训练样本的训练只会更新一小部分的模型权重，从而降低计算负担。<br>事实证明，对常用词抽样并且对优化目标采用“negative sampling”不仅降低了训练过程中的计算负担，还提高了训练的词向量的质量。</li>
-</ol>
-</li>
-</ul>
-<p><strong>word pairs and phases</strong><br>一些单词组合的含义和拆开以后具有完全不同的意义，比如 New York，单独的New 和York无法表达这个词组的含义。因此，应该把New York作为一个单独的词组来生成其词向量。<br><strong>对高频词抽样</strong><br>对于高频词，如 the ，按上面的处理方式会有两个问题：</p>
-<ul>
-<li><ol>
-<li>当我们得到成对的单词训练样本时，（dog， the）这样的样本并不会提供更多关于dog的语义信息，因为the 在每个单词的上下文几乎都会出现</li>
-</ol>
-</li>
-<li><ol start="2">
-<li>由于the 这样的高频词出现的概率很大，因此为们将会有大量的（the ， 。。。）这样的训练样本，而这些样本的数量远远超过我们学习the这个单词所需的训练样本数。</li>
-</ol>
-</li>
-</ul>
-<p>如果直接删除掉这些高频词，会有两个问题:</p>
-<ul>
-<li>1.删除后，the这个单词永远也不会出现在我们的上下文窗口</li>
-<li>2.训练样本会减少</li>
-</ul>
-<p>所以word2vec 采用抽样的方式来解决这种高频词问题。他的基本思想是：对于我们在训练原始文本中遇到的每一个单词，他们都有一定概率被我们从文本中删除掉，而这个被删除的概率与单词的频率有关。<br><img src="/2019/10/13/skipgram/del.png" alt><br>wi 是一个单词，$Z(w_i)$是这个单词在所有预料中出现的频次。$P(w_i)$是被保留的概率。</p>
-<ul>
-<li>当$Z(w_i) &lt;= 0.0026$时,$P(w_i) = 1.0$。当单词在语料中出现的频率小于0.0026时，它是100%被保留的，这意味着只有那些在语料中出现频率超过0.26%的单词才会被采样。</li>
-<li>当$Z(w_i) = 0.00746$ 时，$P(w_i) = 0.5$，意味着这一部分的单词有50%的概率被保留。</li>
-<li>当$Z(w_i) = 1.0$ 时，$P(w_i) = 0.033$，意味着这部分单词以3.3%的概率被保留</li>
-</ul>
-<p><strong>负采样</strong><br>训练一个神经网络意味着要输入训练样本并且不断的调整神经元的权重，不断提高对目标的准确预测。而vocabulary的大小决定了skip-gram神经网络将拥有大规模的权重矩阵，所有的这些权重需要通过我们数以亿计的样本来训练调整，非常消耗计算资源，并且实际中会非常慢。<br>负采样解决了这个问题，不同于原本每个训练样本更新所有权重，负采样每次让一个训练样本仅仅更新一部分权重，减小计算量。<br>对于训练样本（fox，quick），都是经过one-hot编码的，当vocabulary的大小为10000时，我们期望输出对应的quick单词的那个神经元的输出是1，其余9999个都是0，这9999个输出为0的神经元所对应的单词称为negative word<br>隐层-输出层拥有$300 *10000$的权重，而负采样时，我们仅仅更新quick 和我们选择的其他5个negative word的结点对应的权重，共6个神经元，$300* 6 = 1800$ 个权重，相当于只计算了0.06%的权重，计算效率大大提高。<br><img src="/2019/10/13/skipgram/sample.png" alt><br>其中f(wi)代表每个单词出现的频次，p(wi)代表被选中的概率。<br>负采样的C语言实现非常的有趣。unigram table有一个包含了一亿个元素的数组，这个数组是由词汇表中每个单词的索引号填充的，并且这个数组中有重复，也就是说有些单词会出现多次。那么每个单词的索引在这个数组中出现的次数该如何决定呢，由公式$P(w_i) * table_size$，也就是说计算出的负采样概率*1亿=单词在表中出现的次数。<br>有了这张表以后，每次去我们进行负采样时，只需要在0-1亿范围内生成一个随机数，然后选择表中索引号为这个随机数的那个单词作为我们的negative word即可。一个单词的负采样概率越大，那么它在这个表中出现的次数就越多，它被选中的概率就越大。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于内蒙古乌兰布统</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>word2vec</tag>
-        <tag>skipgram</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Knowledge Distillation (2) &amp;#58; 知识迁移</title>
     <url>/2020/08/31/bert-01/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -1798,6 +1762,42 @@
       <tags>
         <tag>BERT</tag>
         <tag>Distillation</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>模型增强（2）&amp;#58; 从label下手</title>
+    <url>/2020/09/13/classification-label-augment/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#gou-zao-xin-label">构造新label</a><ul>
+<li><a href="#zi-jian-du">自监督</a></li>
+<li><a href="#xiang-si-xing">相似性</a></li>
+</ul>
+</li>
+<li><a href="#shi-yan-jie-guo">实验结果</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>上篇<a href="https://xv44586.github.io/2020/08/31/bert-01/">Knowledge Distillation (2): distilling knowledge of bert</a>中我们提到，模型压缩时一个很重要的知识是soft labels，<br>并且提出了一种简单的方式：自蒸馏（self-distillation），而从label 的角度来看，可以看作是一种label augmentation，即构造了一个新的label，为模型新增了一个任务，通过新任务的学习，来提高模型对原来任务的性能。本文就label augmentation 继续脑洞。</p>
+<h1><span id="gou-zao-xin-label">构造新label</span><a href="#gou-zao-xin-label" class="header-anchor"></a></h1><p>构造新label，其实本质上是构造一个与当前任务相关的新的任务，而对应的label则是通过当前样本通过某种方式获得，获得的label至少要比随机好，否则只会帮倒忙。</p>
+<h2><span id="zi-jian-du">自监督</span><a href="#zi-jian-du" class="header-anchor"></a></h2><p>构造新label，我们可以借鉴自监督的方式，如Mask Language Model，AutoRegressive，而BERT中已使用来MLM，UniLM中也告诉我们增加Seq2Seq的AR 任务对NLU任务提高不显著，不过今年的论文<a href="http://arxiv.org/abs/2004.10964" target="_blank" rel="noopener">Don’t Stop Pretraining: Adapt Language Models to Domains and Tasks</a> 实验证明了进一步预训练是能进一步提升下游任务的性能。而当前任务是文本分类，MLM也许不是很合适，所以Seq2Seq 的方式可以尝试。<br>具体的，我们让模型学习目标类别的同时，希望模型能同时生成样本的描述字段（或者人为给定的某种相关性短语），即利用类别对应描述字段构造一个seq2seq任务。</p>
+<h2><span id="xiang-si-xing">相似性</span><a href="#xiang-si-xing" class="header-anchor"></a></h2><p>对于同一个类别的样本，他们必然有某种相似性，至少比与其他类别的样本更相似。而何如构造样本呢？<br>一种简单的方式是对每个样本都从类当中抽取一个样本与他组成一对，然后让每个<code>i</code>样本与<code>i+1</code>样本相似。这种方式由于每次样本都是shuffle 的，只要让batch size 小于label number，一个batch 内同时出现多个同一类别的样本概率就会很小。<br>既然在构造seq2seq任务时，我们使用来label对应的描述，此时我们也可以继续尝试使用：每个样本构造一个新的样本，新样本由label对应描述与label id组成。</p>
+<h1><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h1><p>两组实验结果如下：</p>
+<p>$$<br>\begin{array}{c|c|c}<br>\hline \\<br>\text{seq2seq} &amp; \text{similarity} \\<br>\hline \\<br>59.91\% &amp; 56.9\%<br>\end{array}<br>$$</p>
+<p>可以看到，对于构造seq2seq 任务，其结果与直接fine-tuning 结果基本一致，这也符合预期。而构造相似性任务，其结果直接fine-tuning 结果相比反而更差了。原因可能是样本不均衡，所以同一batch 内有较高概率出现同一类别的样本，同时通过让样本与同一样本相似来间接相似，这种方式可能有些曲折了，不过最根本的原因应该还是batch 内同一类别样本的出现干扰了学习。<br>具体实验代码可以查阅<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_auxiliary_seq2seq_task.py" target="_blank" rel="noopener">classification_ifytek_auxiliary_seq2seq_task</a> 和<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_with_similarity.py" target="_blank" rel="noopener">classification_ifytek_with_similarity</a></p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文只是由于之前实验想到的尝试对label 做增强来实现模型增强的尝试，最后两组实验都没取得什么好的结果。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于翠湖湿地</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>Classification</tag>
       </tags>
   </entry>
   <entry>
@@ -2180,31 +2180,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Contrastive Learning</title>
-    <url>/2020/11/23/scl/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#dui-bi-xue-xi">对比学习</a></li>
-<li><a href="#dui-bi-xue-xi-de-zi-jian-du-xue-xi">对比学习的自监督学习</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-<p></div><br>最近看了两篇关于对比学习（Contrastive Learning）的论文，觉得思路挺有意思，所以总结一下。</p>
-<h1><span id="dui-bi-xue-xi">对比学习</span><a href="#dui-bi-xue-xi" class="header-anchor"></a></h1><p>不知道大家有没有小时候抽读课文的回忆，当读到不认识读字时，我们就会猜他的发音。猜的时候呢，通常就是先看看他的组成部分里有没有认识的，如果有，则读认识的部分的发音，即读<code>半边</code>, 如果拆开的部分不是独立的字，那我们就会联想一下有哪些字跟他有共同的部分，然后那些字都是如何发音的。即便到了现在，遇到不认识的字，我依然会使用这种方法去<code>读</code>. 而这背后的原理其实就是我们认为，该字（样本x）与其相似的字（距离更近的样本）具有相同的发音（label）。这样一个没有经过多少学习的<code>模型</code>却在很多时候都是奏效的。<br>而对比学习与这有着相似的含义：我们在学习表示的时候，不需要完完全全的学习样本的细节，只需要让样本相对其正样本的得分远远大于其相对负样本的得分即可：<br>$$<br>s(f(x), f(x^+)) &gt;&gt; s(f(x),f(x^-))<br>$$<br>其中 $f$是映射函数，也是我们的主要学习任务，$s$是一个打分函数，用来衡量样本之间的距离，最常用的如点积。<br>以上就是一个对比学习的框架，而要使用对比学习，核心问题只有两个：</p>
-<ol>
-<li>如何定义目标函数，上面提到的点积就是一种比较简单通用的方式，此外，还可以用triple-loss等。</li>
-<li>如何构造正负样本，正负样本的构造，合理的正负样本，才能让学到的表示更好的作用在下游任务上。</li>
-</ol>
-<p>此外，如果熟悉Word2Vec的同学也会发现，其实负采样也在对比学习的范畴中，即在使用负采样训练Word2Vec 时，我们的优化目标是让正样本对之间的概率尽可能的大，而其与负样本之间的概率尽可能小，也即拉近正样本对之间的距离。其中定义的目标函数使用的是点积，而正样本的构造是通过窗口大小来选取，负样本的构造即负采样。</p>
-<h1><span id="dui-bi-xue-xi-de-zi-jian-du-xue-xi">对比学习的自监督学习</span><a href="#dui-bi-xue-xi-de-zi-jian-du-xue-xi" class="header-anchor"></a></h1><p>目前学习表示的主流是自监督学习，那为了引入对比学习，我们就需要构造样本的正负样本，其中可以将所有非自己的样本都认为是负样本，需要拉远，那如何构造正样本呢？答案是data augmentation（数据增强）。在CV 中通常用旋转、裁剪等</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-  </entry>
-  <entry>
     <title>跨界之阿尔滋海默病的分类竞赛</title>
     <url>/2020/11/21/ad-dti/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -2243,6 +2218,31 @@
       <tags>
         <tag>Competition</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Contrastive Learning</title>
+    <url>/2020/11/23/scl/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#dui-bi-xue-xi">对比学习</a></li>
+<li><a href="#dui-bi-xue-xi-de-zi-jian-du-xue-xi">对比学习的自监督学习</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div><br>最近看了两篇关于对比学习（Contrastive Learning）的论文，觉得思路挺有意思，所以总结一下。</p>
+<h1><span id="dui-bi-xue-xi">对比学习</span><a href="#dui-bi-xue-xi" class="header-anchor"></a></h1><p>不知道大家有没有小时候抽读课文的回忆，当读到不认识读字时，我们就会猜他的发音。猜的时候呢，通常就是先看看他的组成部分里有没有认识的，如果有，则读认识的部分的发音，即读<code>半边</code>, 如果拆开的部分不是独立的字，那我们就会联想一下有哪些字跟他有共同的部分，然后那些字都是如何发音的。即便到了现在，遇到不认识的字，我依然会使用这种方法去<code>读</code>. 而这背后的原理其实就是我们认为，该字（样本x）与其相似的字（距离更近的样本）具有相同的发音（label）。这样一个没有经过多少学习的<code>模型</code>却在很多时候都是奏效的。<br>而对比学习与这有着相似的含义：我们在学习表示的时候，不需要完完全全的学习样本的细节，只需要让样本相对其正样本的得分远远大于其相对负样本的得分即可：<br>$$<br>s(f(x), f(x^+)) &gt;&gt; s(f(x),f(x^-))<br>$$<br>其中 $f$是映射函数，也是我们的主要学习任务，$s$是一个打分函数，用来衡量样本之间的距离，最常用的如点积。<br>以上就是一个对比学习的框架，而要使用对比学习，核心问题只有两个：</p>
+<ol>
+<li>如何定义目标函数，上面提到的点积就是一种比较简单通用的方式，此外，还可以用triple-loss等。</li>
+<li>如何构造正负样本，正负样本的构造，合理的正负样本，才能让学到的表示更好的作用在下游任务上。</li>
+</ol>
+<p>此外，如果熟悉Word2Vec的同学也会发现，其实负采样也在对比学习的范畴中，即在使用负采样训练Word2Vec 时，我们的优化目标是让正样本对之间的概率尽可能的大，而其与负样本之间的概率尽可能小，也即拉近正样本对之间的距离。其中定义的目标函数使用的是点积，而正样本的构造是通过窗口大小来选取，负样本的构造即负采样。</p>
+<h1><span id="dui-bi-xue-xi-de-zi-jian-du-xue-xi">对比学习的自监督学习</span><a href="#dui-bi-xue-xi-de-zi-jian-du-xue-xi" class="header-anchor"></a></h1><p>目前学习表示的主流是自监督学习，那为了引入对比学习，我们就需要构造样本的正负样本，其中可以将所有非自己的样本都认为是负样本，需要拉远，那如何构造正样本呢？答案是data augmentation（数据增强）。在CV 中通常用旋转、裁剪等</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
   </entry>
   <entry>
     <title>如何提升bert在下游任务中的性能</title>
@@ -3205,49 +3205,6 @@
       </tags>
   </entry>
   <entry>
-    <title>fine-tuning-at-few-shot</title>
-    <url>/2023/02/01/fine-tuning-at-few-shot/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#few-shot">few-shot</a></li>
-<li><a href="#fine-tuning">fine-tuning</a><ul>
-<li><a href="#supervised-fine-tuning">supervised fine-tuning</a></li>
-<li><a href="#instruction-tuning">instruction-tuning</a></li>
-<li><a href="#prompt-tuning">prompt tuning</a></li>
-<li><a href="#reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</a></li>
-</ul>
-</li>
-<li><a href="#qi-fa">启发</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-<p></div><br>LLM 目前的使用方式主要是zero-shot/few-shot,其是从context中的examle 数量来区分，如果按这个角度进一步概括目前的fine-tuning 方案，感觉是个有趣的视角。<br><img src="/2023/02/01/fine-tuning-at-few-shot/few-shot.PNG" alt></p>
-<h1><span id="few-shot">few-shot</span><a href="#few-shot" class="header-anchor"></a></h1><p>目前LLM 的使用方式主要是zero-shot/few-shot，而通常few-shot 的性能也比zero-shot 要好，而且随着example 的数量的增加，few-shot 的性能也可能进一步提升；zero-shot 时只给出task input 效果可能不佳，通常需要给出对应的task description，而更”精准“ 的task description 通常也能得到更好的zero-shot 效果。<br>所以，提升LLM zero-shot /few-shot 的性能，主要的方式有两个：</p>
-<ol>
-<li>给出更”好“的task description</li>
-<li>给出更多的example</li>
-</ol>
-<h1><span id="fine-tuning">fine-tuning</span><a href="#fine-tuning" class="header-anchor"></a></h1><h2><span id="supervised-fine-tuning">supervised fine-tuning</span><a href="#supervised-fine-tuning" class="header-anchor"></a></h2><p>对于小模型来说，其in-context learning 能力较弱，性能不理想。为了提升模型的性能，一个可以尝试的方向是增加context 中的example 数量，但是由于模型的context 窗口有限，不支持我们无限制的将更多的example 塞进context 中，所以我们变通一下，采用通过更新参数的方式将example 塞进“context”。此时可以看作是无限example（inf-shot)；</p>
-<h2><span id="instruction-tuning">instruction-tuning</span><a href="#instruction-tuning" class="header-anchor"></a></h2><p>通常在supervised fine-tuning 时，我们是将一个任务的example “塞”进context，而instruction-tuning 可以看作是同时将多个任务的example “塞”进context，为了在使用时区分应该当前context 里应该使用哪些example，我们在不同的task 前面增加对应的description，作为判断依据。即：同时将多个任务的多个example 塞进模型的context 中，使用时通过不同的task description 来区分当前context 内的example 应该是哪些。</p>
-<h2><span id="prompt-tuning">prompt tuning</span><a href="#prompt-tuning" class="header-anchor"></a></h2><p>由于pretrain model 的任务是预测下一个token，而非处理用户的指令（instruction），为了提升模型zero-shot 的性能，一个可以尝试的方法就是找到模型视角下更好的task description（pattern），prompt-tuning 的思路即通过大量的监督样本，尝试寻找到更适应模型的task description，然后期望这个task description 能提高模型的zero-shot 的性能。</p>
-<h2><span id="reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</span><a href="#reinforcement-learning-with-human-feedback" class="header-anchor"></a></h2><p>prompt-tuning 时，我们尝试找到模型视角下更好的task description，而这个方法显然是不利于交互的，更好的方式是让模型理解人类视角下的task description。rlhf 就是按照这个思路，让模型反过来更好的理解人类视角下的task description，使得交互更方便。</p>
-<h1><span id="qi-fa">启发</span><a href="#qi-fa" class="header-anchor"></a></h1><p>从这个视角看，我们发现即使是小模型，也是有一定的in-context learning 的能力的，只是不够强，所以我们需要更多的example 他才能发挥出更好的效果；<br>pretrain+fine-tuning 的模式之所以能work，是因为pretrain 后的model 有in-context learning 的能力，in-context learning 并不要求task 的形式与pretrain 的一致，所以我们才能在pretrain 的基础上根据下游任务的不同，来构造不同的fine-tuning 过程，在few-shot 视角下，其对应的是在context 中”塞“进更多的example；<br>in-context learning 的增强，对应的是所需的样本逐渐减少，从supervised fine-tuning 的大量样本到few-shot 的少量样本最终到zero-shot 的不需要提供样本，只需提供任务描述。</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文是笔者最近思考pretrain + fine-tuning 模式为什么能work 时，通过在few-shot 视角下的一个解释。通过该思路，笔者尝试将目前的fine-tuning 主流思路统一起来。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>太空视角下的喜马拉雅山脉</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>LLM</tag>
-        <tag>In-context learning</tag>
-        <tag>fine-tuning</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>From zero to ChatGPT</title>
     <url>/2023/01/09/zero-to-chatgpt/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -3496,10 +3453,53 @@
         <category>NLP</category>
       </categories>
       <tags>
-        <tag>LLM</tag>
-        <tag>In-context learning</tag>
         <tag>GPT-3</tag>
+        <tag>In-context learning</tag>
+        <tag>LLM</tag>
         <tag>ChatGPT</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>few-shot视角下的fine-tuning</title>
+    <url>/2023/02/01/fine-tuning-at-few-shot/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#few-shot">few-shot</a></li>
+<li><a href="#fine-tuning">fine-tuning</a><ul>
+<li><a href="#supervised-fine-tuning">supervised fine-tuning</a></li>
+<li><a href="#instruction-tuning">instruction-tuning</a></li>
+<li><a href="#prompt-tuning">prompt tuning</a></li>
+<li><a href="#reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</a></li>
+</ul>
+</li>
+<li><a href="#qi-fa">启发</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div><br>LLM 目前的使用方式主要是zero-shot/few-shot,其是从context中的examle 数量来区分的，如果按这个角度进一步概括目前的fine-tuning 方案，感觉是个有趣的视角。<br><img src="/2023/02/01/fine-tuning-at-few-shot/few-shot.PNG" alt></p>
+<h1><span id="few-shot">few-shot</span><a href="#few-shot" class="header-anchor"></a></h1><p>目前LLM 的使用方式主要是zero-shot/few-shot，而通常few-shot 的性能也比zero-shot 要好，而且随着example 的数量的增加，few-shot 的性能也可能进一步提升；zero-shot 时只给出task input 效果可能不佳，通常需要给出对应的task description，而更”精准“ 的task description 通常也能得到更好的zero-shot 效果。<br>所以，提升LLM zero-shot /few-shot 的性能，主要的方式有两个：</p>
+<ol>
+<li>给出更”好“的task description</li>
+<li>给出更多的example</li>
+</ol>
+<h1><span id="fine-tuning">fine-tuning</span><a href="#fine-tuning" class="header-anchor"></a></h1><h2><span id="supervised-fine-tuning">supervised fine-tuning</span><a href="#supervised-fine-tuning" class="header-anchor"></a></h2><p>对于小模型来说，其in-context learning 能力较弱，性能不理想。为了提升模型的性能，一个可以尝试的方向是增加context 中的example 数量，但是由于模型的context 窗口有限，不支持我们无限制的将更多的example 塞进context 中，所以我们变通一下，采用通过更新参数的方式将example 塞进“context”。此时可以看作是无限example（inf-shot)；</p>
+<h2><span id="instruction-tuning">instruction-tuning</span><a href="#instruction-tuning" class="header-anchor"></a></h2><p>通常在supervised fine-tuning 时，我们是将一个任务的example “塞”进context，而instruction-tuning 可以看作是同时将多个任务的example “塞”进context，为了在使用时区分应该当前context 里应该使用哪些example，我们在不同的task 前面增加对应的description，作为判断依据。即：同时将多个任务的多个example 塞进模型的context 中，使用时通过不同的task description 来区分当前context 内的example 应该是哪些。</p>
+<h2><span id="prompt-tuning">prompt tuning</span><a href="#prompt-tuning" class="header-anchor"></a></h2><p>由于pretrain model 的任务是预测下一个token，而非处理用户的指令（instruction），为了提升模型zero-shot 的性能，一个可以尝试的方法就是找到模型视角下更好的task description（pattern），prompt-tuning 的思路即通过大量的监督样本，尝试寻找到更适应模型的task description，然后期望这个task description 能提高模型的zero-shot 的性能。</p>
+<h2><span id="reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</span><a href="#reinforcement-learning-with-human-feedback" class="header-anchor"></a></h2><p>prompt-tuning 时，我们尝试找到模型视角下更好的task description，而这个方法显然是不利于交互的，更好的方式是让模型理解人类视角下的task description。rlhf 就是按照这个思路，让模型反过来更好的理解人类视角下的task description，使得交互更方便。</p>
+<h1><span id="qi-fa">启发</span><a href="#qi-fa" class="header-anchor"></a></h1><p>从这个视角看，我们发现即使是小模型，也是有一定的in-context learning 的能力的，只是不够强，所以我们需要更多的example 他才能发挥出更好的效果；<br>pretrain+fine-tuning 的模式之所以能work，是因为pretrain 后的model 有in-context learning 的能力，in-context learning 并不要求task 的形式与pretrain 的一致，所以我们才能在pretrain 的基础上根据下游任务的不同，来构造不同的fine-tuning 过程，在few-shot 视角下，其对应的是在context 中”塞“进更多的example；<br>in-context learning 的增强，对应的是所需的样本逐渐减少，从supervised fine-tuning 的大量样本到few-shot 的少量样本最终到zero-shot 的不需要提供样本，只需提供任务描述。</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文是笔者最近思考pretrain + fine-tuning 模式为什么能work 时，通过在few-shot 视角下的一个解释。通过该思路，笔者尝试将目前的fine-tuning 主流思路统一起来。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>太空视角下的喜马拉雅山脉</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>In-context learning</tag>
+        <tag>LLM</tag>
+        <tag>fine-tuning</tag>
       </tags>
   </entry>
 </search>
