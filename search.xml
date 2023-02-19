@@ -417,40 +417,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Dropout--深度神经网络中的Bagging</title>
-    <url>/2019/10/17/dropout/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</a></li>
-<li><a href="#dropout">Dropout</a></li>
-<li><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</a></li>
-<li><a href="#updating">updating…</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</span><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti" class="header-anchor"></a></h1><p>深度神经网络由于其巨大的参数量，可以很方便的拟合非常复杂的非线性关系，同时，巨大的参数量也给模型带来了过拟合的问题。为了解决这个问题，也有人提出了早停和加入正则项等手段。而在传统机器学习中，除了这些手段，还有一种手段来解决这个问题，即bagging（参考我之前的文章<a href="https://xv44586.github.io/2019/10/16/bagging/">Bagging为什么能降低过拟合</a>），最典型的就是随机森林：对样本和特征进行抽样，训练多个模型，然后进行集成（投票/求平均）。那如何将这种思路引入到深度神经网络中呢？<br>首先,由于训练单个深度神经网络就已经非常耗时，通常样本量也不够多，不适合采样，所以像随机森林一样抽样训练多个模型的方案不可取。<br>剩下的思路就是用“一个”模型来模拟多个sub-model，那如何来模拟呢？</p>
-<h1><span id="dropout">Dropout</span><a href="#dropout" class="header-anchor"></a></h1><p>对于深度神经网络，其最重要的部分就是其隐藏单元（神经元），对于一个有n个神经元的层，我们可以通过设置神经元是否激活，来模拟$2^n$ 种结构，即sub-model，而在evaluate阶段，我们将这些所有的sub-mdoel的结果进行求平均。那对于现在的结构，不可能对 $2^n$中结构都去做计算然后再求平均，一种近似的做法是用当前这“一个”模型来近似模拟：设置所有神经元都处于激活状态，同时，对每个神经元的输出乘以其激活概率keep_prob.这就是Dropout的背后思想。<br><img src="/2019/10/17/dropout/dropout.png" alt="Dropout"><br>简单总结Dropout的具体做法：训练阶段，在前向传播的时候，让某个神经元的激活值以一定的概率p停止工作；预测阶段，对每个神经元的输出乘以1-p (keep_prob)。<br>接下来思考一下，为什么这么做work:首先，训练阶段部分神经元失活，对应的结果是部分features不参与计算，本质上是对features进行采样；其次，从整个训练过程中看，每次训练（batch-data),都对应不同的失活神经元（sub-model)，对应的每个sub-model在单个epoch内，都是在对样本进行无放回的抽样，本质上是在bagging。最后，在预测阶段，为什么可以用“一个”完整的模型来模拟sub-model的求平均过程呢？从sub-model的角度看，每个sub-model被training的概率为$(1-p)$, 而神经元对所有sub-model是共享的，唯一的区别是是否激活，所以归一到每个神经元上，单个神经元被training（激活）的概率为$(1-p)$,而sub-model的总数是$2^n$，每个神经元求平均的过程即$Out_i * (1-p) * 2^n/ 2^n = Out_i * (1 -p)$.<br>具体实现时，我们的目的是在训练阶段对神经元进行随机（概率p)失活,而在test和evaluate时，对神经元的输出乘以$(1-p)$,所以在实现时，可以采用一个trick：dropout时，对样本进行mask的同时，将其除以$(1-p)$,这样就可以一次计算完成所有逻辑，同时，把所有逻辑保留在整个层中。<br><strong>tf的实现：</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dropout</span><span class="params">(x, keep_prob, noise_shape=None, seed=None, name=None)</span>:</span>  <span class="comment"># pylint: disable=invalid-name</span></span><br><span class="line">  <span class="string">"""Computes dropout.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  With probability `keep_prob`, outputs the input element scaled up by</span></span><br><span class="line"><span class="string">  `1 / keep_prob`, otherwise outputs `0`.  The scaling is so that the expected</span></span><br><span class="line"><span class="string">  sum is unchanged.</span></span><br><span class="line"><span class="string">    ...</span></span><br><span class="line"><span class="string"> """</span></span><br><span class="line">  <span class="keyword">with</span> ops.name_scope(name, <span class="string">"dropout"</span>, [x]) <span class="keyword">as</span> name:</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment"># Do nothing if we know keep_prob == 1</span></span><br><span class="line">    <span class="keyword">if</span> tensor_util.constant_value(keep_prob) == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    noise_shape = noise_shape <span class="keyword">if</span> noise_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> array_ops.shape(x)</span><br><span class="line">    <span class="comment"># uniform [keep_prob, 1.0 + keep_prob)</span></span><br><span class="line">    random_tensor = keep_prob</span><br><span class="line">    random_tensor += random_ops.random_uniform(noise_shape,</span><br><span class="line">                                               seed=seed,</span><br><span class="line">                                               dtype=x.dtype)</span><br><span class="line">    <span class="comment"># 0. if [keep_prob, 1.0) and 1. if [1.0, 1.0 + keep_prob)</span></span><br><span class="line">    binary_tensor = math_ops.floor(random_tensor)</span><br><span class="line">    ret = math_ops.div(x, keep_prob) * binary_tensor</span><br><span class="line">    <span class="keyword">if</span> context.in_graph_mode():</span><br><span class="line">      ret.set_shape(x.get_shape())</span><br><span class="line">    <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure></p>
-<h1><span id="bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</span><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan" class="header-anchor"></a></h1><p>如果在非dropout阶段不进行scaled会如何？<br>scaled<br><img src="/2019/10/17/dropout/scaled.png" alt="scaled.png"><br>without_scaled<br><img src="/2019/10/17/dropout/without-scaled.png" alt="without_scaled.png"><br>实验也说明非dropout阶段如果没有进行scaled（求平均），对应的loss会比train阶段高，同时acc也会降低。</p>
-<p><strong>桥豆麻袋，到这里好像出现了一点问题：</strong><br>按照我们上面的思路，在test和evaluate阶段，我们从对sub-model求平均转化为对每个神经元的output进行scaled down，即 $activation(x * W ) * (1 - p)$， 而我们在实现时，只是对x进行scaled up操作，如果后面接的层的激活函数是线性的，这样处理没有什么问题，但是，后面的层不总是线性激活函数，那此时，$output = activation(x * (1-p) * W)  != activation(x*W) * (1 - p)$,即我们得到的输出与我们想要的并不一样，按照以上的理解，我们对output进行scaled-down，验证一下两者的区别。<br>scaled_input<br><img src="/2019/10/17/dropout/scaled-input.png" alt="scaled_input.png"><br>scaled_output<br><img src="/2019/10/17/dropout/scaled-output.png" alt="scaled_output.png"></p>
-<p>看上去对output进行scaled-down结果稍微好一点，但是并不显著，此时的激活函数是relu，而且是在倒数第二层，换个激活函数试试。<br>scaled_input_tanh<br><img src="/2019/10/17/dropout/scaled_input_tanh.png" alt="scaled_input_tanh.png"><br>scaled_output_tanh<br><img src="/2019/10/17/dropout/scaled_output_tanh.png" alt="scaled_output_tanh.png"><br>结果看上去对output进行scaled-down效果稍微差一些，但差距不大。<br>代码地址<a href="https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout" target="_blank" rel="noopener">https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout</a>，感兴趣的可以试试其他方式。<br>既然两种方式在结果上看，效果差不多，而对output进行scaled-down需要添加一个AfterDropLayer，逻辑会在不同的层中，而对inputs直接进行scaled-up，所有逻辑都保存在一个layer中，更清晰。<br><strong>But，Why？</strong>为什么两种方式的结果效果差异不大？真让人头秃啊！</p>
-<p><strong>论文地址</strong><br><a href="http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" target="_blank" rel="noopener">http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf</a></p>
-<p>================================</p>
-<h1><span id="updating">updating…</span><a href="#updating" class="header-anchor"></a></h1><p><img src="/2019/10/17/dropout/linear.png" alt="image.png"></p>
-<p>上图是sigmoid函数在[-8,8]区间的图像，其中linear是由[-8,-4,-2,2,4,8]截断的直线，看图可以看出，sigmoid在区间内都非常的接近”linear”，梯度变化较大的部分只在几个拐点周围，大部分都是近似”linear”,所以也就解释了为什么两种方式有差异，但是差异并不大。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>大四竞赛作品截图</p>
-]]></content>
-      <categories>
-        <category>MachineLearning</category>
-      </categories>
-      <tags>
-        <tag>Deep Learning</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Glove模型</title>
     <url>/2019/10/17/glove/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -502,6 +468,40 @@
       </categories>
       <tags>
         <tag>Glove</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Dropout--深度神经网络中的Bagging</title>
+    <url>/2019/10/17/dropout/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</a></li>
+<li><a href="#dropout">Dropout</a></li>
+<li><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</a></li>
+<li><a href="#updating">updating…</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<h1><span id="shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</span><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti" class="header-anchor"></a></h1><p>深度神经网络由于其巨大的参数量，可以很方便的拟合非常复杂的非线性关系，同时，巨大的参数量也给模型带来了过拟合的问题。为了解决这个问题，也有人提出了早停和加入正则项等手段。而在传统机器学习中，除了这些手段，还有一种手段来解决这个问题，即bagging（参考我之前的文章<a href="https://xv44586.github.io/2019/10/16/bagging/">Bagging为什么能降低过拟合</a>），最典型的就是随机森林：对样本和特征进行抽样，训练多个模型，然后进行集成（投票/求平均）。那如何将这种思路引入到深度神经网络中呢？<br>首先,由于训练单个深度神经网络就已经非常耗时，通常样本量也不够多，不适合采样，所以像随机森林一样抽样训练多个模型的方案不可取。<br>剩下的思路就是用“一个”模型来模拟多个sub-model，那如何来模拟呢？</p>
+<h1><span id="dropout">Dropout</span><a href="#dropout" class="header-anchor"></a></h1><p>对于深度神经网络，其最重要的部分就是其隐藏单元（神经元），对于一个有n个神经元的层，我们可以通过设置神经元是否激活，来模拟$2^n$ 种结构，即sub-model，而在evaluate阶段，我们将这些所有的sub-mdoel的结果进行求平均。那对于现在的结构，不可能对 $2^n$中结构都去做计算然后再求平均，一种近似的做法是用当前这“一个”模型来近似模拟：设置所有神经元都处于激活状态，同时，对每个神经元的输出乘以其激活概率keep_prob.这就是Dropout的背后思想。<br><img src="/2019/10/17/dropout/dropout.png" alt="Dropout"><br>简单总结Dropout的具体做法：训练阶段，在前向传播的时候，让某个神经元的激活值以一定的概率p停止工作；预测阶段，对每个神经元的输出乘以1-p (keep_prob)。<br>接下来思考一下，为什么这么做work:首先，训练阶段部分神经元失活，对应的结果是部分features不参与计算，本质上是对features进行采样；其次，从整个训练过程中看，每次训练（batch-data),都对应不同的失活神经元（sub-model)，对应的每个sub-model在单个epoch内，都是在对样本进行无放回的抽样，本质上是在bagging。最后，在预测阶段，为什么可以用“一个”完整的模型来模拟sub-model的求平均过程呢？从sub-model的角度看，每个sub-model被training的概率为$(1-p)$, 而神经元对所有sub-model是共享的，唯一的区别是是否激活，所以归一到每个神经元上，单个神经元被training（激活）的概率为$(1-p)$,而sub-model的总数是$2^n$，每个神经元求平均的过程即$Out_i * (1-p) * 2^n/ 2^n = Out_i * (1 -p)$.<br>具体实现时，我们的目的是在训练阶段对神经元进行随机（概率p)失活,而在test和evaluate时，对神经元的输出乘以$(1-p)$,所以在实现时，可以采用一个trick：dropout时，对样本进行mask的同时，将其除以$(1-p)$,这样就可以一次计算完成所有逻辑，同时，把所有逻辑保留在整个层中。<br><strong>tf的实现：</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dropout</span><span class="params">(x, keep_prob, noise_shape=None, seed=None, name=None)</span>:</span>  <span class="comment"># pylint: disable=invalid-name</span></span><br><span class="line">  <span class="string">"""Computes dropout.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  With probability `keep_prob`, outputs the input element scaled up by</span></span><br><span class="line"><span class="string">  `1 / keep_prob`, otherwise outputs `0`.  The scaling is so that the expected</span></span><br><span class="line"><span class="string">  sum is unchanged.</span></span><br><span class="line"><span class="string">    ...</span></span><br><span class="line"><span class="string"> """</span></span><br><span class="line">  <span class="keyword">with</span> ops.name_scope(name, <span class="string">"dropout"</span>, [x]) <span class="keyword">as</span> name:</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment"># Do nothing if we know keep_prob == 1</span></span><br><span class="line">    <span class="keyword">if</span> tensor_util.constant_value(keep_prob) == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    noise_shape = noise_shape <span class="keyword">if</span> noise_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> array_ops.shape(x)</span><br><span class="line">    <span class="comment"># uniform [keep_prob, 1.0 + keep_prob)</span></span><br><span class="line">    random_tensor = keep_prob</span><br><span class="line">    random_tensor += random_ops.random_uniform(noise_shape,</span><br><span class="line">                                               seed=seed,</span><br><span class="line">                                               dtype=x.dtype)</span><br><span class="line">    <span class="comment"># 0. if [keep_prob, 1.0) and 1. if [1.0, 1.0 + keep_prob)</span></span><br><span class="line">    binary_tensor = math_ops.floor(random_tensor)</span><br><span class="line">    ret = math_ops.div(x, keep_prob) * binary_tensor</span><br><span class="line">    <span class="keyword">if</span> context.in_graph_mode():</span><br><span class="line">      ret.set_shape(x.get_shape())</span><br><span class="line">    <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure></p>
+<h1><span id="bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</span><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan" class="header-anchor"></a></h1><p>如果在非dropout阶段不进行scaled会如何？<br>scaled<br><img src="/2019/10/17/dropout/scaled.png" alt="scaled.png"><br>without_scaled<br><img src="/2019/10/17/dropout/without-scaled.png" alt="without_scaled.png"><br>实验也说明非dropout阶段如果没有进行scaled（求平均），对应的loss会比train阶段高，同时acc也会降低。</p>
+<p><strong>桥豆麻袋，到这里好像出现了一点问题：</strong><br>按照我们上面的思路，在test和evaluate阶段，我们从对sub-model求平均转化为对每个神经元的output进行scaled down，即 $activation(x * W ) * (1 - p)$， 而我们在实现时，只是对x进行scaled up操作，如果后面接的层的激活函数是线性的，这样处理没有什么问题，但是，后面的层不总是线性激活函数，那此时，$output = activation(x * (1-p) * W)  != activation(x*W) * (1 - p)$,即我们得到的输出与我们想要的并不一样，按照以上的理解，我们对output进行scaled-down，验证一下两者的区别。<br>scaled_input<br><img src="/2019/10/17/dropout/scaled-input.png" alt="scaled_input.png"><br>scaled_output<br><img src="/2019/10/17/dropout/scaled-output.png" alt="scaled_output.png"></p>
+<p>看上去对output进行scaled-down结果稍微好一点，但是并不显著，此时的激活函数是relu，而且是在倒数第二层，换个激活函数试试。<br>scaled_input_tanh<br><img src="/2019/10/17/dropout/scaled_input_tanh.png" alt="scaled_input_tanh.png"><br>scaled_output_tanh<br><img src="/2019/10/17/dropout/scaled_output_tanh.png" alt="scaled_output_tanh.png"><br>结果看上去对output进行scaled-down效果稍微差一些，但差距不大。<br>代码地址<a href="https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout" target="_blank" rel="noopener">https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout</a>，感兴趣的可以试试其他方式。<br>既然两种方式在结果上看，效果差不多，而对output进行scaled-down需要添加一个AfterDropLayer，逻辑会在不同的层中，而对inputs直接进行scaled-up，所有逻辑都保存在一个layer中，更清晰。<br><strong>But，Why？</strong>为什么两种方式的结果效果差异不大？真让人头秃啊！</p>
+<p><strong>论文地址</strong><br><a href="http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" target="_blank" rel="noopener">http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf</a></p>
+<p>================================</p>
+<h1><span id="updating">updating…</span><a href="#updating" class="header-anchor"></a></h1><p><img src="/2019/10/17/dropout/linear.png" alt="image.png"></p>
+<p>上图是sigmoid函数在[-8,8]区间的图像，其中linear是由[-8,-4,-2,2,4,8]截断的直线，看图可以看出，sigmoid在区间内都非常的接近”linear”，梯度变化较大的部分只在几个拐点周围，大部分都是近似”linear”,所以也就解释了为什么两种方式有差异，但是差异并不大。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>大四竞赛作品截图</p>
+]]></content>
+      <categories>
+        <category>MachineLearning</category>
+      </categories>
+      <tags>
+        <tag>Deep Learning</tag>
       </tags>
   </entry>
   <entry>
@@ -1444,6 +1444,61 @@
       </tags>
   </entry>
   <entry>
+    <title>Knowledge Distillation (1) &amp;#58; 模块替换之bert-of-theseus-上篇</title>
+    <url>/2020/08/09/bert-of-theseus/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#mo-xing-ya-suo">模型压缩</a><ul>
+<li><a href="#jian-zhi">剪枝</a></li>
+<li><a href="#liang-hua">量化</a></li>
+<li><a href="#zhi-shi-zheng-liu">知识蒸馏</a></li>
+<li><a href="#quan-chong-gong-xiang">权重共享</a></li>
+<li><a href="#quan-chong-fen-jie">权重分解</a></li>
+<li><a href="#mo-xing-ya-suo-de-bi-yao-xing">模型压缩的必要性</a></li>
+<li><a href="#bert-of-theseus">Bert of theseus</a></li>
+<li><a href="#ju-ti-liu-cheng">具体流程</a></li>
+<li><a href="#shi-yan-xiao-guo">实验效果</a></li>
+</ul>
+</li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+
+<blockquote>如果忒修斯的船上的木头被逐渐替换，直到所有的木头都不是原来的木头，那这艘船还是原来的那艘船吗？<br><br>-普鲁塔克</blockquote>
+
+<p>最近遇到一个需要对算法加速的场景，了解到了一个比较简洁实用的方法：<a href="https://arxiv.org/abs/2002.02925" target="_blank" rel="noopener">Bert-of-theseus</a>,了解了原理后参考代码实验后，验证了其有效性，所以总结一下。</p>
+<h1><span id="mo-xing-ya-suo">模型压缩</span><a href="#mo-xing-ya-suo" class="header-anchor"></a></h1><p>模型在设计之初都是过参数化的，这是因为模型的参数量与复杂度代表着模型的容量与学习能力，但当我们实际使用时，我们需要更好的部署他（低资源），更快的响应（快速推理），常常需要进行模型压缩。<br>模型压缩就是<code>简化大的模型，得到推理快资源占用低的小模型</code>，而想”即要马而跑又不用吃草”通常是很难的，所以压缩后的模型常常也会有不同程度的牺牲，如模型性能下降。<br>此外，模型压缩是作用在推理阶段，带来的常常是训练时间的增加。<br>模型压缩又分为三种方式：一种是<code>剪枝(Pruning)</code>与<code>量化(Quantization)</code>,一种是<code>知识蒸馏(Knowledge Distillation)</code>,还有一种是<code>权重共享（Sharing）与因数分解（Factorization）</code>。该部分内容推荐一篇博客：<a href="http://mitchgordon.me/machine/learning/2019/11/18/all-the-ways-to-compress-BERT.html" target="_blank" rel="noopener">All The Ways You Can Compress BERT</a></p>
+<h2><span id="jian-zhi">剪枝</span><a href="#jian-zhi" class="header-anchor"></a></h2><p>剪枝技术是通过将大模型中一些”不重要”的连接剪断，得到一个”稀疏”结构的模型。剪枝又分为”结构性剪枝”与”非结构性剪枝”.剪枝可以作用在权重粒度，也可以作用在attention heads / layer粒度上。不过剪枝技术感觉会逐步被<cdoe>NAS（Neural Architecture Search）取。</cdoe></p>
+<h2><span id="liang-hua">量化</span><a href="#liang-hua" class="header-anchor"></a></h2><p>量化不改变模型的网络结构，而是改变模型的参数的数据格式，通常模型在建立与训练时使用的是 float32 格式的，量化就是将格式转换为 <code>low-bit</code>, 如 float16 甚至二值化，如此即提速又省显存。</p>
+<h2><span id="zhi-shi-zheng-liu">知识蒸馏</span><a href="#zhi-shi-zheng-liu" class="header-anchor"></a></h2><p>知识蒸馏是训练一个小模型(student)来学习大模型(teacher)，由于大模型是之前已经fine-tuning的，所以此时学习的目标已经转换为对应的logit而<br>不再是one-hot编码了，所以student有可能比teacher的性能更好。这样即小又准的模型实在太好了。不过为了达到这样的效果，通常设计小模型时不<br>光要学习大模型的输出，还要学习各个中间层结果，相关矩阵等，这就需要仔细设计模型的结构与loss及loss融合方案了。一种简单的方法是只学习大模型的logit，这与对label做embedding有点类似，不过我没做过实验还。</p>
+<h2><span id="quan-chong-gong-xiang">权重共享</span><a href="#quan-chong-gong-xiang" class="header-anchor"></a></h2><p>将部分权重在多个层中共享以达到压缩模型的效果，如ALBERT中共享self-attention中的参数。</p>
+<h2><span id="quan-chong-fen-jie">权重分解</span><a href="#quan-chong-fen-jie" class="header-anchor"></a></h2><p>将权重矩阵进行因数分解，形成两个低秩的矩阵相乘的形式，从而降低计算量，如ALBERT中通过将Embedding分解降低参数量。</p>
+<h2><span id="mo-xing-ya-suo-de-bi-yao-xing">模型压缩的必要性</span><a href="#mo-xing-ya-suo-de-bi-yao-xing" class="header-anchor"></a></h2><p>看了上面模型压缩的方法，每一个都有种”脱裤子放屁”的感觉，与其训练一个大模型，再费力把它变小，为何不直接开始就弄个小的呢？<br>首先，模型在设计之初是都是会或多或少的过参数化，因为模型的参数量与复杂度代表着模型的容量与学习能力；<br>其次，开始就用一个小模型，那这个小模型也是需要设计的，不能随便拿来一个，而设计一个性能高参数规模小的小模型难度是非常大的，往往是模型小了性能也低了；<br>第三点，大模型压缩后与小模型虽然参数规模相当，但是对应的模型空间并不相同。<br>此外，为了更好的部署，如手机或FPGA等，得到精度更高模型更小(distillation)或者利用硬件加速(low-bit)，模型压缩都是值得试一试的手段。<br>更详细的讨论，可以参考<a href="https://www.zhihu.com/question/303922732" target="_blank" rel="noopener">为什么要压缩模型，而不直接训练一个小的CNN</a></p>
+<h2><span id="bert-of-theseus">Bert of theseus</span><a href="#bert-of-theseus" class="header-anchor"></a></h2><p>Bert of theseus 方法属于上面提到的知识蒸馏，知识蒸馏中我们提到，在蒸馏时，我们不光要学习teacher的输出，对中间层我们也希望他们直接尽量相似，<br>那想象一个这种状态对应对理想情况：<code>中间层的结果一致，最终的结果一致</code>,既然我们的期望中间结果一致，那也就意味着两者可以互相替换。<br>正如开头提到的忒修斯之船一样。所以核心思想是：<br><code>与其设计复杂的loss来让中间层结果相似不如直接用小模型替换大模型来训练</code><br>通过复杂loss来达到与中间层结果相似可以看作是一种整体渐进式的逼近，让小模型一点点去学习，而直接替换可以看作是一种简单粗暴的方式，<br>但是他不需要设计各种loss，优化目标也是同一个，就只有一个下游任务相关的loss，突出一个<code>简洁</code>。<br>这就好比高中上学一样，即使花高价也要让孩子去一所好高中，因为学校的”氛围”能让孩子的学习成绩进步，其实是因为周围的孩子带着一起学，<br>弱鸡也能学的比平时更多一点。bert-of-theseus也是类似的道理，跟着大佬（teacher）总比单独fine-tuning效果好。</p>
+<h2><span id="ju-ti-liu-cheng">具体流程</span><a href="#ju-ti-liu-cheng" class="header-anchor"></a></h2><p>如果直接将小模型替换大模型，那其实是在对小模型进行微调，与大模型就脱离了，也达不到对应的效果，所以作者采用了一种概率替换的方式。<br>首先呢，想象我们现在已经训练好了一个6层的BERT，我们成为<code>Predecessor（前辈）</code>, 而我们需要训练一个三层的bert，<br>他的结果近似12层BERT的效果，我们成为<code>Successor(传承者)</code>,那 bert-of-theseus的模型结构如<a href="https://spaces.ac.cn/archives/7575" target="_blank" rel="noopener">下图</a>所示：</p>
+<p><img src="/2020/08/09/bert-of-theseus/bert-of-theseus.png" alt="bert-of-theseus"></p>
+<p>在bert-of-theseus中，首先固定predecessor的权重，然后将6层的Bert分为3个block，每个block与successor的一层对应，训练过程分为两个stage：<br>首先用successor中的层概率替换predecessor中对应的block，在下游任务中直接fine-tuning（只训练successor），<br>然后将successor从bert-of-theseus中分离出来，单独在下游任务中进行fine-tuning，直到指标不再上升。<br>所谓替换，就是输出的替换，在进入下一层前在predecessor和successor的输出中二选一。<br>替换概率作者也给出了两种方式，一种是固定 0.5,一种是线性从0-1,如下图所示：<br><img src="/2020/08/09/bert-of-theseus/figure2.png" alt></p>
+<h2><span id="shi-yan-xiao-guo">实验效果</span><a href="#shi-yan-xiao-guo" class="header-anchor"></a></h2><p>实验代码主要参考<a href="https://github.com/bojone/bert-of-theseus" target="_blank" rel="noopener">bert-of-theseus</a>, 实验主要做了三组，一组文本分类两组ner-crf，结果如下：</p>
+<p>文本分类：CLUE的iflytek数据集</p>
+<p>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 60.11\% &amp; 58.99\%  &amp; 57.96\%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 59.6\%  &amp; 59.3\% \end{array}\\<br>\hline<br>\end{array}<br>$$</p>
+<p>ner-crf: 公司数据<br>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 97.5\% &amp; 97.0\%  &amp; 96.1\%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 97.3\%  &amp; 96.6\% \end{array}\\<br>\hline<br>\end{array}<br>$$</p>
+<p>可以看到，相比直接那前几层微调，bert-of-theseus的效果确实更好，此外，我还尝试了线性策略的替换概率，效果上差别不大。<br>实验代码：<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_bert_of_theseus.py" target="_blank" rel="noopener">classification_ifytek_bert_of_theseus</a><br><a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/sequence_labeling_ner_bert_of_theseus.py" target="_blank" rel="noopener">sequence_labeling_ner_bert_of_theseus</a></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p><a href="https://github.com/JetRunner/BERT-of-Theseus" target="_blank" rel="noopener">论文原作者配图</a></p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>Distillation</tag>
+        <tag>BERT</tag>
+        <tag>speed-up</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>optimizer of bert</title>
     <url>/2020/08/01/optimizer-in-bert/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -1497,63 +1552,8 @@
         <category>NLP</category>
       </categories>
       <tags>
+        <tag>BERT</tag>
         <tag>Optimizer</tag>
-        <tag>BERT</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Knowledge Distillation (1) &amp;#58; 模块替换之bert-of-theseus-上篇</title>
-    <url>/2020/08/09/bert-of-theseus/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#mo-xing-ya-suo">模型压缩</a><ul>
-<li><a href="#jian-zhi">剪枝</a></li>
-<li><a href="#liang-hua">量化</a></li>
-<li><a href="#zhi-shi-zheng-liu">知识蒸馏</a></li>
-<li><a href="#quan-chong-gong-xiang">权重共享</a></li>
-<li><a href="#quan-chong-fen-jie">权重分解</a></li>
-<li><a href="#mo-xing-ya-suo-de-bi-yao-xing">模型压缩的必要性</a></li>
-<li><a href="#bert-of-theseus">Bert of theseus</a></li>
-<li><a href="#ju-ti-liu-cheng">具体流程</a></li>
-<li><a href="#shi-yan-xiao-guo">实验效果</a></li>
-</ul>
-</li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-
-<blockquote>如果忒修斯的船上的木头被逐渐替换，直到所有的木头都不是原来的木头，那这艘船还是原来的那艘船吗？<br><br>-普鲁塔克</blockquote>
-
-<p>最近遇到一个需要对算法加速的场景，了解到了一个比较简洁实用的方法：<a href="https://arxiv.org/abs/2002.02925" target="_blank" rel="noopener">Bert-of-theseus</a>,了解了原理后参考代码实验后，验证了其有效性，所以总结一下。</p>
-<h1><span id="mo-xing-ya-suo">模型压缩</span><a href="#mo-xing-ya-suo" class="header-anchor"></a></h1><p>模型在设计之初都是过参数化的，这是因为模型的参数量与复杂度代表着模型的容量与学习能力，但当我们实际使用时，我们需要更好的部署他（低资源），更快的响应（快速推理），常常需要进行模型压缩。<br>模型压缩就是<code>简化大的模型，得到推理快资源占用低的小模型</code>，而想”即要马而跑又不用吃草”通常是很难的，所以压缩后的模型常常也会有不同程度的牺牲，如模型性能下降。<br>此外，模型压缩是作用在推理阶段，带来的常常是训练时间的增加。<br>模型压缩又分为三种方式：一种是<code>剪枝(Pruning)</code>与<code>量化(Quantization)</code>,一种是<code>知识蒸馏(Knowledge Distillation)</code>,还有一种是<code>权重共享（Sharing）与因数分解（Factorization）</code>。该部分内容推荐一篇博客：<a href="http://mitchgordon.me/machine/learning/2019/11/18/all-the-ways-to-compress-BERT.html" target="_blank" rel="noopener">All The Ways You Can Compress BERT</a></p>
-<h2><span id="jian-zhi">剪枝</span><a href="#jian-zhi" class="header-anchor"></a></h2><p>剪枝技术是通过将大模型中一些”不重要”的连接剪断，得到一个”稀疏”结构的模型。剪枝又分为”结构性剪枝”与”非结构性剪枝”.剪枝可以作用在权重粒度，也可以作用在attention heads / layer粒度上。不过剪枝技术感觉会逐步被<cdoe>NAS（Neural Architecture Search）取。</cdoe></p>
-<h2><span id="liang-hua">量化</span><a href="#liang-hua" class="header-anchor"></a></h2><p>量化不改变模型的网络结构，而是改变模型的参数的数据格式，通常模型在建立与训练时使用的是 float32 格式的，量化就是将格式转换为 <code>low-bit</code>, 如 float16 甚至二值化，如此即提速又省显存。</p>
-<h2><span id="zhi-shi-zheng-liu">知识蒸馏</span><a href="#zhi-shi-zheng-liu" class="header-anchor"></a></h2><p>知识蒸馏是训练一个小模型(student)来学习大模型(teacher)，由于大模型是之前已经fine-tuning的，所以此时学习的目标已经转换为对应的logit而<br>不再是one-hot编码了，所以student有可能比teacher的性能更好。这样即小又准的模型实在太好了。不过为了达到这样的效果，通常设计小模型时不<br>光要学习大模型的输出，还要学习各个中间层结果，相关矩阵等，这就需要仔细设计模型的结构与loss及loss融合方案了。一种简单的方法是只学习大模型的logit，这与对label做embedding有点类似，不过我没做过实验还。</p>
-<h2><span id="quan-chong-gong-xiang">权重共享</span><a href="#quan-chong-gong-xiang" class="header-anchor"></a></h2><p>将部分权重在多个层中共享以达到压缩模型的效果，如ALBERT中共享self-attention中的参数。</p>
-<h2><span id="quan-chong-fen-jie">权重分解</span><a href="#quan-chong-fen-jie" class="header-anchor"></a></h2><p>将权重矩阵进行因数分解，形成两个低秩的矩阵相乘的形式，从而降低计算量，如ALBERT中通过将Embedding分解降低参数量。</p>
-<h2><span id="mo-xing-ya-suo-de-bi-yao-xing">模型压缩的必要性</span><a href="#mo-xing-ya-suo-de-bi-yao-xing" class="header-anchor"></a></h2><p>看了上面模型压缩的方法，每一个都有种”脱裤子放屁”的感觉，与其训练一个大模型，再费力把它变小，为何不直接开始就弄个小的呢？<br>首先，模型在设计之初是都是会或多或少的过参数化，因为模型的参数量与复杂度代表着模型的容量与学习能力；<br>其次，开始就用一个小模型，那这个小模型也是需要设计的，不能随便拿来一个，而设计一个性能高参数规模小的小模型难度是非常大的，往往是模型小了性能也低了；<br>第三点，大模型压缩后与小模型虽然参数规模相当，但是对应的模型空间并不相同。<br>此外，为了更好的部署，如手机或FPGA等，得到精度更高模型更小(distillation)或者利用硬件加速(low-bit)，模型压缩都是值得试一试的手段。<br>更详细的讨论，可以参考<a href="https://www.zhihu.com/question/303922732" target="_blank" rel="noopener">为什么要压缩模型，而不直接训练一个小的CNN</a></p>
-<h2><span id="bert-of-theseus">Bert of theseus</span><a href="#bert-of-theseus" class="header-anchor"></a></h2><p>Bert of theseus 方法属于上面提到的知识蒸馏，知识蒸馏中我们提到，在蒸馏时，我们不光要学习teacher的输出，对中间层我们也希望他们直接尽量相似，<br>那想象一个这种状态对应对理想情况：<code>中间层的结果一致，最终的结果一致</code>,既然我们的期望中间结果一致，那也就意味着两者可以互相替换。<br>正如开头提到的忒修斯之船一样。所以核心思想是：<br><code>与其设计复杂的loss来让中间层结果相似不如直接用小模型替换大模型来训练</code><br>通过复杂loss来达到与中间层结果相似可以看作是一种整体渐进式的逼近，让小模型一点点去学习，而直接替换可以看作是一种简单粗暴的方式，<br>但是他不需要设计各种loss，优化目标也是同一个，就只有一个下游任务相关的loss，突出一个<code>简洁</code>。<br>这就好比高中上学一样，即使花高价也要让孩子去一所好高中，因为学校的”氛围”能让孩子的学习成绩进步，其实是因为周围的孩子带着一起学，<br>弱鸡也能学的比平时更多一点。bert-of-theseus也是类似的道理，跟着大佬（teacher）总比单独fine-tuning效果好。</p>
-<h2><span id="ju-ti-liu-cheng">具体流程</span><a href="#ju-ti-liu-cheng" class="header-anchor"></a></h2><p>如果直接将小模型替换大模型，那其实是在对小模型进行微调，与大模型就脱离了，也达不到对应的效果，所以作者采用了一种概率替换的方式。<br>首先呢，想象我们现在已经训练好了一个6层的BERT，我们成为<code>Predecessor（前辈）</code>, 而我们需要训练一个三层的bert，<br>他的结果近似12层BERT的效果，我们成为<code>Successor(传承者)</code>,那 bert-of-theseus的模型结构如<a href="https://spaces.ac.cn/archives/7575" target="_blank" rel="noopener">下图</a>所示：</p>
-<p><img src="/2020/08/09/bert-of-theseus/bert-of-theseus.png" alt="bert-of-theseus"></p>
-<p>在bert-of-theseus中，首先固定predecessor的权重，然后将6层的Bert分为3个block，每个block与successor的一层对应，训练过程分为两个stage：<br>首先用successor中的层概率替换predecessor中对应的block，在下游任务中直接fine-tuning（只训练successor），<br>然后将successor从bert-of-theseus中分离出来，单独在下游任务中进行fine-tuning，直到指标不再上升。<br>所谓替换，就是输出的替换，在进入下一层前在predecessor和successor的输出中二选一。<br>替换概率作者也给出了两种方式，一种是固定 0.5,一种是线性从0-1,如下图所示：<br><img src="/2020/08/09/bert-of-theseus/figure2.png" alt></p>
-<h2><span id="shi-yan-xiao-guo">实验效果</span><a href="#shi-yan-xiao-guo" class="header-anchor"></a></h2><p>实验代码主要参考<a href="https://github.com/bojone/bert-of-theseus" target="_blank" rel="noopener">bert-of-theseus</a>, 实验主要做了三组，一组文本分类两组ner-crf，结果如下：</p>
-<p>文本分类：CLUE的iflytek数据集</p>
-<p>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 60.11\% &amp; 58.99\%  &amp; 57.96\%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 59.6\%  &amp; 59.3\% \end{array}\\<br>\hline<br>\end{array}<br>$$</p>
-<p>ner-crf: 公司数据<br>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 97.5\% &amp; 97.0\%  &amp; 96.1\%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 97.3\%  &amp; 96.6\% \end{array}\\<br>\hline<br>\end{array}<br>$$</p>
-<p>可以看到，相比直接那前几层微调，bert-of-theseus的效果确实更好，此外，我还尝试了线性策略的替换概率，效果上差别不大。<br>实验代码：<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_bert_of_theseus.py" target="_blank" rel="noopener">classification_ifytek_bert_of_theseus</a><br><a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/sequence_labeling_ner_bert_of_theseus.py" target="_blank" rel="noopener">sequence_labeling_ner_bert_of_theseus</a></p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p><a href="https://github.com/JetRunner/BERT-of-Theseus" target="_blank" rel="noopener">论文原作者配图</a></p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>BERT</tag>
-        <tag>Distillation</tag>
-        <tag>speed-up</tag>
       </tags>
   </entry>
   <entry>
@@ -1595,8 +1595,8 @@
         <category>NLP</category>
       </categories>
       <tags>
-        <tag>BERT</tag>
         <tag>Distillation</tag>
+        <tag>BERT</tag>
         <tag>speed-up</tag>
       </tags>
   </entry>
@@ -1760,8 +1760,8 @@
         <category>NLP</category>
       </categories>
       <tags>
-        <tag>BERT</tag>
         <tag>Distillation</tag>
+        <tag>BERT</tag>
       </tags>
   </entry>
   <entry>
@@ -3205,6 +3205,49 @@
       </tags>
   </entry>
   <entry>
+    <title>few-shot视角下的fine-tuning</title>
+    <url>/2023/02/01/fine-tuning-at-few-shot/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#few-shot">few-shot</a></li>
+<li><a href="#fine-tuning">fine-tuning</a><ul>
+<li><a href="#supervised-fine-tuning">supervised fine-tuning</a></li>
+<li><a href="#instruction-tuning">instruction-tuning</a></li>
+<li><a href="#prompt-tuning">prompt tuning</a></li>
+<li><a href="#reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</a></li>
+</ul>
+</li>
+<li><a href="#qi-fa">启发</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div><br>LLM 目前的使用方式主要是zero-shot/few-shot,其是从context中的examle 数量来区分的，如果按这个角度进一步概括目前的fine-tuning 方案，感觉是个有趣的视角。<br><img src="/2023/02/01/fine-tuning-at-few-shot/few-shot.PNG" alt></p>
+<h1><span id="few-shot">few-shot</span><a href="#few-shot" class="header-anchor"></a></h1><p>目前LLM 的使用方式主要是zero-shot/few-shot，而通常few-shot 的性能也比zero-shot 要好，而且随着example 的数量的增加，few-shot 的性能也可能进一步提升；zero-shot 时只给出task input 效果可能不佳，通常需要给出对应的task description，而更”精准“ 的task description 通常也能得到更好的zero-shot 效果。<br>所以，提升LLM zero-shot /few-shot 的性能，主要的方式有两个：</p>
+<ol>
+<li>给出更”好“的task description</li>
+<li>给出更多的example</li>
+</ol>
+<h1><span id="fine-tuning">fine-tuning</span><a href="#fine-tuning" class="header-anchor"></a></h1><h2><span id="supervised-fine-tuning">supervised fine-tuning</span><a href="#supervised-fine-tuning" class="header-anchor"></a></h2><p>对于小模型来说，其in-context learning 能力较弱，性能不理想。为了提升模型的性能，一个可以尝试的方向是增加context 中的example 数量，但是由于模型的context 窗口有限，不支持我们无限制的将更多的example 塞进context 中，所以我们变通一下，采用通过更新参数的方式将example 塞进“context”。此时可以看作是无限example（inf-shot)；</p>
+<h2><span id="instruction-tuning">instruction-tuning</span><a href="#instruction-tuning" class="header-anchor"></a></h2><p>通常在supervised fine-tuning 时，我们是将一个任务的example “塞”进context，而instruction-tuning 可以看作是同时将多个任务的example “塞”进context，为了在使用时区分应该当前context 里应该使用哪些example，我们在不同的task 前面增加对应的description，作为判断依据。即：同时将多个任务的多个example 塞进模型的context 中，使用时通过不同的task description 来区分当前context 内的example 应该是哪些。</p>
+<h2><span id="prompt-tuning">prompt tuning</span><a href="#prompt-tuning" class="header-anchor"></a></h2><p>由于pretrain model 的任务是预测下一个token，而非处理用户的指令（instruction），为了提升模型zero-shot 的性能，一个可以尝试的方法就是找到模型视角下更好的task description（pattern），prompt-tuning 的思路即通过大量的监督样本，尝试寻找到更适应模型的task description，然后期望这个task description 能提高模型的zero-shot 的性能。</p>
+<h2><span id="reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</span><a href="#reinforcement-learning-with-human-feedback" class="header-anchor"></a></h2><p>prompt-tuning 时，我们尝试找到模型视角下更好的task description，而这个方法显然是不利于交互的，更好的方式是让模型理解人类视角下的task description。rlhf 就是按照这个思路，让模型反过来更好的理解人类视角下的task description，使得交互更方便。</p>
+<h1><span id="qi-fa">启发</span><a href="#qi-fa" class="header-anchor"></a></h1><p>从这个视角看，我们发现即使是小模型，也是有一定的in-context learning 的能力的，只是不够强，所以我们需要更多的example 他才能发挥出更好的效果；<br>pretrain+fine-tuning 的模式之所以能work，是因为pretrain 后的model 有in-context learning 的能力，in-context learning 并不要求task 的形式与pretrain 的一致，所以我们才能在pretrain 的基础上根据下游任务的不同，来构造不同的fine-tuning 过程，在few-shot 视角下，其对应的是在context 中”塞“进更多的example；<br>in-context learning 的增强，对应的是所需的样本逐渐减少，从supervised fine-tuning 的大量样本到few-shot 的少量样本最终到zero-shot 的不需要提供样本，只需提供任务描述。</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文是笔者最近思考pretrain + fine-tuning 模式为什么能work 时，通过在few-shot 视角下的一个解释。通过该思路，笔者尝试将目前的fine-tuning 主流思路统一起来。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>太空视角下的喜马拉雅山脉</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>LLM</tag>
+        <tag>In-context learning</tag>
+        <tag>fine-tuning</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>From zero to ChatGPT</title>
     <url>/2023/01/09/zero-to-chatgpt/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -3264,7 +3307,7 @@
 <h1><span id="language-model">Language Model</span><a href="#language-model" class="header-anchor"></a></h1><p>长期一来，人类一直梦想着让机器替代人来完成各种工作，其中也包括语言相关工作，如翻译文字，识别语言，检索、生成文字等。为了完成这些目标，就需要机器理解语言。最早人们想到的办法是让机器模拟人类进行学习，如学习人类通过学习语法规则、词性、构词法、分析语句等学习语言。尤其是在乔姆斯基（Noam Chomsky 有史以来最伟大的语言学家）提出 “形式语言” 以后，人们更坚定了利用语法规则的办法进行文字处理的信念。遗憾的是，几十年过去了，在计算机处理语言领域，基于这个语法规则的方法几乎毫无突破。</p>
 <h2><span id="tong-ji-yu-yan-mo-xing">统计语言模型</span><a href="#tong-ji-yu-yan-mo-xing" class="header-anchor"></a></h2><p>另一个对自然语言感兴趣的就是香农，他在很早就提出了用数学的方法来处理自然语言的想法。但是当时即使使用计算机技术，也无法进行大量的信息处理。不过随着计算机技术的发展，这个思路成了一种可能。<br>首先成功利用数学方法解决自然语言问题的是贾里尼克 (Fred Jelinek) 及他领导的IBM Wason实验室。贾里尼克提出的方法也十分简单：判断一个词序列（短语，句子，文档等）是否合理，就看他的可能性有多大。举个例子：判断“I have a pen” 翻译为中文”我有个笔“是否合理，只需要判断”I have a pen.我有个笔” 这个序列的可能性有多大。而如何判断一个词序列的可能性，就需要对这个词序列的概率进行建模，也就是统计语言模型：$S$ 表示一连串特定顺序排列的词$w_1$,$w_2$, …, $w_n$，n 是序列的长度，则$S$出现的概率$P(S)=P(w_1,w_2,…w_n)$.<br>但是这个概率$P(S)$ 很难估算，所以这里我们转化一下。首先，利用条件概率公式将其展开:<br>$$<br>P(S)=P(w_1,w_2,..w_n)=P(w_1)∗P(w_2|w_1)∗P(w_3|w_1,w_2)∗…∗P(w_n|w_1,w_2,..w_{n−1})<br>$$<br>即：<br>$$<br>P(w_{1}^{n})=\prod_{i=1}^{n}P(w_i|w_{1}^{i-1})<br>$$</p>
 <p>接着，我们利用马尔可夫假设，即任意一个词$w_i$ 出现的概率只与其前一个词$w_{i-1})$（或有限的几个） 有关。于是，问题就变的简单了许多。对应的$S$ 的概率就变为:<br>$$<br>P(S)=P(w_{1}^{n})=\prod_{i=1}^{n}P(w_i|w_{1}^{i-1})\approx\prod_{i=1}^{n}P(w_i|w_{i-1})<br>$$<br>以上对应的便是一个二元模型，当然，如果词由其前面的$N-1$ 个词决定，则对应的是N元模型。</p>
-<h2><span id="shen-jing-wang-luo-yu-yan-mo-xing">神经网络语言模型</span><a href="#shen-jing-wang-luo-yu-yan-mo-xing" class="header-anchor"></a></h2><p>统计语言模型有很多问题：1.训练语料中未出现过的词（句子）如何处理(OOV);2.长尾低频词如何平滑；3.one-hot 向量带来的维度灾难；4.未考虑词之间的相似性等。<br>为了解决上述问题，Yoshua Bengio(深度学习三巨头之一）在2003年提出用神经网络来建模语言模型，同时学习词的低纬度的分布式表征(distributed representation),具体的：<br>1.不直接对$P(w_{1}^{n})$ 建模，而是对$P(w_i|w_{1}^{i-1})$进行建模;<br>2.简化求解时，不限制只能是左边的词，也可以含右边的词，即可以是一个上下文窗口(context) 内的所有词；<br>3.共享网络参数。</p>
+<h2><span id="shen-jing-wang-luo-yu-yan-mo-xing">神经网络语言模型</span><a href="#shen-jing-wang-luo-yu-yan-mo-xing" class="header-anchor"></a></h2><p>统计语言模型有很多问题：1.训练语料中未出现过的词（句子）如何处理(OOV);2.长尾低频词如何平滑；3.one-hot 向量带来的维度灾难；4.未考虑词之间的相似性等。<br>为了解决上述问题，Yoshua Bengio(深度学习三巨头之一）在2003年提出用神经网络来建模语言模型，同时学习词的低维度的分布式表征(distributed representation),具体的：<br>1.不直接对$P(w_{1}^{n})$ 建模，而是对$P(w_i|w_{1}^{i-1})$进行建模;<br>2.简化求解时，不限制只能是左边的词，也可以含右边的词，即可以是一个上下文窗口(context) 内的所有词；<br>3.共享网络参数。</p>
 <p>具体形式如下：<br>$$<br>P(w_t=i|w_{1}^{t-1})=f(i,w_{t-1},…,w_{t-n+1})=g(i, C(w_{t-1}),…,C(w_{t-n+1}))<br>$$<br><img src="/2023/01/09/zero-to-chatgpt/NNLM.png" alt="NNLM"><br>由于当时的计算机技术的限制，神经网络语言模型的概率结果往往都不好（一层MLP效果肯定好不了），所以当时主要还是用这个形式训练词向量。</p>
 <h2><span id="sheng-ji">升级</span><a href="#sheng-ji" class="header-anchor"></a></h2><p>随着数据、算力、模型架构、范式等的升级，神经网络语言模型也得到了长足的发展。如模型架构从 mlp 到cnn/rnn 又到目前的transformer-base ，对应的能力也在不断发展，从之前只对$P(w_i|w_{i-1})$ 建模，通过”“并行”或“串行” 的方式，也可以对$P(w_i^n)$建模。求解NLP task 从原来的word2vector + ML 发展为pretrain + fine-tuning。目前最有代表性的就是BERT和GPT。<br><img src="/2023/01/09/zero-to-chatgpt/bert.jpeg" alt="BERT"><br><img src="/2023/01/09/zero-to-chatgpt/GPT.jpeg" alt="GPT"></p>
 <p>BERT: 双向，autoencoding，MLM，encoder</p>
@@ -3453,53 +3496,10 @@
         <category>NLP</category>
       </categories>
       <tags>
+        <tag>LLM</tag>
+        <tag>In-context learning</tag>
         <tag>GPT-3</tag>
-        <tag>In-context learning</tag>
-        <tag>LLM</tag>
         <tag>ChatGPT</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>few-shot视角下的fine-tuning</title>
-    <url>/2023/02/01/fine-tuning-at-few-shot/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#few-shot">few-shot</a></li>
-<li><a href="#fine-tuning">fine-tuning</a><ul>
-<li><a href="#supervised-fine-tuning">supervised fine-tuning</a></li>
-<li><a href="#instruction-tuning">instruction-tuning</a></li>
-<li><a href="#prompt-tuning">prompt tuning</a></li>
-<li><a href="#reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</a></li>
-</ul>
-</li>
-<li><a href="#qi-fa">启发</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-<p></div><br>LLM 目前的使用方式主要是zero-shot/few-shot,其是从context中的examle 数量来区分的，如果按这个角度进一步概括目前的fine-tuning 方案，感觉是个有趣的视角。<br><img src="/2023/02/01/fine-tuning-at-few-shot/few-shot.PNG" alt></p>
-<h1><span id="few-shot">few-shot</span><a href="#few-shot" class="header-anchor"></a></h1><p>目前LLM 的使用方式主要是zero-shot/few-shot，而通常few-shot 的性能也比zero-shot 要好，而且随着example 的数量的增加，few-shot 的性能也可能进一步提升；zero-shot 时只给出task input 效果可能不佳，通常需要给出对应的task description，而更”精准“ 的task description 通常也能得到更好的zero-shot 效果。<br>所以，提升LLM zero-shot /few-shot 的性能，主要的方式有两个：</p>
-<ol>
-<li>给出更”好“的task description</li>
-<li>给出更多的example</li>
-</ol>
-<h1><span id="fine-tuning">fine-tuning</span><a href="#fine-tuning" class="header-anchor"></a></h1><h2><span id="supervised-fine-tuning">supervised fine-tuning</span><a href="#supervised-fine-tuning" class="header-anchor"></a></h2><p>对于小模型来说，其in-context learning 能力较弱，性能不理想。为了提升模型的性能，一个可以尝试的方向是增加context 中的example 数量，但是由于模型的context 窗口有限，不支持我们无限制的将更多的example 塞进context 中，所以我们变通一下，采用通过更新参数的方式将example 塞进“context”。此时可以看作是无限example（inf-shot)；</p>
-<h2><span id="instruction-tuning">instruction-tuning</span><a href="#instruction-tuning" class="header-anchor"></a></h2><p>通常在supervised fine-tuning 时，我们是将一个任务的example “塞”进context，而instruction-tuning 可以看作是同时将多个任务的example “塞”进context，为了在使用时区分应该当前context 里应该使用哪些example，我们在不同的task 前面增加对应的description，作为判断依据。即：同时将多个任务的多个example 塞进模型的context 中，使用时通过不同的task description 来区分当前context 内的example 应该是哪些。</p>
-<h2><span id="prompt-tuning">prompt tuning</span><a href="#prompt-tuning" class="header-anchor"></a></h2><p>由于pretrain model 的任务是预测下一个token，而非处理用户的指令（instruction），为了提升模型zero-shot 的性能，一个可以尝试的方法就是找到模型视角下更好的task description（pattern），prompt-tuning 的思路即通过大量的监督样本，尝试寻找到更适应模型的task description，然后期望这个task description 能提高模型的zero-shot 的性能。</p>
-<h2><span id="reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</span><a href="#reinforcement-learning-with-human-feedback" class="header-anchor"></a></h2><p>prompt-tuning 时，我们尝试找到模型视角下更好的task description，而这个方法显然是不利于交互的，更好的方式是让模型理解人类视角下的task description。rlhf 就是按照这个思路，让模型反过来更好的理解人类视角下的task description，使得交互更方便。</p>
-<h1><span id="qi-fa">启发</span><a href="#qi-fa" class="header-anchor"></a></h1><p>从这个视角看，我们发现即使是小模型，也是有一定的in-context learning 的能力的，只是不够强，所以我们需要更多的example 他才能发挥出更好的效果；<br>pretrain+fine-tuning 的模式之所以能work，是因为pretrain 后的model 有in-context learning 的能力，in-context learning 并不要求task 的形式与pretrain 的一致，所以我们才能在pretrain 的基础上根据下游任务的不同，来构造不同的fine-tuning 过程，在few-shot 视角下，其对应的是在context 中”塞“进更多的example；<br>in-context learning 的增强，对应的是所需的样本逐渐减少，从supervised fine-tuning 的大量样本到few-shot 的少量样本最终到zero-shot 的不需要提供样本，只需提供任务描述。</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文是笔者最近思考pretrain + fine-tuning 模式为什么能work 时，通过在few-shot 视角下的一个解释。通过该思路，笔者尝试将目前的fine-tuning 主流思路统一起来。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>太空视角下的喜马拉雅山脉</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>In-context learning</tag>
-        <tag>LLM</tag>
-        <tag>fine-tuning</tag>
       </tags>
   </entry>
 </search>
