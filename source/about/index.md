@@ -20,6 +20,8 @@ date: 2019-10-05 07:48:20
 Backend -> BigData -> Machine Learning -> NLP
 **生活尝试**
 每周跑步二十公里以上    2019.09.25 -> now
+**联系我**
+![wechat](./Wechat.jpeg)
 
 # 计划
 Updating...
