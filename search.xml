@@ -65,6 +65,29 @@
       </tags>
   </entry>
   <entry>
+    <title>python中的多线程</title>
+    <url>/2019/10/13/multiThreads/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<!-- tocstop -->
+</div>
+
+<p>  最近在看Python的多线程，经常我们会听到老手说：“Python下多线程是鸡肋，推荐使用多进程！”，但是为什么这么说呢？<br>要知其然，更要知其所以然。所以有了下面的深入研究：<br>首先强调背景：<br><strong>1. GIL是什么？</strong><br>  GIL的全称是Global Interpreter Lock(全局解释器锁)，来源是python设计之初的考虑，为了数据安全所做的决定。</p>
+<p><strong>2. 每个CPU在同一时间只能执行一个线程</strong><br>  在单核CPU下的多线程其实都只是并发，不是并行，并发和并行从宏观上来讲都是同时处理多路请求的概念。但并发和并行又有区别，并行是指两个或者多个事件在同一时刻发生；而并发是指两个或多个事件在同一时间间隔内发生。<br>在Python多线程下，每个线程的执行方式：<br>    <strong><strong>获取GIL</strong></strong><br>    <strong><strong>执行代码直到sleep或者是python虚拟机将其挂起。</strong></strong><br>    <strong><strong>释放GIL</strong></strong></p>
+<p>  可见，某个线程想要执行，必须先拿到GIL，我们可以把GIL看作是“通行证”，并且在一个python进程中，GIL只有一个。拿不到通行证的线程，就不允许进入CPU执行。<br>在Python2.x里，GIL的释放逻辑是当前线程遇见IO操作或者ticks计数达到100（ticks可以看作是Python自身的一个计数器，专门作用于GIL，每次释放后归零，这个计数可以通过 sys.setcheckinterval 来调整），进行释放。而每次释放GIL锁，线程进行锁竞争、切换线程，会消耗资源。并且由于GIL锁存在，python里一个进程永远只能同时执行一个线程(拿到GIL的线程才能执行)，这就是为什么在多核CPU上，python的多线程效率并不高。那么是不是python的多线程就完全没用了呢？在这里我们进行分类讨论：</p>
+<p>  <strong>CPU密集型</strong><br>  CPU密集型代码包括各种循环处理、计数等等，在这种情况下，由于计算工作多，ticks计数很快就会达到阈值，然后触发GIL的释放与再竞争（多个线程来回切换当然是需要消耗资源的），所以python下的多线程对CPU密集型代码并不友好。</p>
+<p>  <strong>IO密集型</strong><br>  IO密集型代码包括文件处理、网络爬虫等，多线程能够有效提升效率(单线程下有IO操作会进行IO等待，造成不必要的时间浪费，而开启多线程能在线程A等待时，自动切换到线程B，可以不浪费CPU的资源，从而能提升程序执行效率)。所以python的多线程对IO密集型代码比较友好。<br>而在python3.x中，GIL不使用ticks计数，改为使用计时器（执行时间达到阈值后，当前线程释放GIL），这样对CPU密集型程序更加友好，但依然没有解决GIL导致的同一时间只能执行一个线程的问题，所以效率依然不尽如人意。<br>请注意：多核多线程比单核多线程更差，原因是单核下的多线程，每次释放GIL，唤醒的那个线程都能获取到GIL锁，所以能够无缝执行，但多核下，CPU0释放GIL后，其他CPU上的线程都会进行竞争，但GIL可能会马上又被CPU0拿到，导致其他几个CPU上被唤醒后的线程会醒着等待到切换时间后又进入待调度状态，这样会造成线程颠簸(thrashing)，导致效率更低。<br>回到最开始的问题：经常我们会听到老手说：“python下想要充分利用多核CPU，就用多进程”，原因是什么呢？<br>原因是：每个进程有各自独立的GIL，互不干扰，这样就可以真正意义上的并行执行，所以在python中，多进程的执行效率优于多线程(仅仅针对多核CPU而言)。<br>所以在这里说结论：多核下，想做并行提升效率，比较通用的方法是使用多进程，能够有效提高执行效率</p>
+<p><strong>关于头图</strong><br>摄于首开广场</p>
+]]></content>
+      <categories>
+        <category>Programming</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>逻辑回归与最大熵模型</title>
     <url>/2019/10/13/logistic/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><p><strong>最大熵是概论模型学习的一个准则。</strong></p>
@@ -107,20 +130,25 @@
       </tags>
   </entry>
   <entry>
-    <title>python中的多线程</title>
-    <url>/2019/10/13/multiThreads/</url>
+    <title>python中实现单例模式</title>
+    <url>/2019/10/13/singleton/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
 
 <!-- toc -->
 <!-- tocstop -->
 </div>
 
-<p>  最近在看Python的多线程，经常我们会听到老手说：“Python下多线程是鸡肋，推荐使用多进程！”，但是为什么这么说呢？<br>要知其然，更要知其所以然。所以有了下面的深入研究：<br>首先强调背景：<br><strong>1. GIL是什么？</strong><br>  GIL的全称是Global Interpreter Lock(全局解释器锁)，来源是python设计之初的考虑，为了数据安全所做的决定。</p>
-<p><strong>2. 每个CPU在同一时间只能执行一个线程</strong><br>  在单核CPU下的多线程其实都只是并发，不是并行，并发和并行从宏观上来讲都是同时处理多路请求的概念。但并发和并行又有区别，并行是指两个或者多个事件在同一时刻发生；而并发是指两个或多个事件在同一时间间隔内发生。<br>在Python多线程下，每个线程的执行方式：<br>    <strong><strong>获取GIL</strong></strong><br>    <strong><strong>执行代码直到sleep或者是python虚拟机将其挂起。</strong></strong><br>    <strong><strong>释放GIL</strong></strong></p>
-<p>  可见，某个线程想要执行，必须先拿到GIL，我们可以把GIL看作是“通行证”，并且在一个python进程中，GIL只有一个。拿不到通行证的线程，就不允许进入CPU执行。<br>在Python2.x里，GIL的释放逻辑是当前线程遇见IO操作或者ticks计数达到100（ticks可以看作是Python自身的一个计数器，专门作用于GIL，每次释放后归零，这个计数可以通过 sys.setcheckinterval 来调整），进行释放。而每次释放GIL锁，线程进行锁竞争、切换线程，会消耗资源。并且由于GIL锁存在，python里一个进程永远只能同时执行一个线程(拿到GIL的线程才能执行)，这就是为什么在多核CPU上，python的多线程效率并不高。那么是不是python的多线程就完全没用了呢？在这里我们进行分类讨论：</p>
-<p>  <strong>CPU密集型</strong><br>  CPU密集型代码包括各种循环处理、计数等等，在这种情况下，由于计算工作多，ticks计数很快就会达到阈值，然后触发GIL的释放与再竞争（多个线程来回切换当然是需要消耗资源的），所以python下的多线程对CPU密集型代码并不友好。</p>
-<p>  <strong>IO密集型</strong><br>  IO密集型代码包括文件处理、网络爬虫等，多线程能够有效提升效率(单线程下有IO操作会进行IO等待，造成不必要的时间浪费，而开启多线程能在线程A等待时，自动切换到线程B，可以不浪费CPU的资源，从而能提升程序执行效率)。所以python的多线程对IO密集型代码比较友好。<br>而在python3.x中，GIL不使用ticks计数，改为使用计时器（执行时间达到阈值后，当前线程释放GIL），这样对CPU密集型程序更加友好，但依然没有解决GIL导致的同一时间只能执行一个线程的问题，所以效率依然不尽如人意。<br>请注意：多核多线程比单核多线程更差，原因是单核下的多线程，每次释放GIL，唤醒的那个线程都能获取到GIL锁，所以能够无缝执行，但多核下，CPU0释放GIL后，其他CPU上的线程都会进行竞争，但GIL可能会马上又被CPU0拿到，导致其他几个CPU上被唤醒后的线程会醒着等待到切换时间后又进入待调度状态，这样会造成线程颠簸(thrashing)，导致效率更低。<br>回到最开始的问题：经常我们会听到老手说：“python下想要充分利用多核CPU，就用多进程”，原因是什么呢？<br>原因是：每个进程有各自独立的GIL，互不干扰，这样就可以真正意义上的并行执行，所以在python中，多进程的执行效率优于多线程(仅仅针对多核CPU而言)。<br>所以在这里说结论：多核下，想做并行提升效率，比较通用的方法是使用多进程，能够有效提高执行效率</p>
-<p><strong>关于头图</strong><br>摄于首开广场</p>
+<p>python中实现单例模式的方式大致有四种：<br>1.模块<br>2.改写类的<strong>new</strong>方法，控制实例生成<br>3.装饰器<br>4.元类</p>
+<p>1.模块<br>python中的模块是天然的单例模式，并且是线程安全的，所有的模块只会在运行时加载一次。<br>所以，利用模块就可以实现一个线程安全的单例。如：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># my singleton.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">My_singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">my_singleton = My_singleton()</span><br></pre></td></tr></table></figure></p>
+<ol start="2">
+<li><strong>new</strong>方法<br>python中每个类在实例化对象时，首先会调用<strong>new</strong>方法创建一个实例，然后再调用<strong>init</strong>方法动态绑定其他属性.如：<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    _instance = <span class="literal">None</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(cls, *args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> cls._instance:</span><br><span class="line">            cls._instance = super(Singleton, cls).__new__(cls, *args, **kw)  </span><br><span class="line">        <span class="keyword">return</span> cls._instance  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(Singleton)</span>:</span>  </span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>3.装饰器<br>装饰器可以动态的修改一个类或方法的表现，利用装饰器生成单例<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">singleton</span><span class="params">(cls)</span>:</span></span><br><span class="line">    instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @wraps(cls)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getinstance</span><span class="params">(*args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> instances:</span><br><span class="line">            instances[cls] = cls(*args, **kw)</span><br><span class="line">        <span class="keyword">return</span> instances[cls]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> getinstance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@singleton</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>4.元类<br>元类可以控制其子类的类对象(<strong>new</strong>)及类实例对象(<strong>call</strong>)的创建。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(type)</span>:</span></span><br><span class="line">    _instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(cls, *args, **kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> cls._instances:</span><br><span class="line">            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> cls._instances[cls]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Python2</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    __metaclass__ = Singleton</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Python3</span></span><br><span class="line">    <span class="comment"># class MyClass(metaclass=Singleton):</span></span><br><span class="line">    <span class="comment">#    pass</span></span><br></pre></td></tr></table></figure></p>
+<p>最著名的就是Django中的ORM，其model中就使用了元类来控制所有model的表现</p>
+<p><strong>关于头图</strong></p>
+<p>摄于内蒙古乌兰布统草原</p>
 ]]></content>
       <categories>
         <category>Programming</category>
@@ -197,34 +225,6 @@
       </categories>
       <tags>
         <tag>Language Model</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>python中实现单例模式</title>
-    <url>/2019/10/13/singleton/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<!-- tocstop -->
-</div>
-
-<p>python中实现单例模式的方式大致有四种：<br>1.模块<br>2.改写类的<strong>new</strong>方法，控制实例生成<br>3.装饰器<br>4.元类</p>
-<p>1.模块<br>python中的模块是天然的单例模式，并且是线程安全的，所有的模块只会在运行时加载一次。<br>所以，利用模块就可以实现一个线程安全的单例。如：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># my singleton.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">My_singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">my_singleton = My_singleton()</span><br></pre></td></tr></table></figure></p>
-<ol start="2">
-<li><strong>new</strong>方法<br>python中每个类在实例化对象时，首先会调用<strong>new</strong>方法创建一个实例，然后再调用<strong>init</strong>方法动态绑定其他属性.如：<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    _instance = <span class="literal">None</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(cls, *args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> cls._instance:</span><br><span class="line">            cls._instance = super(Singleton, cls).__new__(cls, *args, **kw)  </span><br><span class="line">        <span class="keyword">return</span> cls._instance  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(Singleton)</span>:</span>  </span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>3.装饰器<br>装饰器可以动态的修改一个类或方法的表现，利用装饰器生成单例<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">singleton</span><span class="params">(cls)</span>:</span></span><br><span class="line">    instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @wraps(cls)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getinstance</span><span class="params">(*args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> instances:</span><br><span class="line">            instances[cls] = cls(*args, **kw)</span><br><span class="line">        <span class="keyword">return</span> instances[cls]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> getinstance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@singleton</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
-<p>4.元类<br>元类可以控制其子类的类对象(<strong>new</strong>)及类实例对象(<strong>call</strong>)的创建。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(type)</span>:</span></span><br><span class="line">    _instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(cls, *args, **kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> cls._instances:</span><br><span class="line">            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> cls._instances[cls]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Python2</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    __metaclass__ = Singleton</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Python3</span></span><br><span class="line">    <span class="comment"># class MyClass(metaclass=Singleton):</span></span><br><span class="line">    <span class="comment">#    pass</span></span><br></pre></td></tr></table></figure></p>
-<p>最著名的就是Django中的ORM，其model中就使用了元类来控制所有model的表现</p>
-<p><strong>关于头图</strong></p>
-<p>摄于内蒙古乌兰布统草原</p>
-]]></content>
-      <categories>
-        <category>Programming</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -417,60 +417,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Glove模型</title>
-    <url>/2019/10/17/glove/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#yi-zheng-ti-si-lu">一、整体思路</a></li>
-<li><a href="#er-ji-ben-jia-she">二、基本假设</a></li>
-<li><a href="#san-mo-xing">三、模型</a></li>
-<li><a href="#si-dui-bi">四、对比</a></li>
-<li><a href="#wu-si-kao">五、思考</a></li>
-<li><a href="#zai-si-kao">再思考：</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="yi-zheng-ti-si-lu">一、整体思路</span><a href="#yi-zheng-ti-si-lu" class="header-anchor"></a></h1><p>获取词向量基本上有两种思路：</p>
-<ul>
-<li>1.利用全局统计信息，进行矩阵分解（如LSA）来获取词向量，这样获得的词向量往往在词相似性任务上表现不好，表明这是一个次优的向量空间结构；</li>
-<li>2.利用局部上下文窗口单独训练，但是统计信息作为有用的先验知识，没有很好的利用到。   </li>
-</ul>
-<p>Glove：结合两种训练方式，获取更好的词向量</p>
-<h1><span id="er-ji-ben-jia-she">二、基本假设</span><a href="#er-ji-ben-jia-she" class="header-anchor"></a></h1><p>词的共现次数与其语义的相关性往往不是严格成比例，所以直接用共线性来表征词之间相关性效果不好，因此，作者通过引入第三个词，通过词之间的差异来刻画相关性。差异选择用两个词与同一个词的共现概率的次数来更好的判断词之间的相关性。比率：$ratio_{i,j,k}=\frac{Pi,k}{Pj,k} $<br>看下面这个例子：<br><img src="/2019/10/17/glove/table1.png" alt="image.png"><br>ice 与solid相关性高，而steam与solid相关性弱，对应比例大于1；ice与gas相关性弱，steam与gas相关性高，对应比例小于1，ice与steam都与water相关，对应比例约等于1，ice与steam与fashion都不相关，对应比例也是约等于1.<br>相关性的规律：<br><img src="/2019/10/17/glove/ratio.png" alt="image.png"></p>
-<h1><span id="san-mo-xing">三、模型</span><a href="#san-mo-xing" class="header-anchor"></a></h1><p>模型的数学形式为：<br><img src="/2019/10/17/glove/1.png" alt><br>其中$w_i$, $w_j$ 与$w_k$分属不同的两个词向量空间（参考skipgram），对于F函数，我们希望他能够在向量空间内预测$p(P_{ik}/P_{jk})$这个比率，由于向量空间的线性结构，最自然的方式就是用向量的差，即：<br><img src="/2019/10/17/glove/2.png" alt><br>等式的右侧是一个标量，左侧F函数可以是一个复杂函数，而我们上面提到我们希望捕捉向量的线性结构，所以避免使用复杂函数，首先将参数做内积：<br><img src="/2019/10/17/glove/3.png" alt><br>在窗口滑动的过程中，中心词与上下文词的角色会相互转化，但是当词的位置互换后，其相关性应该是保持一致的，所以，F函数需要对<code>和</code>操作与<code>商</code>操作上同态（这里同态的意思是F函数在左右两侧应该是一致的，也就是 $F((w_i - w_j)）= F(w_i) / F(w_j)$：<br><img src="/2019/10/17/glove/4.png" alt><br>其中：<br><img src="/2019/10/17/glove/5.png" alt></p>
-<p>为了解决 上式4，F函数的形式就是exp(指数形式），最终求解后：<br><img src="/2019/10/17/glove/6.png" alt><br>上式中，等式左侧是对称的，即$W_i^T*W_j = W_j^T*W_i$, 而右侧是不对称的，即$log(p_{ij}) != log(P_{ji})$. 如果上式的右侧没有$log(x_i)$,则等式的左右就对称了，考虑到与$k$无关，所以把这一项并入到$i$的偏差项中，即：<br><img src="/2019/10/17/glove/7.png" alt><br>由于上式中有$log$，所以需要处理0值，同时，对于低频与高频的共线词都不能过度训练，于是，优化目标就变成了：<br><img src="/2019/10/17/glove/8.png" alt><br>其中，权重函数$f(x)$需要满足：</p>
-<ul>
-<li>1， f(0)=0</li>
-<li>2, 非减以避免低频共现过度训练</li>
-<li>3，抑制高频共现避免过度训练<br>最后采用的$f(x)$ 形式为：<br><img src="/2019/10/17/glove/9.png" alt><br>实验中他们采用的是xmax=100, a=3/4<br><img src="/2019/10/17/glove/scratch.png" alt="完整过程"></li>
-</ul>
-<h1><span id="si-dui-bi">四、对比</span><a href="#si-dui-bi" class="header-anchor"></a></h1><p>与局部窗口方式对比：<br><img src="/2019/10/17/glove/comp.png" alt="与local window对比"><br>优化目标使用不同的损失函数，并带有调和函数来降低高频词的影响。<br>语义相似性结果对比：<br><img src="/2019/10/17/glove/result.png" alt="不同模型对比"></p>
-<h1><span id="wu-si-kao">五、思考</span><a href="#wu-si-kao" class="header-anchor"></a></h1><ul>
-<li>1.相对与word2vec, Glove引入了词频统计信息，这是很重要的全局信息。</li>
-<li>2.word2vec的训练次数与词频相关，Glove的训练中词频是loss的weight，高频低频词的overweight的情况更低。</li>
-<li>3.将基于局部窗口的模型中，相同词进行合并，修改对应object：<img src="/2019/10/17/glove/13.png" alt><br>其中$H$为交叉熵，相对Glove的object：<br><img src="/2019/10/17/glove/16.png" alt><br>loss由交叉熵改为最小二乘，$X_i$改为$f(X_i)$函数进行调和。</li>
-<li>4.Glove中的左右词向量也是两个不同的词向量空间，与word2vec一样，虽然Glove模型上看上去可以使用同一个词向量空间做，但是作者说是因为更好优化且模型更稳定，不同的时，最后的结果是左右词向量求和（虽然word2vec也可以这么做）</li>
-</ul>
-<p>Demo:<a href="https://github.com/xv44586/Papers/blob/master/NLP/WordVector/GloveDemo.ipynb" target="_blank" rel="noopener">https://github.com/xv44586/Papers/blob/master/NLP/WordVector/GloveDemo.ipynb</a></p>
-<hr>
-<h1><span id="zai-si-kao">再思考：</span><a href="#zai-si-kao" class="header-anchor"></a></h1><ul>
-<li>1.通常我们都是根据模型来推导其对应的性质，而Glove是因为其应该具有的性质，来反推模型，这种方式也给人提供了一种新思路。</li>
-<li>2.为什么两种模型都有两套词向量空间（中心词向量和上下文词向量）？虽然两个作者都说是因为更好优化且模型更稳定，那有没有更合理的理论上的解释呢？我的理解是：对于word2vec，模型直接对概率$p(w|context)$,如skipgram中，直接对$P(w_2|w_1)$进行建模，而$P(w_2|w_1$)与$P(w_1|w_2)$并不一定相等，所以需要针对词的位置区分，也就是需要两套不一样的词向量空间；而Glove中，如上文中公式（6）所示，模型右侧有一个与位置有关的参数，虽然通过引入两个bias可以一定程度上消除这个位置相关的参数，但是这个参数并不是均匀分布，所以仅通过bias不能完全解决这个问题，而引入两个不同的词向量空间，相当于是引入了位置信息，这样能更好的解决这个问题。其最本质的原因是在窗口滑动过程中，词位置变化的同时信息可能是不对称的，即以a为中心词的窗口中的b在以b为窗口时，a可能丢失。</li>
-<li>3.对于上式8，存在一个比较严重的问题，模型为了消去位置相关参数，将其吸收进bias内，而这个bias的引入，就导致了一个严重的问题，即模型不适定。<br><img src="/2019/10/17/glove/ret.png" alt><br>即当你求得一组解后，你可以给这组解加上一个常数向量，其还是一组解。那这个问题就很严重了，你无法评估你得到的解是哪组解。如果加上的是非常大的常数向量，那这组词向量在很多度量上就失去了意义（如余弦距离）<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>摄于北京某水库</li>
-</ul>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>Glove</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Dropout--深度神经网络中的Bagging</title>
     <url>/2019/10/17/dropout/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -525,6 +471,60 @@
       </categories>
       <tags>
         <tag>Random Forest</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Glove模型</title>
+    <url>/2019/10/17/glove/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#yi-zheng-ti-si-lu">一、整体思路</a></li>
+<li><a href="#er-ji-ben-jia-she">二、基本假设</a></li>
+<li><a href="#san-mo-xing">三、模型</a></li>
+<li><a href="#si-dui-bi">四、对比</a></li>
+<li><a href="#wu-si-kao">五、思考</a></li>
+<li><a href="#zai-si-kao">再思考：</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<h1><span id="yi-zheng-ti-si-lu">一、整体思路</span><a href="#yi-zheng-ti-si-lu" class="header-anchor"></a></h1><p>获取词向量基本上有两种思路：</p>
+<ul>
+<li>1.利用全局统计信息，进行矩阵分解（如LSA）来获取词向量，这样获得的词向量往往在词相似性任务上表现不好，表明这是一个次优的向量空间结构；</li>
+<li>2.利用局部上下文窗口单独训练，但是统计信息作为有用的先验知识，没有很好的利用到。   </li>
+</ul>
+<p>Glove：结合两种训练方式，获取更好的词向量</p>
+<h1><span id="er-ji-ben-jia-she">二、基本假设</span><a href="#er-ji-ben-jia-she" class="header-anchor"></a></h1><p>词的共现次数与其语义的相关性往往不是严格成比例，所以直接用共线性来表征词之间相关性效果不好，因此，作者通过引入第三个词，通过词之间的差异来刻画相关性。差异选择用两个词与同一个词的共现概率的次数来更好的判断词之间的相关性。比率：$ratio_{i,j,k}=\frac{Pi,k}{Pj,k} $<br>看下面这个例子：<br><img src="/2019/10/17/glove/table1.png" alt="image.png"><br>ice 与solid相关性高，而steam与solid相关性弱，对应比例大于1；ice与gas相关性弱，steam与gas相关性高，对应比例小于1，ice与steam都与water相关，对应比例约等于1，ice与steam与fashion都不相关，对应比例也是约等于1.<br>相关性的规律：<br><img src="/2019/10/17/glove/ratio.png" alt="image.png"></p>
+<h1><span id="san-mo-xing">三、模型</span><a href="#san-mo-xing" class="header-anchor"></a></h1><p>模型的数学形式为：<br><img src="/2019/10/17/glove/1.png" alt><br>其中$w_i$, $w_j$ 与$w_k$分属不同的两个词向量空间（参考skipgram），对于F函数，我们希望他能够在向量空间内预测$p(P_{ik}/P_{jk})$这个比率，由于向量空间的线性结构，最自然的方式就是用向量的差，即：<br><img src="/2019/10/17/glove/2.png" alt><br>等式的右侧是一个标量，左侧F函数可以是一个复杂函数，而我们上面提到我们希望捕捉向量的线性结构，所以避免使用复杂函数，首先将参数做内积：<br><img src="/2019/10/17/glove/3.png" alt><br>在窗口滑动的过程中，中心词与上下文词的角色会相互转化，但是当词的位置互换后，其相关性应该是保持一致的，所以，F函数需要对<code>和</code>操作与<code>商</code>操作上同态（这里同态的意思是F函数在左右两侧应该是一致的，也就是 $F((w_i - w_j)）= F(w_i) / F(w_j)$：<br><img src="/2019/10/17/glove/4.png" alt><br>其中：<br><img src="/2019/10/17/glove/5.png" alt></p>
+<p>为了解决 上式4，F函数的形式就是exp(指数形式），最终求解后：<br><img src="/2019/10/17/glove/6.png" alt><br>上式中，等式左侧是对称的，即$W_i^T*W_j = W_j^T*W_i$, 而右侧是不对称的，即$log(p_{ij}) != log(P_{ji})$. 如果上式的右侧没有$log(x_i)$,则等式的左右就对称了，考虑到与$k$无关，所以把这一项并入到$i$的偏差项中，即：<br><img src="/2019/10/17/glove/7.png" alt><br>由于上式中有$log$，所以需要处理0值，同时，对于低频与高频的共线词都不能过度训练，于是，优化目标就变成了：<br><img src="/2019/10/17/glove/8.png" alt><br>其中，权重函数$f(x)$需要满足：</p>
+<ul>
+<li>1， f(0)=0</li>
+<li>2, 非减以避免低频共现过度训练</li>
+<li>3，抑制高频共现避免过度训练<br>最后采用的$f(x)$ 形式为：<br><img src="/2019/10/17/glove/9.png" alt><br>实验中他们采用的是xmax=100, a=3/4<br><img src="/2019/10/17/glove/scratch.png" alt="完整过程"></li>
+</ul>
+<h1><span id="si-dui-bi">四、对比</span><a href="#si-dui-bi" class="header-anchor"></a></h1><p>与局部窗口方式对比：<br><img src="/2019/10/17/glove/comp.png" alt="与local window对比"><br>优化目标使用不同的损失函数，并带有调和函数来降低高频词的影响。<br>语义相似性结果对比：<br><img src="/2019/10/17/glove/result.png" alt="不同模型对比"></p>
+<h1><span id="wu-si-kao">五、思考</span><a href="#wu-si-kao" class="header-anchor"></a></h1><ul>
+<li>1.相对与word2vec, Glove引入了词频统计信息，这是很重要的全局信息。</li>
+<li>2.word2vec的训练次数与词频相关，Glove的训练中词频是loss的weight，高频低频词的overweight的情况更低。</li>
+<li>3.将基于局部窗口的模型中，相同词进行合并，修改对应object：<img src="/2019/10/17/glove/13.png" alt><br>其中$H$为交叉熵，相对Glove的object：<br><img src="/2019/10/17/glove/16.png" alt><br>loss由交叉熵改为最小二乘，$X_i$改为$f(X_i)$函数进行调和。</li>
+<li>4.Glove中的左右词向量也是两个不同的词向量空间，与word2vec一样，虽然Glove模型上看上去可以使用同一个词向量空间做，但是作者说是因为更好优化且模型更稳定，不同的时，最后的结果是左右词向量求和（虽然word2vec也可以这么做）</li>
+</ul>
+<p>Demo:<a href="https://github.com/xv44586/Papers/blob/master/NLP/WordVector/GloveDemo.ipynb" target="_blank" rel="noopener">https://github.com/xv44586/Papers/blob/master/NLP/WordVector/GloveDemo.ipynb</a></p>
+<hr>
+<h1><span id="zai-si-kao">再思考：</span><a href="#zai-si-kao" class="header-anchor"></a></h1><ul>
+<li>1.通常我们都是根据模型来推导其对应的性质，而Glove是因为其应该具有的性质，来反推模型，这种方式也给人提供了一种新思路。</li>
+<li>2.为什么两种模型都有两套词向量空间（中心词向量和上下文词向量）？虽然两个作者都说是因为更好优化且模型更稳定，那有没有更合理的理论上的解释呢？我的理解是：对于word2vec，模型直接对概率$p(w|context)$,如skipgram中，直接对$P(w_2|w_1)$进行建模，而$P(w_2|w_1$)与$P(w_1|w_2)$并不一定相等，所以需要针对词的位置区分，也就是需要两套不一样的词向量空间；而Glove中，如上文中公式（6）所示，模型右侧有一个与位置有关的参数，虽然通过引入两个bias可以一定程度上消除这个位置相关的参数，但是这个参数并不是均匀分布，所以仅通过bias不能完全解决这个问题，而引入两个不同的词向量空间，相当于是引入了位置信息，这样能更好的解决这个问题。其最本质的原因是在窗口滑动过程中，词位置变化的同时信息可能是不对称的，即以a为中心词的窗口中的b在以b为窗口时，a可能丢失。</li>
+<li>3.对于上式8，存在一个比较严重的问题，模型为了消去位置相关参数，将其吸收进bias内，而这个bias的引入，就导致了一个严重的问题，即模型不适定。<br><img src="/2019/10/17/glove/ret.png" alt><br>即当你求得一组解后，你可以给这组解加上一个常数向量，其还是一组解。那这个问题就很严重了，你无法评估你得到的解是哪组解。如果加上的是非常大的常数向量，那这组词向量在很多度量上就失去了意义（如余弦距离）<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>摄于北京某水库</li>
+</ul>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>Glove</tag>
       </tags>
   </entry>
   <entry>
@@ -903,33 +903,6 @@
       </tags>
   </entry>
   <entry>
-    <title>有趣的概率统计题</title>
-    <url>/2019/11/30/statistics/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-
-<p>昨晚下雪了，开心😄！</p>
-<h1><span id="fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</span><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti" class="header-anchor"></a></h1><p>一段线段上，任意取两不重合的点，将这条线段切分成三段，问，这三条线段组成三角形点概率是多少？</p>
-<p>现在我们将问题转化一下，假设原始线段长度为1，即$(0，1)$表示原始线段，此时，随机在$(0，1)$范围内选两个点a，b，组成$(0，a)$，$(a，b)$，$(b，1)$三个线段，<br>此时原始问题等价于现在的三个线段组成三角形的概率。<br>现在我们来考虑一下，三条线段分别为$A$， $B$，$C$，其中$A &gt;= B &gt;= C$,则A的长度必定在$[1/3, 1)$,而要组成三角形，则需要 $B + C &gt; A$,所以 B + C 的长度为$(1/2, 1)$,<br>而对应的A的长度也就在[1/3, 1/2)内，所以，最终能构成三角形的概率即为 $A_{triangle} / A_{all} = (1/2 - 1/3) / (1 - 1/3) = 1/4$</p>
-<p>看似非常复杂的问题，从最基本的数学知识就能解答，还真是有趣！ </p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>2019年的第一场雪，摄于望京地铁站</p>
-]]></content>
-      <categories>
-        <category>Math</category>
-      </categories>
-      <tags>
-        <tag>Statistics</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>分享一个有趣的游戏</title>
     <url>/2019/12/09/longton/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -954,6 +927,33 @@
       </categories>
       <tags>
         <tag>Game</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>有趣的概率统计题</title>
+    <url>/2019/11/30/statistics/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+
+<p>昨晚下雪了，开心😄！</p>
+<h1><span id="fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</span><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti" class="header-anchor"></a></h1><p>一段线段上，任意取两不重合的点，将这条线段切分成三段，问，这三条线段组成三角形点概率是多少？</p>
+<p>现在我们将问题转化一下，假设原始线段长度为1，即$(0，1)$表示原始线段，此时，随机在$(0，1)$范围内选两个点a，b，组成$(0，a)$，$(a，b)$，$(b，1)$三个线段，<br>此时原始问题等价于现在的三个线段组成三角形的概率。<br>现在我们来考虑一下，三条线段分别为$A$， $B$，$C$，其中$A &gt;= B &gt;= C$,则A的长度必定在$[1/3, 1)$,而要组成三角形，则需要 $B + C &gt; A$,所以 B + C 的长度为$(1/2, 1)$,<br>而对应的A的长度也就在[1/3, 1/2)内，所以，最终能构成三角形的概率即为 $A_{triangle} / A_{all} = (1/2 - 1/3) / (1 - 1/3) = 1/4$</p>
+<p>看似非常复杂的问题，从最基本的数学知识就能解答，还真是有趣！ </p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>2019年的第一场雪，摄于望京地铁站</p>
+]]></content>
+      <categories>
+        <category>Math</category>
+      </categories>
+      <tags>
+        <tag>Statistics</tag>
       </tags>
   </entry>
   <entry>
@@ -1499,6 +1499,50 @@
       </tags>
   </entry>
   <entry>
+    <title>Knowledge Distillation (1) &amp;#58; 模块替换之bert-of-theseus-下篇</title>
+    <url>/2020/08/19/bert-of-theseus-2/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#fu-xian-shi-de-wen-ti">复现时的问题</a><ul>
+<li><a href="#si-kao-1-wei-shi-me-shi-xiao">思考1：为什么失效</a></li>
+<li><a href="#si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me">思考二 ：bert-of–theseus有效的本质是什么</a></li>
+<li><a href="#shi-yan-1">实验1</a></li>
+<li><a href="#si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing">思考三：直接在predecessor 上抽successor行不行？</a></li>
+<li><a href="#shi-yan-2">实验2</a></li>
+</ul>
+</li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>上一篇<a href="https://xv44586.github.io/2020/08/09/bert-of-theseus/">模块替换之bert-of-theseus-上篇</a>中介绍了bert-of-theseus论文的主要思路，并贴了两组实验的结论，这篇是对上篇的后续一些思考与实验。</p>
+<h1><span id="fu-xian-shi-de-wen-ti">复现时的问题</span><a href="#fu-xian-shi-de-wen-ti" class="header-anchor"></a></h1><p>在复现时，遇到最大的问题就是结果不稳定。首先每次训练predecessor时，其最优结果就会有上下1个点左右的波动，而因为theseus 中引入了随机数<br>来概率替换对应block，所以结果上一言难尽，有时能比12层bert低0.6个点, 有时只能达到直接3层fine tuning 的效果，于是我做了些观察与思考。</p>
+<h2><span id="si-kao-1-wei-shi-me-shi-xiao">思考1：为什么失效</span><a href="#si-kao-1-wei-shi-me-shi-xiao" class="header-anchor"></a></h2><p>在训练theseus model时，其中抽出的successor在每个epoch结束后在验证集上的结果有时会很高，基本到达只比三层fine-tuning低6个点，有时又很<br>低，基本不到0.1%, 第一种明显是successor在theseus中训练太多，以至于接近直接fine tuning，而另一种情况下可能是successor训练不充足，<br>也可能是替换次数太少导致没有被训练，而且大多数情况下successor的验证集上都是不到0.1%。<br>为了验证第二种情况下是否是未替换导致successor在做fine tuning，我将successor进行单独fine tuning后,将得到的classifier 拼回predecessor，<br>发现此时在验证集上d结果只下降了2个点，所以此时大概率是替换次数过少，基本没有训练到successor，所以导致结果不好，而这里开始我以为是我<br>实现问题，后来来来回回检查了一周，也没发现问题，于是我就想换一种更稳定的方式。</p>
+<h2><span id="si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me">思考二 ：bert-of–theseus有效的本质是什么</span><a href="#si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me" class="header-anchor"></a></h2><p>熟悉bert的同学肯定对warm up不陌生，而warm up之所以有效，我认为比较重要的一点是如果在最初的steps中，模型提前拟合了样本，进入了一个局部最优区域，后期无论你怎么迭代他都跳不出来，而由已经<code>fine tuned predecessor</code>带着一起再进行训练，也和warm up有些相似，即用小的<br>步子带着你朝着更优的方向走几步，跳出来，让你有进入更好的局部最优点的可能，此外，概率替换的思路也与<code>Dropout</code>有几分相似，让successor<br>有一定的几率参与训练，从而让successor在缺少predecessor的情况下也有一定的robust。<br><a href="https://spaces.ac.cn/archives/7575" target="_blank" rel="noopener">苏剑林的博客</a>里也提到了替换的数学形式：<br>$$<br>\begin{equation}\begin{aligned}<br>&amp;\varepsilon^{(l)}\sim U(\{0, 1\})\\<br>&amp;x^{(l)} = x_p^{(l)} \times \varepsilon^{(l)} + x_s^{(l)} \times \left(1 - \varepsilon^{(l)}\right)\\<br>&amp;x_p^{(l+1)} = F_p^{(l+1)}\left(x^{(l)}\right)\\<br>&amp;x_s^{(l+1)} = F_s^{(l+1)}\left(x^{(l)}\right)<br>\end{aligned}\end{equation}<br>$$<br>同时，他也提到$\epsilon$能否不取非0即1，那既然我们是想让successor在task方向上warm up一下，那直接相加，即此时 $\epsilon = k$,<br>k是常数也是可以的。此时只要调节k 就能避免successor训练不充分或太充分的情况了，模型也就稳定了，可以满足我们的要求了。</p>
+<h2><span id="shi-yan-1">实验1</span><a href="#shi-yan-1" class="header-anchor"></a></h2><p>实验代码其实比较容易修改，只需将BinaryRandomChoice 层替换为相加即可。具体代码在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_bert_of_theseus.py" target="_blank" rel="noopener">classification_ifytek_bert_of_theseus</a><br>中可以看到。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProportionalAdd</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="string">"""将两层的结果乘比例后相加，output = (input_1 * proportion + input_2 * (1 - proportion)) / 2</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, proportion=<span class="number">0.5</span>, **kwargs)</span>:</span></span><br><span class="line">        super(ProportionalAdd, self).__init__(**kwargs)</span><br><span class="line">        self.supports_masking = <span class="literal">True</span></span><br><span class="line">        self.proportion = proportion</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">compute_mask</span><span class="params">(self, inputs, mask=None)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> mask[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span></span><br><span class="line">        source, target = inputs</span><br><span class="line">        source = source * self.proportion</span><br><span class="line">        target = target * (<span class="number">1</span> - self.proportion)</span><br><span class="line">        output = (source + target)/<span class="number">2</span></span><br><span class="line">        <span class="keyword">return</span> K.in_train_phase(output, target)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">compute_output_shape</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> input_shape[<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+<p>文本分类：CLUE的iflytek数据集</p>
+<p>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 60.11\% &amp; 58.99\%  &amp; 57.96\%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 59.7\%  &amp; 59.5\% \end{array}\\<br>\hline<br>\end{array}<br>$$</p>
+<p>结果上看确实更稳定了，也更好一点点了，基本比predecessor低<code>0.5%~1%</code> .</p>
+<h2><span id="si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing">思考三：直接在predecessor 上抽successor行不行？</span><a href="#si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing" class="header-anchor"></a></h2><p>既然我们说bert-of-theseus有效的原因是在task 的方向进行了warm up，那predecessor已经在task上fine tuned了，能不能<code>直接抽取某几<br>层作为successor来直接fine tuning?</code>此外，之前我们也说了，predecessor与successor的classifer差距很小，那我们能不能改变successor<br>的classifer的学习率，让他进一步学习，来弥补一部分前三层无法拟合的分布呢？</p>
+<h2><span id="shi-yan-2">实验2</span><a href="#shi-yan-2" class="header-anchor"></a></h2><p>具体实验代码<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/two_stage_fine_tuning.py" target="_blank" rel="noopener">two-stage-fine-tuning</a><br>实验时尝试了<code>随机初始化classifier/predecessor classifier初始化classifier/ 放大classifier lr</code>组合策略，最后的结果就不贴了，基本都没有<br>超过3层bert fine tuning的效果。</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>尝试分析了bert-of-theseus复现中的问题，并尝试了一些修复方案，同时，实验测试了theseus model的必要性，最后结论是binary random choice<br>策略不如 proportion add 策略稳定，同时，theseus是必须的。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p><a href="https://github.com/JetRunner/BERT-of-Theseus" target="_blank" rel="noopener">论文原作者配图</a></p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>Distillation</tag>
+        <tag>BERT</tag>
+        <tag>speed-up</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>optimizer of bert</title>
     <url>/2020/08/01/optimizer-in-bert/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -1557,50 +1601,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Knowledge Distillation (1) &amp;#58; 模块替换之bert-of-theseus-下篇</title>
-    <url>/2020/08/19/bert-of-theseus-2/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#fu-xian-shi-de-wen-ti">复现时的问题</a><ul>
-<li><a href="#si-kao-1-wei-shi-me-shi-xiao">思考1：为什么失效</a></li>
-<li><a href="#si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me">思考二 ：bert-of–theseus有效的本质是什么</a></li>
-<li><a href="#shi-yan-1">实验1</a></li>
-<li><a href="#si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing">思考三：直接在predecessor 上抽successor行不行？</a></li>
-<li><a href="#shi-yan-2">实验2</a></li>
-</ul>
-</li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>上一篇<a href="https://xv44586.github.io/2020/08/09/bert-of-theseus/">模块替换之bert-of-theseus-上篇</a>中介绍了bert-of-theseus论文的主要思路，并贴了两组实验的结论，这篇是对上篇的后续一些思考与实验。</p>
-<h1><span id="fu-xian-shi-de-wen-ti">复现时的问题</span><a href="#fu-xian-shi-de-wen-ti" class="header-anchor"></a></h1><p>在复现时，遇到最大的问题就是结果不稳定。首先每次训练predecessor时，其最优结果就会有上下1个点左右的波动，而因为theseus 中引入了随机数<br>来概率替换对应block，所以结果上一言难尽，有时能比12层bert低0.6个点, 有时只能达到直接3层fine tuning 的效果，于是我做了些观察与思考。</p>
-<h2><span id="si-kao-1-wei-shi-me-shi-xiao">思考1：为什么失效</span><a href="#si-kao-1-wei-shi-me-shi-xiao" class="header-anchor"></a></h2><p>在训练theseus model时，其中抽出的successor在每个epoch结束后在验证集上的结果有时会很高，基本到达只比三层fine-tuning低6个点，有时又很<br>低，基本不到0.1%, 第一种明显是successor在theseus中训练太多，以至于接近直接fine tuning，而另一种情况下可能是successor训练不充足，<br>也可能是替换次数太少导致没有被训练，而且大多数情况下successor的验证集上都是不到0.1%。<br>为了验证第二种情况下是否是未替换导致successor在做fine tuning，我将successor进行单独fine tuning后,将得到的classifier 拼回predecessor，<br>发现此时在验证集上d结果只下降了2个点，所以此时大概率是替换次数过少，基本没有训练到successor，所以导致结果不好，而这里开始我以为是我<br>实现问题，后来来来回回检查了一周，也没发现问题，于是我就想换一种更稳定的方式。</p>
-<h2><span id="si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me">思考二 ：bert-of–theseus有效的本质是什么</span><a href="#si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me" class="header-anchor"></a></h2><p>熟悉bert的同学肯定对warm up不陌生，而warm up之所以有效，我认为比较重要的一点是如果在最初的steps中，模型提前拟合了样本，进入了一个局部最优区域，后期无论你怎么迭代他都跳不出来，而由已经<code>fine tuned predecessor</code>带着一起再进行训练，也和warm up有些相似，即用小的<br>步子带着你朝着更优的方向走几步，跳出来，让你有进入更好的局部最优点的可能，此外，概率替换的思路也与<code>Dropout</code>有几分相似，让successor<br>有一定的几率参与训练，从而让successor在缺少predecessor的情况下也有一定的robust。<br><a href="https://spaces.ac.cn/archives/7575" target="_blank" rel="noopener">苏剑林的博客</a>里也提到了替换的数学形式：<br>$$<br>\begin{equation}\begin{aligned}<br>&amp;\varepsilon^{(l)}\sim U(\{0, 1\})\\<br>&amp;x^{(l)} = x_p^{(l)} \times \varepsilon^{(l)} + x_s^{(l)} \times \left(1 - \varepsilon^{(l)}\right)\\<br>&amp;x_p^{(l+1)} = F_p^{(l+1)}\left(x^{(l)}\right)\\<br>&amp;x_s^{(l+1)} = F_s^{(l+1)}\left(x^{(l)}\right)<br>\end{aligned}\end{equation}<br>$$<br>同时，他也提到$\epsilon$能否不取非0即1，那既然我们是想让successor在task方向上warm up一下，那直接相加，即此时 $\epsilon = k$,<br>k是常数也是可以的。此时只要调节k 就能避免successor训练不充分或太充分的情况了，模型也就稳定了，可以满足我们的要求了。</p>
-<h2><span id="shi-yan-1">实验1</span><a href="#shi-yan-1" class="header-anchor"></a></h2><p>实验代码其实比较容易修改，只需将BinaryRandomChoice 层替换为相加即可。具体代码在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_bert_of_theseus.py" target="_blank" rel="noopener">classification_ifytek_bert_of_theseus</a><br>中可以看到。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProportionalAdd</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="string">"""将两层的结果乘比例后相加，output = (input_1 * proportion + input_2 * (1 - proportion)) / 2</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, proportion=<span class="number">0.5</span>, **kwargs)</span>:</span></span><br><span class="line">        super(ProportionalAdd, self).__init__(**kwargs)</span><br><span class="line">        self.supports_masking = <span class="literal">True</span></span><br><span class="line">        self.proportion = proportion</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">compute_mask</span><span class="params">(self, inputs, mask=None)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> mask[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span></span><br><span class="line">        source, target = inputs</span><br><span class="line">        source = source * self.proportion</span><br><span class="line">        target = target * (<span class="number">1</span> - self.proportion)</span><br><span class="line">        output = (source + target)/<span class="number">2</span></span><br><span class="line">        <span class="keyword">return</span> K.in_train_phase(output, target)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">compute_output_shape</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> input_shape[<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
-<p>文本分类：CLUE的iflytek数据集</p>
-<p>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 60.11\% &amp; 58.99\%  &amp; 57.96\%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 59.7\%  &amp; 59.5\% \end{array}\\<br>\hline<br>\end{array}<br>$$</p>
-<p>结果上看确实更稳定了，也更好一点点了，基本比predecessor低<code>0.5%~1%</code> .</p>
-<h2><span id="si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing">思考三：直接在predecessor 上抽successor行不行？</span><a href="#si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing" class="header-anchor"></a></h2><p>既然我们说bert-of-theseus有效的原因是在task 的方向进行了warm up，那predecessor已经在task上fine tuned了，能不能<code>直接抽取某几<br>层作为successor来直接fine tuning?</code>此外，之前我们也说了，predecessor与successor的classifer差距很小，那我们能不能改变successor<br>的classifer的学习率，让他进一步学习，来弥补一部分前三层无法拟合的分布呢？</p>
-<h2><span id="shi-yan-2">实验2</span><a href="#shi-yan-2" class="header-anchor"></a></h2><p>具体实验代码<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/two_stage_fine_tuning.py" target="_blank" rel="noopener">two-stage-fine-tuning</a><br>实验时尝试了<code>随机初始化classifier/predecessor classifier初始化classifier/ 放大classifier lr</code>组合策略，最后的结果就不贴了，基本都没有<br>超过3层bert fine tuning的效果。</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>尝试分析了bert-of-theseus复现中的问题，并尝试了一些修复方案，同时，实验测试了theseus model的必要性，最后结论是binary random choice<br>策略不如 proportion add 策略稳定，同时，theseus是必须的。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p><a href="https://github.com/JetRunner/BERT-of-Theseus" target="_blank" rel="noopener">论文原作者配图</a></p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>Distillation</tag>
-        <tag>BERT</tag>
-        <tag>speed-up</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>模型增强（1）&amp;#58; 利用NLG 增强QA 任务性能</title>
     <url>/2020/08/22/qa-augmentation/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -1644,6 +1644,42 @@
         <tag>QA</tag>
         <tag>NLG</tag>
         <tag>UniLM</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>模型增强（2）&amp;#58; 从label下手</title>
+    <url>/2020/09/13/classification-label-augment/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#gou-zao-xin-label">构造新label</a><ul>
+<li><a href="#zi-jian-du">自监督</a></li>
+<li><a href="#xiang-si-xing">相似性</a></li>
+</ul>
+</li>
+<li><a href="#shi-yan-jie-guo">实验结果</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>上篇<a href="https://xv44586.github.io/2020/08/31/bert-01/">Knowledge Distillation (2): distilling knowledge of bert</a>中我们提到，模型压缩时一个很重要的知识是soft labels，<br>并且提出了一种简单的方式：自蒸馏（self-distillation），而从label 的角度来看，可以看作是一种label augmentation，即构造了一个新的label，为模型新增了一个任务，通过新任务的学习，来提高模型对原来任务的性能。本文就label augmentation 继续脑洞。</p>
+<h1><span id="gou-zao-xin-label">构造新label</span><a href="#gou-zao-xin-label" class="header-anchor"></a></h1><p>构造新label，其实本质上是构造一个与当前任务相关的新的任务，而对应的label则是通过当前样本通过某种方式获得，获得的label至少要比随机好，否则只会帮倒忙。</p>
+<h2><span id="zi-jian-du">自监督</span><a href="#zi-jian-du" class="header-anchor"></a></h2><p>构造新label，我们可以借鉴自监督的方式，如Mask Language Model，AutoRegressive，而BERT中已使用来MLM，UniLM中也告诉我们增加Seq2Seq的AR 任务对NLU任务提高不显著，不过今年的论文<a href="http://arxiv.org/abs/2004.10964" target="_blank" rel="noopener">Don’t Stop Pretraining: Adapt Language Models to Domains and Tasks</a> 实验证明了进一步预训练是能进一步提升下游任务的性能。而当前任务是文本分类，MLM也许不是很合适，所以Seq2Seq 的方式可以尝试。<br>具体的，我们让模型学习目标类别的同时，希望模型能同时生成样本的描述字段（或者人为给定的某种相关性短语），即利用类别对应描述字段构造一个seq2seq任务。</p>
+<h2><span id="xiang-si-xing">相似性</span><a href="#xiang-si-xing" class="header-anchor"></a></h2><p>对于同一个类别的样本，他们必然有某种相似性，至少比与其他类别的样本更相似。而何如构造样本呢？<br>一种简单的方式是对每个样本都从类当中抽取一个样本与他组成一对，然后让每个<code>i</code>样本与<code>i+1</code>样本相似。这种方式由于每次样本都是shuffle 的，只要让batch size 小于label number，一个batch 内同时出现多个同一类别的样本概率就会很小。<br>既然在构造seq2seq任务时，我们使用来label对应的描述，此时我们也可以继续尝试使用：每个样本构造一个新的样本，新样本由label对应描述与label id组成。</p>
+<h1><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h1><p>两组实验结果如下：</p>
+<p>$$<br>\begin{array}{c|c|c}<br>\hline \\<br>\text{seq2seq} &amp; \text{similarity} \\<br>\hline \\<br>59.91\% &amp; 56.9\%<br>\end{array}<br>$$</p>
+<p>可以看到，对于构造seq2seq 任务，其结果与直接fine-tuning 结果基本一致，这也符合预期。而构造相似性任务，其结果直接fine-tuning 结果相比反而更差了。原因可能是样本不均衡，所以同一batch 内有较高概率出现同一类别的样本，同时通过让样本与同一样本相似来间接相似，这种方式可能有些曲折了，不过最根本的原因应该还是batch 内同一类别样本的出现干扰了学习。<br>具体实验代码可以查阅<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_auxiliary_seq2seq_task.py" target="_blank" rel="noopener">classification_ifytek_auxiliary_seq2seq_task</a> 和<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_with_similarity.py" target="_blank" rel="noopener">classification_ifytek_with_similarity</a></p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文只是由于之前实验想到的尝试对label 做增强来实现模型增强的尝试，最后两组实验都没取得什么好的结果。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于翠湖湿地</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>Classification</tag>
       </tags>
   </entry>
   <entry>
@@ -1762,42 +1798,6 @@
       <tags>
         <tag>Distillation</tag>
         <tag>BERT</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>模型增强（2）&amp;#58; 从label下手</title>
-    <url>/2020/09/13/classification-label-augment/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#gou-zao-xin-label">构造新label</a><ul>
-<li><a href="#zi-jian-du">自监督</a></li>
-<li><a href="#xiang-si-xing">相似性</a></li>
-</ul>
-</li>
-<li><a href="#shi-yan-jie-guo">实验结果</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>上篇<a href="https://xv44586.github.io/2020/08/31/bert-01/">Knowledge Distillation (2): distilling knowledge of bert</a>中我们提到，模型压缩时一个很重要的知识是soft labels，<br>并且提出了一种简单的方式：自蒸馏（self-distillation），而从label 的角度来看，可以看作是一种label augmentation，即构造了一个新的label，为模型新增了一个任务，通过新任务的学习，来提高模型对原来任务的性能。本文就label augmentation 继续脑洞。</p>
-<h1><span id="gou-zao-xin-label">构造新label</span><a href="#gou-zao-xin-label" class="header-anchor"></a></h1><p>构造新label，其实本质上是构造一个与当前任务相关的新的任务，而对应的label则是通过当前样本通过某种方式获得，获得的label至少要比随机好，否则只会帮倒忙。</p>
-<h2><span id="zi-jian-du">自监督</span><a href="#zi-jian-du" class="header-anchor"></a></h2><p>构造新label，我们可以借鉴自监督的方式，如Mask Language Model，AutoRegressive，而BERT中已使用来MLM，UniLM中也告诉我们增加Seq2Seq的AR 任务对NLU任务提高不显著，不过今年的论文<a href="http://arxiv.org/abs/2004.10964" target="_blank" rel="noopener">Don’t Stop Pretraining: Adapt Language Models to Domains and Tasks</a> 实验证明了进一步预训练是能进一步提升下游任务的性能。而当前任务是文本分类，MLM也许不是很合适，所以Seq2Seq 的方式可以尝试。<br>具体的，我们让模型学习目标类别的同时，希望模型能同时生成样本的描述字段（或者人为给定的某种相关性短语），即利用类别对应描述字段构造一个seq2seq任务。</p>
-<h2><span id="xiang-si-xing">相似性</span><a href="#xiang-si-xing" class="header-anchor"></a></h2><p>对于同一个类别的样本，他们必然有某种相似性，至少比与其他类别的样本更相似。而何如构造样本呢？<br>一种简单的方式是对每个样本都从类当中抽取一个样本与他组成一对，然后让每个<code>i</code>样本与<code>i+1</code>样本相似。这种方式由于每次样本都是shuffle 的，只要让batch size 小于label number，一个batch 内同时出现多个同一类别的样本概率就会很小。<br>既然在构造seq2seq任务时，我们使用来label对应的描述，此时我们也可以继续尝试使用：每个样本构造一个新的样本，新样本由label对应描述与label id组成。</p>
-<h1><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h1><p>两组实验结果如下：</p>
-<p>$$<br>\begin{array}{c|c|c}<br>\hline \\<br>\text{seq2seq} &amp; \text{similarity} \\<br>\hline \\<br>59.91\% &amp; 56.9\%<br>\end{array}<br>$$</p>
-<p>可以看到，对于构造seq2seq 任务，其结果与直接fine-tuning 结果基本一致，这也符合预期。而构造相似性任务，其结果直接fine-tuning 结果相比反而更差了。原因可能是样本不均衡，所以同一batch 内有较高概率出现同一类别的样本，同时通过让样本与同一样本相似来间接相似，这种方式可能有些曲折了，不过最根本的原因应该还是batch 内同一类别样本的出现干扰了学习。<br>具体实验代码可以查阅<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_auxiliary_seq2seq_task.py" target="_blank" rel="noopener">classification_ifytek_auxiliary_seq2seq_task</a> 和<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_with_similarity.py" target="_blank" rel="noopener">classification_ifytek_with_similarity</a></p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文只是由于之前实验想到的尝试对label 做增强来实现模型增强的尝试，最后两组实验都没取得什么好的结果。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于翠湖湿地</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>Classification</tag>
       </tags>
   </entry>
   <entry>
@@ -1999,55 +1999,6 @@
       </tags>
   </entry>
   <entry>
-    <title>PET-文本分类的又一种妙解</title>
-    <url>/2020/10/25/pet/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#classification-to-nlg">Classification to NLG</a></li>
-<li><a href="#mlm">MLM</a></li>
-<li><a href="#ren-wu-zhuan-huan">任务转换</a></li>
-<li><a href="#pattern-exploiting-training">Pattern-Exploiting Training</a></li>
-<li><a href="#yu-nlg-chai-yi">与NLG差异</a></li>
-<li><a href="#shi-yan">实验</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-<p></div><br>之前的一篇<a href="https://xv44586.github.io/2020/09/13/classification-label-augment/">《模型增强-从label下手》</a>中，我们提到了通过转换label，将分类转换为NLG的方法，而由于性能没有得到增加，所以就没有继续往下做。今天看到两篇文章，思路略微相似，也让我眼前一亮，发现原来我与顶会思路这么近（误），所以总结对比一下。</p>
-<h1><span id="classification-to-nlg">Classification to NLG</span><a href="#classification-to-nlg" class="header-anchor"></a></h1><p>对于分类任务，我们可以将其转换为一个生成任务。比如此时我们有一个样本：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"context：'「天天特价房」华庭仁和国际 3室2厅2卫仅售65万', label: '房产', label_id: 0"</span></span><br></pre></td></tr></table></figure></p>
-<p>通常我们直接预测对应的label id，而由于其也有label，所以我们可以将其转换为一个NLG任务，即：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"context：['「天天特价房」华庭仁和国际 3室2厅2卫仅售65万', '房产']"</span></span><br></pre></td></tr></table></figure></p>
-<p>即通过样本生成label对应的token。借助UniLM同时具有NLU与NLG的能力，只需要很小的改动就可以利用BERT做该任务了，对应的示意图如下：<br><img src="/2020/10/25/pet/unilm.png" alt></p>
-<p>不过当时考虑到UniLM中提到seq2seq的训练<code>不能</code>提高NLU的能力，所以当时并没有选择使用MLM来尝试，最后得到的结论是：</p>
-<p>1.<em> 将分类转为生成后，性能基本一致；</em><br>2.<em> 将分类与生成联合起来训练，性能与单个任务性能基本一致。</em></p>
-<h1><span id="mlm">MLM</span><a href="#mlm" class="header-anchor"></a></h1><p>MLM,即Masked Language Model,中文翻译又叫“掩码语言模型”，即以自监督的方式，mask 掉一部分，然后通过剩余的部分来还原被mask 掉的部分，示意图如下：<br><img src="/2020/10/25/pet/mlm.png" alt></p>
-<p>而mask的方式也有多种，如随机选择token进行mask；将token所在的整个词都mask（whole word mask）；或者将某个span内的token都mask掉（span mask）。<br>虽然mlm在预训练任务上已经被证明十分有效，但是通常认为mlm部分的参数是与mlm任务相关的，而通常在下游任务中我们是别的任务，所以会舍弃掉这部分参数，而只使用encoder部分。<br>但是论文<a href="http://arxiv.org/abs/2009.07118" target="_blank" rel="noopener">It’s Not Just Size That Matters: Small Language Models Are Also Few-Shot Learners</a>与<a href="http://arxiv.org/abs/2001.07676" target="_blank" rel="noopener">Exploiting Cloze Questions for Few Shot Text Classification and Natural Language Inference</a>却告诉我们，mlm不仅有用，在few-shot场景下，通过一下简单的融合手段，性能能超过当前的明星GPT-3.</p>
-<h1><span id="ren-wu-zhuan-huan">任务转换</span><a href="#ren-wu-zhuan-huan" class="header-anchor"></a></h1><p>与之前的思路类似，我们针对分类任务，不再直接对label进行预测，而是预测其label description，即将其转换为完形填空形式的任务，来预测不同label description的概率。<br>而如何转换成完形填空呢？也很简单，我们添加一个简单的语义通顺的描述，然后将其中与分类有关的内容mask掉即可。举个例子：<br>假如我们现在的任务是短文本分类，一个样本为“context：’「天天特价房」华庭仁和国际 3室2厅2卫仅售65万’, label: ‘房产’”，我们添加一个统一的描述句，将其变为：<br>“下面是一则__相关新闻标题: 「天天特价房」华庭仁和国际 3室2厅2卫仅售65万”,其中的空格可选的内容是所有的label description，对应的真实值是”房产”两个字，这样，我们就将分类任务转换为一个完形填空的形式。<br>而添加的方式也可以分为前缀、后缀两种，完整的方式：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"以下是一则__相关新闻标题: 「天天特价房」华庭仁和国际 3室2厅2卫仅售65万"</span></span><br><span class="line"><span class="string">"「天天特价房」华庭仁和国际 3室2厅2卫仅售65万，以上是一则__相关新闻标题"</span></span><br></pre></td></tr></table></figure></p>
-<h1><span id="pattern-exploiting-training">Pattern-Exploiting Training</span><a href="#pattern-exploiting-training" class="header-anchor"></a></h1><p>上面我们添加的前缀/后缀句子称为<code>Pattern</code>, 而label description可以有多种方式，比如，对于“房产”这个label，我们也可以用“地产”来表达，对于“娱乐”label，也可以用“八卦”来表达，所以需要一个token到label的映射，这个映射可以是多对一的，这个被称为<code>Verbalizer</code>,所以在预测时可以将多个token的概率结合起来判断其对应的label。<br>由于是few-shot，为了提高性能，作者采用了与Knowledge Distillation类似的思路，具体方案如下：</p>
-<p>1.<em> 对每个Pattern利用多个pre-train model 进行fine-tuning，得到多个模型.其中$loss=L_{ce} + L_{mlm}$;</em><br>2.<em> 将多个模型的结果进行融合，得到一个融合模型Teacher Model；</em><br>3.<em> 利用Teacher Model在大量unlabed数据上进行预测，得到对应的soft labels；</em><br>4.<em> 利用soft labels数据，训练一个常规的分类模型（非MLM模型）。</em></p>
-<p>以上就是论文<a href="http://arxiv.org/abs/2001.07676" target="_blank" rel="noopener">Exploiting Cloze Questions for Few Shot Text Classification and Natural Language Inference</a>中提到的PET。<br>此外，该论文中还提到了一个改进：iPET。其中的区别是：在ipet中，得到mlm的多个model后，增加一个迭代：每次会从训练mlm的model中抽取一个$m_i$，然后从剩余的model中选取一部分对unlabeled data进行预测，将其中预测结果确定（不是准确，此时意味着结果的熵很小）的部分打上一个fake label，让$m_i$进行训练。重复多次后，融合模型对unlabeled data进行预测，得到一个soft labels data，在此基础上训练一个常规分类器。</p>
-<p>可以看到，PET的方式主要适用label description为有限空间，即选择题，此外，每个样本的label description需要长度相同，而且由于mask之间相互独立，所以长度也不能太长。</p>
-<h1><span id="yu-nlg-chai-yi">与NLG差异</span><a href="#yu-nlg-chai-yi" class="header-anchor"></a></h1><p>在之前的脑洞中，我们将分类任务转变为NLG任务，即利用样本来生成对应的label description，而他与PET中的主要差别主要有几点：</p>
-<p>1.<em> NLG中我们并没有没有限制label description的长度，且不同label对应description也可能是不同长度；</em><br>2.<em> NLG中我们每个token的生成是有依赖关系的，即后面的token会依赖之前的token，所以token长度可以比PET中稍微长一些；</em><br>3.<em> PET中对应的解码空间大大减小，只需要得到label对应token的概率即可;</em><br>4.<em> PET中的pattern可以放在前缀也可以放在后缀，NLG可以看作是后缀PET.</em><br>5.<em> PET 中由于pre-train是mlm任务，所以zero-show性能更好。</em></p>
-<h1><span id="shi-yan">实验</span><a href="#shi-yan" class="header-anchor"></a></h1><p>针对这些差异尝试做了几组实验，验证一下想法。</p>
-<ol>
-<li>NLG中label长度同一且解码时利用PET的方式解码，在few-shot下准确率从$52.4%$上升到$52.9%$，所以生成的label越短，解码空间越小越准确；</li>
-<li>PET前缀pattern下准确率为%53.7%$,所以前缀pattern比后缀性能更好，这也与苏剑林<a href="https://spaces.ac.cn/archives/7764" target="_blank" rel="noopener">《必须要GPT3吗？不，BERT的MLM模型也能小样本学习》</a>的结论一致。</li>
-<li>zero-shot情况下，PET的准确率为$47.2%$, 而NLG只有$17.9%$，考虑到数据集全量下目前最好成绩才$60.7%$,说明PET的方式在zero-shot下效果相当惊人。</li>
-</ol>
-<p>主要实验代码在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_pet_seq2seq.py" target="_blank" rel="noopener">classification_pet_seq2seq</a> 与 <a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_tnews_pet.py" target="_blank" rel="noopener">classification_tnews_pet</a></p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文介绍了一种新的转变分类任务获得更好性能的方法：即将分类任务转化为mlm模型进行完形填空，同时与之前脑洞的将分类转变为生成任务进行对比，通过实验验证了两者的差异与有效性。同时也提醒自己，多想几步，也许就能有新的发现。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>Classification</tag>
-        <tag>Few-shot</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ccf问答匹配比赛</title>
     <url>/2020/11/08/ccf-qa/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -2132,6 +2083,55 @@
         <tag>QA</tag>
         <tag>CCF</tag>
         <tag>Competition</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>PET-文本分类的又一种妙解</title>
+    <url>/2020/10/25/pet/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#classification-to-nlg">Classification to NLG</a></li>
+<li><a href="#mlm">MLM</a></li>
+<li><a href="#ren-wu-zhuan-huan">任务转换</a></li>
+<li><a href="#pattern-exploiting-training">Pattern-Exploiting Training</a></li>
+<li><a href="#yu-nlg-chai-yi">与NLG差异</a></li>
+<li><a href="#shi-yan">实验</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div><br>之前的一篇<a href="https://xv44586.github.io/2020/09/13/classification-label-augment/">《模型增强-从label下手》</a>中，我们提到了通过转换label，将分类转换为NLG的方法，而由于性能没有得到增加，所以就没有继续往下做。今天看到两篇文章，思路略微相似，也让我眼前一亮，发现原来我与顶会思路这么近（误），所以总结对比一下。</p>
+<h1><span id="classification-to-nlg">Classification to NLG</span><a href="#classification-to-nlg" class="header-anchor"></a></h1><p>对于分类任务，我们可以将其转换为一个生成任务。比如此时我们有一个样本：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"context：'「天天特价房」华庭仁和国际 3室2厅2卫仅售65万', label: '房产', label_id: 0"</span></span><br></pre></td></tr></table></figure></p>
+<p>通常我们直接预测对应的label id，而由于其也有label，所以我们可以将其转换为一个NLG任务，即：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"context：['「天天特价房」华庭仁和国际 3室2厅2卫仅售65万', '房产']"</span></span><br></pre></td></tr></table></figure></p>
+<p>即通过样本生成label对应的token。借助UniLM同时具有NLU与NLG的能力，只需要很小的改动就可以利用BERT做该任务了，对应的示意图如下：<br><img src="/2020/10/25/pet/unilm.png" alt></p>
+<p>不过当时考虑到UniLM中提到seq2seq的训练<code>不能</code>提高NLU的能力，所以当时并没有选择使用MLM来尝试，最后得到的结论是：</p>
+<p>1.<em> 将分类转为生成后，性能基本一致；</em><br>2.<em> 将分类与生成联合起来训练，性能与单个任务性能基本一致。</em></p>
+<h1><span id="mlm">MLM</span><a href="#mlm" class="header-anchor"></a></h1><p>MLM,即Masked Language Model,中文翻译又叫“掩码语言模型”，即以自监督的方式，mask 掉一部分，然后通过剩余的部分来还原被mask 掉的部分，示意图如下：<br><img src="/2020/10/25/pet/mlm.png" alt></p>
+<p>而mask的方式也有多种，如随机选择token进行mask；将token所在的整个词都mask（whole word mask）；或者将某个span内的token都mask掉（span mask）。<br>虽然mlm在预训练任务上已经被证明十分有效，但是通常认为mlm部分的参数是与mlm任务相关的，而通常在下游任务中我们是别的任务，所以会舍弃掉这部分参数，而只使用encoder部分。<br>但是论文<a href="http://arxiv.org/abs/2009.07118" target="_blank" rel="noopener">It’s Not Just Size That Matters: Small Language Models Are Also Few-Shot Learners</a>与<a href="http://arxiv.org/abs/2001.07676" target="_blank" rel="noopener">Exploiting Cloze Questions for Few Shot Text Classification and Natural Language Inference</a>却告诉我们，mlm不仅有用，在few-shot场景下，通过一下简单的融合手段，性能能超过当前的明星GPT-3.</p>
+<h1><span id="ren-wu-zhuan-huan">任务转换</span><a href="#ren-wu-zhuan-huan" class="header-anchor"></a></h1><p>与之前的思路类似，我们针对分类任务，不再直接对label进行预测，而是预测其label description，即将其转换为完形填空形式的任务，来预测不同label description的概率。<br>而如何转换成完形填空呢？也很简单，我们添加一个简单的语义通顺的描述，然后将其中与分类有关的内容mask掉即可。举个例子：<br>假如我们现在的任务是短文本分类，一个样本为“context：’「天天特价房」华庭仁和国际 3室2厅2卫仅售65万’, label: ‘房产’”，我们添加一个统一的描述句，将其变为：<br>“下面是一则__相关新闻标题: 「天天特价房」华庭仁和国际 3室2厅2卫仅售65万”,其中的空格可选的内容是所有的label description，对应的真实值是”房产”两个字，这样，我们就将分类任务转换为一个完形填空的形式。<br>而添加的方式也可以分为前缀、后缀两种，完整的方式：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"以下是一则__相关新闻标题: 「天天特价房」华庭仁和国际 3室2厅2卫仅售65万"</span></span><br><span class="line"><span class="string">"「天天特价房」华庭仁和国际 3室2厅2卫仅售65万，以上是一则__相关新闻标题"</span></span><br></pre></td></tr></table></figure></p>
+<h1><span id="pattern-exploiting-training">Pattern-Exploiting Training</span><a href="#pattern-exploiting-training" class="header-anchor"></a></h1><p>上面我们添加的前缀/后缀句子称为<code>Pattern</code>, 而label description可以有多种方式，比如，对于“房产”这个label，我们也可以用“地产”来表达，对于“娱乐”label，也可以用“八卦”来表达，所以需要一个token到label的映射，这个映射可以是多对一的，这个被称为<code>Verbalizer</code>,所以在预测时可以将多个token的概率结合起来判断其对应的label。<br>由于是few-shot，为了提高性能，作者采用了与Knowledge Distillation类似的思路，具体方案如下：</p>
+<p>1.<em> 对每个Pattern利用多个pre-train model 进行fine-tuning，得到多个模型.其中$loss=L_{ce} + L_{mlm}$;</em><br>2.<em> 将多个模型的结果进行融合，得到一个融合模型Teacher Model；</em><br>3.<em> 利用Teacher Model在大量unlabed数据上进行预测，得到对应的soft labels；</em><br>4.<em> 利用soft labels数据，训练一个常规的分类模型（非MLM模型）。</em></p>
+<p>以上就是论文<a href="http://arxiv.org/abs/2001.07676" target="_blank" rel="noopener">Exploiting Cloze Questions for Few Shot Text Classification and Natural Language Inference</a>中提到的PET。<br>此外，该论文中还提到了一个改进：iPET。其中的区别是：在ipet中，得到mlm的多个model后，增加一个迭代：每次会从训练mlm的model中抽取一个$m_i$，然后从剩余的model中选取一部分对unlabeled data进行预测，将其中预测结果确定（不是准确，此时意味着结果的熵很小）的部分打上一个fake label，让$m_i$进行训练。重复多次后，融合模型对unlabeled data进行预测，得到一个soft labels data，在此基础上训练一个常规分类器。</p>
+<p>可以看到，PET的方式主要适用label description为有限空间，即选择题，此外，每个样本的label description需要长度相同，而且由于mask之间相互独立，所以长度也不能太长。</p>
+<h1><span id="yu-nlg-chai-yi">与NLG差异</span><a href="#yu-nlg-chai-yi" class="header-anchor"></a></h1><p>在之前的脑洞中，我们将分类任务转变为NLG任务，即利用样本来生成对应的label description，而他与PET中的主要差别主要有几点：</p>
+<p>1.<em> NLG中我们并没有没有限制label description的长度，且不同label对应description也可能是不同长度；</em><br>2.<em> NLG中我们每个token的生成是有依赖关系的，即后面的token会依赖之前的token，所以token长度可以比PET中稍微长一些；</em><br>3.<em> PET中对应的解码空间大大减小，只需要得到label对应token的概率即可;</em><br>4.<em> PET中的pattern可以放在前缀也可以放在后缀，NLG可以看作是后缀PET.</em><br>5.<em> PET 中由于pre-train是mlm任务，所以zero-show性能更好。</em></p>
+<h1><span id="shi-yan">实验</span><a href="#shi-yan" class="header-anchor"></a></h1><p>针对这些差异尝试做了几组实验，验证一下想法。</p>
+<ol>
+<li>NLG中label长度同一且解码时利用PET的方式解码，在few-shot下准确率从$52.4%$上升到$52.9%$，所以生成的label越短，解码空间越小越准确；</li>
+<li>PET前缀pattern下准确率为%53.7%$,所以前缀pattern比后缀性能更好，这也与苏剑林<a href="https://spaces.ac.cn/archives/7764" target="_blank" rel="noopener">《必须要GPT3吗？不，BERT的MLM模型也能小样本学习》</a>的结论一致。</li>
+<li>zero-shot情况下，PET的准确率为$47.2%$, 而NLG只有$17.9%$，考虑到数据集全量下目前最好成绩才$60.7%$,说明PET的方式在zero-shot下效果相当惊人。</li>
+</ol>
+<p>主要实验代码在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_pet_seq2seq.py" target="_blank" rel="noopener">classification_pet_seq2seq</a> 与 <a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_tnews_pet.py" target="_blank" rel="noopener">classification_tnews_pet</a></p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文介绍了一种新的转变分类任务获得更好性能的方法：即将分类任务转化为mlm模型进行完形填空，同时与之前脑洞的将分类转变为生成任务进行对比，通过实验验证了两者的差异与有效性。同时也提醒自己，多想几步，也许就能有新的发现。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>Classification</tag>
+        <tag>Few-shot</tag>
       </tags>
   </entry>
   <entry>
@@ -2245,6 +2245,48 @@
       </categories>
   </entry>
   <entry>
+    <title>重新认识矩阵</title>
+    <url>/2021/01/12/matrix/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#shi-me-shi-1">什么是1</a></li>
+<li><a href="#xiang-liang">向量</a></li>
+<li><a href="#ju-zhen">矩阵</a></li>
+<li><a href="#ju-zhen-cheng-fa">矩阵乘法</a></li>
+<li><a href="#xiang-si-ju-zhen">相似矩阵</a></li>
+<li><a href="#xing-lie-shi">行列式</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>最近有篇很火的论文bert-flow，其中的flow是出了GAN和VAE之外的第三种生成模型，我竟然是第一次听说，所以引起了我的好奇心，然而看flow模型时，发现里面有一个很重要的概念就是行列式，数学渣太久没碰过他所以再看到有些陌生，于是就找了一些文章来重新学习一下，后来发现了孟岩的认识矩阵系列博客与苏神的新认识矩阵系列博客，看完感觉对矩阵的认识refresh了一下，所以做一些总结记录。</p>
+<h1><span id="shi-me-shi-1">什么是1</span><a href="#shi-me-shi-1" class="header-anchor"></a></h1><p>首先我们来讨论一下，什么是<code>1</code>，所谓1，就是参照物，或者是基，而其他的数字都是在参考他得到的，比如2,2就是2 个1，也就是1<em>2.<br>而1又是一个抽象的东西，你没法直观感受什么是1，只有在参考系下，才能直观感受到什么是1，如1瓶水，1米长，而1 与一米的关系就像类与对象一样。所以在参考系下，2米的含义就是2个1米，1米 </em> 2，即在以1米为基的坐标系下，他在2的“位置”。而5瓶水，对应的含义是在以1瓶水为基的参考系下，<br>他处在5的“位置”。而不同的坐标系，在不同的情况下也有优劣之分，如同样的酒，当用来统计销售额时，我们用“瓶”来统计就比用“杯”来统计方便，而当用来劝酒时，用“杯”就明显比用“瓶”要合适一些。也就是，酒还是那么多酒，但是当你用不同的方式来度量时，得到的结果也是不同的，是有优劣之分的。</p>
+<h1><span id="xiang-liang">向量</span><a href="#xiang-liang" class="header-anchor"></a></h1><p>对于向量$A(a, b)$,其对应的含义是在直角坐标系（以$\vec{i}=(1,0),\vec{j}=(0,1)$为基）中，A是在x轴上为a,y轴上为b的点。<br>比如，在以x轴为斤y轴为瓶的直角坐标系（以$\vec{i}=(一斤,0瓶), \vec{j}=(0斤,1瓶)$为基）中，三瓶500毫升的肥仔水对应的向量就是B(3,3).所以，<code>所谓向量即在线性空间内，选定一组基后，用来刻画一个对象</code>。</p>
+<h1><span id="ju-zhen">矩阵</span><a href="#ju-zhen" class="header-anchor"></a></h1><p>那何为矩阵呢？比如对于矩阵<br>$$A=\begin{pmatrix}<br>a &amp; c \\<br>b &amp; d<br>\end{pmatrix}$$<br>我们能观察到什么呢？首先，矩阵也是由向量（列向量）组成的，对于当前矩阵A，也就对应着$\vec{i}=(a,b),\vec{j}=(c,d)$ 两个向量，然后将他们按一定的顺序排列就组成了矩阵；此外，这个矩阵又代表了由这两个向量为基组成的坐标系（线性空间），在这个空间内，所有的对象都能通过这两个基来进行刻画，即对应于一个“向量”。这里如何更直观的理解呢？还是考虑之前的例子，同样是酒，我们可以用“杯”来度量，也可以用“瓶”来度量，假如我们用“杯”作为最初的基，<br>那矩阵对应的就是“瓶”作为基构成的坐标系，而构成矩阵的向量又是在以“杯”为基下度量出来的，其对应的向量中的值的含义就是“瓶”的基在“杯”这个基下的表示，<br>同样的酒，假如在“杯”坐标系下为10（杯），通过这个矩阵，就变为了2（瓶），<code>即矩阵是线性空间里变换（运动）的描述。</code></p>
+<h1><span id="ju-zhen-cheng-fa">矩阵乘法</span><a href="#ju-zhen-cheng-fa" class="header-anchor"></a></h1><p>那何为矩阵乘法呢？比如现在有矩阵<br>$$<br>A=\begin{pmatrix}<br>a &amp; c \\<br>b &amp; d<br>\end{pmatrix}<br>$$<br>向量$x=(e,f)$,对于$Ax$这个矩阵与向量的乘法，这个是什么含义呢？上面我们已经提到了，矩阵是由列向量组成的，而列向量又可以看做是对应坐标系下的一组基，那根据之前我们提到向量与基的关系，就是在基确定后，用来刻画其空间内对象的，对应的就是乘法，那这个矩阵与向量的乘法，我们也可以用这种方式来看待，即矩阵与向量的乘法代表的是在矩阵对应的列向量为基组成的空间内，由向量刻画的对象。这也是为什么矩阵乘法要求对应维度要相等，<br>对应的就是需要用所有的基，才能正确刻画在这组基对应坐标系下的位置（对象）。而矩阵与向量乘法就是用新的基来刻画对象，<code>也即矩阵与向量的乘法代表施加变换。</code></p>
+<p>那为什么矩阵的乘法公式里为对应行与列相乘并求和呢？这是因为最终的结果，我们是需要变换到对应的直角坐标系下的，因为我们书写出来的所有向量，都默认是在直角坐标系下的结果，所以我们需要将结果向量在每个轴上进行分解，然后合并得到最终的结果，对应的就是行与列相乘后求和。</p>
+<p>那何为矩阵与矩阵的乘法呢？如$A * B$,同理，矩阵与矩阵的乘法也可以看做是连续变换后，构造的新的坐标系。矩阵是由向量组成的，而矩阵与向量乘法的含义是在新的基下刻画的对象表示，所以矩阵与矩阵的乘法，对应B这个变换在施加了A这个变换后，形成的新的变换，而施加这个变换，对应B中的列向量都是在A坐标下刻画得到的。</p>
+<p>那何为线性方程呢？比如$Ax = y$, 对应的线性方程是什么含义呢？这个方程左侧有向量有矩阵，而右侧缺只有向量，有点不和谐，我们变换一下，让他们形式一样，$Ax = Iy$,这样，等式成立，两边形式也一样。那写成这个变换，我们就能猜到这个方程中等式的意义了：在直角坐标系($I$)下的y向量，在A坐标系下该如何刻画(x)呢？那再来看看这个方程的解，即$x = A^{-1}y$，而这个式子可以理解为将施加的变换“逆”着再变回去，就还原了原始位置。</p>
+<p>普通乘法有交换律、结合律、分配律，那矩阵乘法是否也满足呢？对于交换律，矩阵乘法是不满足的，想象一下，5“瓶”酒换成“杯”可能是25，而5“杯”酒换成“瓶”，可能也就是1了，所以两个变换交换位置，得到的是不同的变换；而结合律与分配律是满足的，结合律可以看做是将变换分成“几步”走，即先进行“子变换a”,在进行“子变换b”，几步走与一步到位的结果是一致的；而分配律也是类似的思路。</p>
+<h1><span id="xiang-si-ju-zhen">相似矩阵</span><a href="#xiang-si-ju-zhen" class="header-anchor"></a></h1><p>那何为相似矩阵呢？假设有一个矩阵A，对应$y=Ax$, 而现在有一个新的坐标系P，对应有${y}’=B{x}’$,在P坐标系下，x与y对应着$P{x}’=x$, $P{y}’=y$,代入后得到：$P{x}’=AP{y}’ = P(P^{-1}AP){x}’$，即在P坐标系下，从${x}’$ 到${y}’$的变换用矩阵$B=P^{-1}AP$来表示，这就是相似矩阵，<a href="https://spaces.ac.cn/archives/1777" target="_blank" rel="noopener">即同一个线性变换在不同坐标系下的一个测量结果而已。</a></p>
+<h1><span id="xing-lie-shi">行列式</span><a href="#xing-lie-shi" class="header-anchor"></a></h1><p>行列式是在通过<a href="https://zhuanlan.zhihu.com/p/37111386" target="_blank" rel="noopener">高斯消元法解线性方程组时引入的数学工具</a>, 对应的定义为：<br>$$<br>D = \sum(-1)^t a_{1p_n}a_{2p_n}…a_{np_n}<br>$$<br>其中$t$为排列$a_{1p_n}a_{2p_n}…a_{np_n}$的逆序数，$\sum$ 为对所有可能的排列求和。<br>这个计算方式看起来好奇怪，还有一个逆序数，无法直观的理解，那怎么才能有个直观印象，让我们知道为什么这里是这么计算的呢？<br>说实话我虽然几年前在网易云课堂重新学了一遍线性代数，但是今天又基本全忘记了，所以这次，我希望找到一些更“直观”的东西。<br>如果按照矩阵就是对应坐标系的变换，也就是对应基的变换的思路，那矩阵的行列式应该是对应着变换的某种度量（实际是对应坐标系的缩放，也就是基的体积变换）。顺着这个思路，苏神的一篇博文<a href="https://kexue.fm/archives/2208" target="_blank" rel="noopener">新理解矩阵5：体积=行列式</a>中，通过两者的性质相同，证明了行列式的几何意义，就是其对应的n维平行n维体的体积。<br>知道了这个，我们就可以尝试通过计算平行n维体的体积来“直观”感受一下了。<br><img src="/2021/01/12/matrix/det.png" alt></p>
+<p>这里我们讨论二维空间，如上图所示，其中$\overrightarrow{A}$与$\overrightarrow{B}$分别代表两个向量，而其围成的面积S 为(O,A,I,B)四个点所围成的图形。而这个图形又可以看成两个部分的组合：一部分为与四边形(O,D，P,G)重叠的部分，另一部分为剩下的部分。而剩下的部分又可以通过$PI$切分为两个三角形：$\bigtriangleup BPI$ $\bigtriangleup API$，<br>我们分别做两个三角形的高（蓝色线）$PJ=b, PK=c$，此时我们将$\bigtriangleup BPI$ 与 $\bigtriangleup ODA$ 进行对比，两者的高都是$b$,而底的差为$c$，也就是$S\bigtriangleup ODA - S\bigtriangleup BPI = S\bigtriangleup OCM$， 类似的，我们可以求出$S\bigtriangleup OBG - S\bigtriangleup API = S\bigtriangleup OFM$,于是，我们就可以得到一个结论：<br>$$<br>S_{\square OAIB} = S_{\square ODPG} - S_{\square OCMF} = ad - bc = \begin{Vmatrix}<br>a &amp;b \\<br>c &amp; d<br>\end{Vmatrix} = det(A,B)<br>$$</p>
+<p>而两个四边形的位置都是由向量在坐标轴上投影后确定的，也就是对应着行列式中的“排列相乘”，而面积不足需要被“减掉”的小面积就对应逆序数，所以完整的过程就是“通过排列求长方形的面积，然后用大面积减去小面积”。<br>以上的思路可以推广到N维空间，思想是一样的。 而理解了矩阵的行列式就是平行N维体的体积后，对应行列式的计算公式也就显得相当“直观”了。如，对行列式的某一列乘上$\alpha$，则对应的行列式的值也乘上$\alpha$，这里就是对应其中的一个基向量放大了$\alpha$倍，所以体积放大了$\alpha$倍。</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文主要是参考了许多文章后，发现将矩阵看做是变换的表述这个视角下，很多相关问题都变得非常直观又容易理解，最后经过思考做的部分总结，如果对矩阵感兴趣或者总觉得不容易理解，推荐孟岩的<a href="http://blog.csdn.net/myan/article/details/647511" target="_blank" rel="noopener">理解矩阵系列</a>、苏神的<a href="[https://kexue.fm/archives/1765">新理解矩阵系列</a>、<a href="https://www.matongxue.com/madocs/247/" target="_blank" rel="noopener">马同学的矩阵与行列式系列</a></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
+      <categories>
+        <category>Math</category>
+      </categories>
+      <tags>
+        <tag>Math</tag>
+        <tag>Matrix</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>如何提升bert在下游任务中的性能</title>
     <url>/2020/11/24/fine-tune/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -2334,48 +2376,6 @@
       </categories>
       <tags>
         <tag>BERT</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>重新认识矩阵</title>
-    <url>/2021/01/12/matrix/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#shi-me-shi-1">什么是1</a></li>
-<li><a href="#xiang-liang">向量</a></li>
-<li><a href="#ju-zhen">矩阵</a></li>
-<li><a href="#ju-zhen-cheng-fa">矩阵乘法</a></li>
-<li><a href="#xiang-si-ju-zhen">相似矩阵</a></li>
-<li><a href="#xing-lie-shi">行列式</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>最近有篇很火的论文bert-flow，其中的flow是出了GAN和VAE之外的第三种生成模型，我竟然是第一次听说，所以引起了我的好奇心，然而看flow模型时，发现里面有一个很重要的概念就是行列式，数学渣太久没碰过他所以再看到有些陌生，于是就找了一些文章来重新学习一下，后来发现了孟岩的认识矩阵系列博客与苏神的新认识矩阵系列博客，看完感觉对矩阵的认识refresh了一下，所以做一些总结记录。</p>
-<h1><span id="shi-me-shi-1">什么是1</span><a href="#shi-me-shi-1" class="header-anchor"></a></h1><p>首先我们来讨论一下，什么是<code>1</code>，所谓1，就是参照物，或者是基，而其他的数字都是在参考他得到的，比如2,2就是2 个1，也就是1<em>2.<br>而1又是一个抽象的东西，你没法直观感受什么是1，只有在参考系下，才能直观感受到什么是1，如1瓶水，1米长，而1 与一米的关系就像类与对象一样。所以在参考系下，2米的含义就是2个1米，1米 </em> 2，即在以1米为基的坐标系下，他在2的“位置”。而5瓶水，对应的含义是在以1瓶水为基的参考系下，<br>他处在5的“位置”。而不同的坐标系，在不同的情况下也有优劣之分，如同样的酒，当用来统计销售额时，我们用“瓶”来统计就比用“杯”来统计方便，而当用来劝酒时，用“杯”就明显比用“瓶”要合适一些。也就是，酒还是那么多酒，但是当你用不同的方式来度量时，得到的结果也是不同的，是有优劣之分的。</p>
-<h1><span id="xiang-liang">向量</span><a href="#xiang-liang" class="header-anchor"></a></h1><p>对于向量$A(a, b)$,其对应的含义是在直角坐标系（以$\vec{i}=(1,0),\vec{j}=(0,1)$为基）中，A是在x轴上为a,y轴上为b的点。<br>比如，在以x轴为斤y轴为瓶的直角坐标系（以$\vec{i}=(一斤,0瓶), \vec{j}=(0斤,1瓶)$为基）中，三瓶500毫升的肥仔水对应的向量就是B(3,3).所以，<code>所谓向量即在线性空间内，选定一组基后，用来刻画一个对象</code>。</p>
-<h1><span id="ju-zhen">矩阵</span><a href="#ju-zhen" class="header-anchor"></a></h1><p>那何为矩阵呢？比如对于矩阵<br>$$A=\begin{pmatrix}<br>a &amp; c \\<br>b &amp; d<br>\end{pmatrix}$$<br>我们能观察到什么呢？首先，矩阵也是由向量（列向量）组成的，对于当前矩阵A，也就对应着$\vec{i}=(a,b),\vec{j}=(c,d)$ 两个向量，然后将他们按一定的顺序排列就组成了矩阵；此外，这个矩阵又代表了由这两个向量为基组成的坐标系（线性空间），在这个空间内，所有的对象都能通过这两个基来进行刻画，即对应于一个“向量”。这里如何更直观的理解呢？还是考虑之前的例子，同样是酒，我们可以用“杯”来度量，也可以用“瓶”来度量，假如我们用“杯”作为最初的基，<br>那矩阵对应的就是“瓶”作为基构成的坐标系，而构成矩阵的向量又是在以“杯”为基下度量出来的，其对应的向量中的值的含义就是“瓶”的基在“杯”这个基下的表示，<br>同样的酒，假如在“杯”坐标系下为10（杯），通过这个矩阵，就变为了2（瓶），<code>即矩阵是线性空间里变换（运动）的描述。</code></p>
-<h1><span id="ju-zhen-cheng-fa">矩阵乘法</span><a href="#ju-zhen-cheng-fa" class="header-anchor"></a></h1><p>那何为矩阵乘法呢？比如现在有矩阵<br>$$<br>A=\begin{pmatrix}<br>a &amp; c \\<br>b &amp; d<br>\end{pmatrix}<br>$$<br>向量$x=(e,f)$,对于$Ax$这个矩阵与向量的乘法，这个是什么含义呢？上面我们已经提到了，矩阵是由列向量组成的，而列向量又可以看做是对应坐标系下的一组基，那根据之前我们提到向量与基的关系，就是在基确定后，用来刻画其空间内对象的，对应的就是乘法，那这个矩阵与向量的乘法，我们也可以用这种方式来看待，即矩阵与向量的乘法代表的是在矩阵对应的列向量为基组成的空间内，由向量刻画的对象。这也是为什么矩阵乘法要求对应维度要相等，<br>对应的就是需要用所有的基，才能正确刻画在这组基对应坐标系下的位置（对象）。而矩阵与向量乘法就是用新的基来刻画对象，<code>也即矩阵与向量的乘法代表施加变换。</code></p>
-<p>那为什么矩阵的乘法公式里为对应行与列相乘并求和呢？这是因为最终的结果，我们是需要变换到对应的直角坐标系下的，因为我们书写出来的所有向量，都默认是在直角坐标系下的结果，所以我们需要将结果向量在每个轴上进行分解，然后合并得到最终的结果，对应的就是行与列相乘后求和。</p>
-<p>那何为矩阵与矩阵的乘法呢？如$A * B$,同理，矩阵与矩阵的乘法也可以看做是连续变换后，构造的新的坐标系。矩阵是由向量组成的，而矩阵与向量乘法的含义是在新的基下刻画的对象表示，所以矩阵与矩阵的乘法，对应B这个变换在施加了A这个变换后，形成的新的变换，而施加这个变换，对应B中的列向量都是在A坐标下刻画得到的。</p>
-<p>那何为线性方程呢？比如$Ax = y$, 对应的线性方程是什么含义呢？这个方程左侧有向量有矩阵，而右侧缺只有向量，有点不和谐，我们变换一下，让他们形式一样，$Ax = Iy$,这样，等式成立，两边形式也一样。那写成这个变换，我们就能猜到这个方程中等式的意义了：在直角坐标系($I$)下的y向量，在A坐标系下该如何刻画(x)呢？那再来看看这个方程的解，即$x = A^{-1}y$，而这个式子可以理解为将施加的变换“逆”着再变回去，就还原了原始位置。</p>
-<p>普通乘法有交换律、结合律、分配律，那矩阵乘法是否也满足呢？对于交换律，矩阵乘法是不满足的，想象一下，5“瓶”酒换成“杯”可能是25，而5“杯”酒换成“瓶”，可能也就是1了，所以两个变换交换位置，得到的是不同的变换；而结合律与分配律是满足的，结合律可以看做是将变换分成“几步”走，即先进行“子变换a”,在进行“子变换b”，几步走与一步到位的结果是一致的；而分配律也是类似的思路。</p>
-<h1><span id="xiang-si-ju-zhen">相似矩阵</span><a href="#xiang-si-ju-zhen" class="header-anchor"></a></h1><p>那何为相似矩阵呢？假设有一个矩阵A，对应$y=Ax$, 而现在有一个新的坐标系P，对应有${y}’=B{x}’$,在P坐标系下，x与y对应着$P{x}’=x$, $P{y}’=y$,代入后得到：$P{x}’=AP{y}’ = P(P^{-1}AP){x}’$，即在P坐标系下，从${x}’$ 到${y}’$的变换用矩阵$B=P^{-1}AP$来表示，这就是相似矩阵，<a href="https://spaces.ac.cn/archives/1777" target="_blank" rel="noopener">即同一个线性变换在不同坐标系下的一个测量结果而已。</a></p>
-<h1><span id="xing-lie-shi">行列式</span><a href="#xing-lie-shi" class="header-anchor"></a></h1><p>行列式是在通过<a href="https://zhuanlan.zhihu.com/p/37111386" target="_blank" rel="noopener">高斯消元法解线性方程组时引入的数学工具</a>, 对应的定义为：<br>$$<br>D = \sum(-1)^t a_{1p_n}a_{2p_n}…a_{np_n}<br>$$<br>其中$t$为排列$a_{1p_n}a_{2p_n}…a_{np_n}$的逆序数，$\sum$ 为对所有可能的排列求和。<br>这个计算方式看起来好奇怪，还有一个逆序数，无法直观的理解，那怎么才能有个直观印象，让我们知道为什么这里是这么计算的呢？<br>说实话我虽然几年前在网易云课堂重新学了一遍线性代数，但是今天又基本全忘记了，所以这次，我希望找到一些更“直观”的东西。<br>如果按照矩阵就是对应坐标系的变换，也就是对应基的变换的思路，那矩阵的行列式应该是对应着变换的某种度量（实际是对应坐标系的缩放，也就是基的体积变换）。顺着这个思路，苏神的一篇博文<a href="https://kexue.fm/archives/2208" target="_blank" rel="noopener">新理解矩阵5：体积=行列式</a>中，通过两者的性质相同，证明了行列式的几何意义，就是其对应的n维平行n维体的体积。<br>知道了这个，我们就可以尝试通过计算平行n维体的体积来“直观”感受一下了。<br><img src="/2021/01/12/matrix/det.png" alt></p>
-<p>这里我们讨论二维空间，如上图所示，其中$\overrightarrow{A}$与$\overrightarrow{B}$分别代表两个向量，而其围成的面积S 为(O,A,I,B)四个点所围成的图形。而这个图形又可以看成两个部分的组合：一部分为与四边形(O,D，P,G)重叠的部分，另一部分为剩下的部分。而剩下的部分又可以通过$PI$切分为两个三角形：$\bigtriangleup BPI$ $\bigtriangleup API$，<br>我们分别做两个三角形的高（蓝色线）$PJ=b, PK=c$，此时我们将$\bigtriangleup BPI$ 与 $\bigtriangleup ODA$ 进行对比，两者的高都是$b$,而底的差为$c$，也就是$S\bigtriangleup ODA - S\bigtriangleup BPI = S\bigtriangleup OCM$， 类似的，我们可以求出$S\bigtriangleup OBG - S\bigtriangleup API = S\bigtriangleup OFM$,于是，我们就可以得到一个结论：<br>$$<br>S_{\square OAIB} = S_{\square ODPG} - S_{\square OCMF} = ad - bc = \begin{Vmatrix}<br>a &amp;b \\<br>c &amp; d<br>\end{Vmatrix} = det(A,B)<br>$$</p>
-<p>而两个四边形的位置都是由向量在坐标轴上投影后确定的，也就是对应着行列式中的“排列相乘”，而面积不足需要被“减掉”的小面积就对应逆序数，所以完整的过程就是“通过排列求长方形的面积，然后用大面积减去小面积”。<br>以上的思路可以推广到N维空间，思想是一样的。 而理解了矩阵的行列式就是平行N维体的体积后，对应行列式的计算公式也就显得相当“直观”了。如，对行列式的某一列乘上$\alpha$，则对应的行列式的值也乘上$\alpha$，这里就是对应其中的一个基向量放大了$\alpha$倍，所以体积放大了$\alpha$倍。</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文主要是参考了许多文章后，发现将矩阵看做是变换的表述这个视角下，很多相关问题都变得非常直观又容易理解，最后经过思考做的部分总结，如果对矩阵感兴趣或者总觉得不容易理解，推荐孟岩的<a href="http://blog.csdn.net/myan/article/details/647511" target="_blank" rel="noopener">理解矩阵系列</a>、苏神的<a href="[https://kexue.fm/archives/1765">新理解矩阵系列</a>、<a href="https://www.matongxue.com/madocs/247/" target="_blank" rel="noopener">马同学的矩阵与行列式系列</a></p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
-      <categories>
-        <category>Math</category>
-      </categories>
-      <tags>
-        <tag>Math</tag>
-        <tag>Matrix</tag>
       </tags>
   </entry>
   <entry>
@@ -2536,34 +2536,6 @@
       </tags>
   </entry>
   <entry>
-    <title>辞旧迎新</title>
-    <url>/2021/02/19/happy-new-year/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#ci-jiu">辞旧</a></li>
-<li><a href="#ying-xin">迎新</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-<p></div><br>在新年这个重要的时间节点上，总应该做些总结与计划，来辞旧迎新，然而我总是懒惰加拖延，到了今天初八才正式开写，所以新的一年，第一个flag就是：希望能找到良药医治一下我的拖延症 - -！</p>
-<h1><span id="ci-jiu">辞旧</span><a href="#ci-jiu" class="header-anchor"></a></h1><p>2020年是神奇的一年，这一年里发生了很多意想不到的事，用网友们的话讲就是这一年总忙着见证历史了。而需要见证的历史太多，大多数我都没关注，所以只记录一下我自己”见证”的历史。<br>首先是过年回家，刚到家我就去县里的药店屯了口罩和感冒药，之后就是持续至今的新冠，而由于新冠初期，大家对其认识很少，所以限制出行，而我也就因此度过了高中以来在家最久的一次”寒假”–整整三个月，直到四月初，才买到了机票回来上班。<br>在家的三个月，对我最大的帮助可能就是心灵治愈了，<code>人间烟火气，最抚凡人心</code><br>虽然在家陪父母，但是后期还是需要正常打卡的，所以我也顺便研究了一下藏文语言模型和文本纠错，也就是这个时期，让我更坚定的想要一台自己的服务器，来实验想法。于是，回到北京后，我就开始调研硬件相关，然后自己动手搭了一台<a href="https://xv44586.github.io/2020/05/05/make-a-computer/">服务器</a>，这里还要感谢一下银翔老哥，帮我报销了2080Ti的钱，哈哈。<br>有了服务器，我就开始<code>放弃幻想，拥抱transformer </code>, 开始了看论文与写demo 的路程，期间参考<a href="https://github.com/bojone/bert4keras.git" target="_blank" rel="noopener">bert4keras</a> 与 <a href="https://github.com/CyberZHG/keras-bert" target="_blank" rel="noopener">keras-bert</a>, 实现了一下Bert，不过中间有次实验结果有些奇怪，为了查问题，API基本上改成bert4keras一致了。后面一些相transformer相关的实验代码基本也都在<a href="https://github.com/xv44586/toolkit4nlp" target="_blank" rel="noopener">toolkit4nlp</a><br>这里还有一个小插曲，王萌老哥带我打了一个脑科学的比赛，我们俩花了一天最后拿了个铜牌，这也让我了解到在很多领域，对机器学习和深度学习还是运用的相当少的，一方面是因为任务形态的原因，一方面也是这些领域接受新事物比较缓慢可能，所以我认为与机器学习做交叉，还是有很多事可以做的。<br>接着就到了十一月，由于看到群里有人讨论小学生解数学题的比赛，就去看了<a href="https://www.datafountain.cn/" target="_blank" rel="noopener">datafountain</a>，然后就写了<a href="https://www.datafountain.cn/competitions/474/datasets" target="_blank" rel="noopener">房产行业问答匹配比赛</a>的baseline：<a href="https://github.com/xv44586/ccf_2020_qa_match" target="_blank" rel="noopener">ccf_2020_qa_match</a>, 其实比赛到这就结束了，我就去看论文了，然而有时候事情就是这么奇妙，很多群里的同学看到我的baseline 邀请我去组队，后来与南大的”钞人小哥”刘猛组队，最终拿了第一还。不过答辩时发现，在看论文与做实验的纬度上，我们应该也是第一了- - ！无论如何，也要感谢一下刘猛小哥，不是他邀请我，我也不会拿到这个金牌。毕竟baseline 我写过不少，但是真的认真打到最后还是第一次～～</p>
-<p>总结一下，去年发生了新冠，直到现在大家还是备受困扰，我个人度过了最爽的一个年假，在NLP 上也有了实足的进步，不过也有很多年初的计划没有完成，比如每周一篇blog，看完花书等。</p>
-<h1><span id="ying-xin">迎新</span><a href="#ying-xin" class="header-anchor"></a></h1><p><code>凡事预则立，不预则废。</code>所以，flag还是要立的，新的一年，希望自己更少一点浮躁，做事能更多一点踏实。</p>
-<ul>
-<li>经典论文还有很多没读，最新的论文又源源不断，所以希望新的一年能找到适合自己的读论文节奏。</li>
-<li>一周一篇blog 可能太困难了，希望能一年写三十篇吧就</li>
-<li>感情上也要更成熟一些，对未来要有更清晰的规划</li>
-<li>有空就多运动</li>
-</ul>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>成都海洋馆的可爱白鲸</p>
-]]></content>
-      <categories>
-        <category>Life</category>
-      </categories>
-  </entry>
-  <entry>
     <title>多任务学习-以天池比赛为例的三种思路</title>
     <url>/2021/03/28/multi-task/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -2601,44 +2573,6 @@
       </categories>
       <tags>
         <tag>multi-task</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>对比学习心路历程</title>
-    <url>/2021/07/06/cl2rdrop/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#qian-yan">前言</a></li>
-<li><a href="#dui-bi-xue-xi-fan-shi">对比学习范式</a></li>
-<li><a href="#wu-jian-du-dui-bi-xue-xi">无监督对比学习</a></li>
-<li><a href="#you-jian-du-dui-bi-xue-xi">有监督对比学习</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="qian-yan">前言</span><a href="#qian-yan" class="header-anchor"></a></h1><p>在之前的<a href="https://xv44586.github.io/2021/01/20/ccf-qa-2/">博客</a>里，笔者介绍了在有监督任务（文本匹配）上，增加对比学习来提高模型性能的实验，而当时尝试后却发现，在新增了对比学习的任务后，模型的性能并没有得到对应的提升，经过简单分析后，笔者也尝试给出了一些可能的问题与解决方案。虽然笔者的实验都失败了，但是笔者依然认为对比学习是一个非常好的方向，所以也在持续关注，这篇就算是后续的填坑与总结吧。</p>
-<h1><span id="dui-bi-xue-xi-fan-shi">对比学习范式</span><a href="#dui-bi-xue-xi-fan-shi" class="header-anchor"></a></h1><p>之前也提到过，这里在简单称述一下对比学习目前的主要范式。对比学习主要是通过对比，拉近相似样本之间的距离，推远不相似样本之间的距离。而相似样本的构造，又可以分为有监督与无监督两种：</p>
-<ul>
-<li>有监督对比学习：通过将监督样本中的相同label的样本作为正样本，不同label的样本作为负样本，来进行对比学习；</li>
-<li>无监督对比学习：由于没有监督信号（label），此时，我们对同一个样本构造两个view，让同一样本构造的两个view互为正样本，而其他样本构造的view则全部为负样本，以此来进行对比学习。而由同一个样本构造两个view，又是数据扩增的过程，所以也可以称作是数据扩展对比学习。而不管那种范式，通常对比学习都是在batch内进行。</li>
-</ul>
-<h1><span id="wu-jian-du-dui-bi-xue-xi">无监督对比学习</span><a href="#wu-jian-du-dui-bi-xue-xi" class="header-anchor"></a></h1><p>笔者曾经在实验中，通过对样本进行eda（随机替换、随机删除、随机重复和随机互换），来构造不同view，由此进行对比学习。实验失败后，笔者也提到失败的可能原因主要有两点：batch size太小且样本上直接进行操作，获得的新样本与原来的语义可能由较大的差别甚至是完全的反义。如：“我不会再爱你” –&gt; “我会再爱你”,而强行让这两个样本的语义距离相互靠近，效果自然不会好；而batch size太小的问题，一来是换大的GPU，二来可以尝试在算法层面进行优化，如将Adam 替换为AdaFactor，re-compute等，这不是本文的重点，所以就不再细说了。<br>而针对直接对样本进行修改会导致语义不一致的问题，其主要原因是NLP中，样本的输入是one-hot形式的，我们的相似样本应该是语义上相似，对应的修改后的语义距离应该尽可能“小”，而直接对one-hot形式进行修改，对应的距离恒定是$\sqrt{2}$ ，怎么看也不小。一种解决方法是借鉴对抗训练在NLP中的方式，将修改放在Embedding 层，由于one-hot与Embedding的对应关系，就能够获得“相似语义”的样本了。对应思路的论文有美团今年的<a href="http://arxiv.org/abs/2105.11741" target="_blank" rel="noopener">ConSERT: A Contrastive Framework for Self-Supervised Sentence Representation Transfer</a>,总的来说，这篇paper就是将EDA的思路放在embedding 层，然后构建不同view后进行对比学习，最后获得的语义表示超过了当前的sota，在多个数据集上获得了提升。不过值得吐槽的是，美团也学坏了，竟然学会了谷歌那套在更多数据上进行训练然后跟只有原始数据的结果进行对比，可能是论文本身没什么亮点，只能通过“大的提升”来吸引眼球了吧~<br>而做数据扩增时，最常用的两个方式随机删除与随机互换，而位置编码在transformer 中起到的作用不是关键性的，且直接互换位置也会带来语义变化较大的风险，那只使用随机删除策略做数据扩增，进行对比学习效果如何呢？答案是非常好！女神陈丹琦最近的论文<a href="https://arxiv.org/abs/2104.08821" target="_blank" rel="noopener">SimCSE: Simple Contrastive Learning of Sentence Embeddings</a>,只使用dropout ，对同一个样本构造两个不同的view，然后进行对比学习，最终的效果在非监督学习任务下8个点提升起步，在监督任务下4个点提升起步，此外，<a href="https://github.com/bojone/SimCSE" target="_blank" rel="noopener">苏神</a>在中文任务上也进行了实验，再次验证了该方法的有效性。</p>
-<p><img src="/2021/07/06/cl2rdrop/simcse.png" alt="效果对比"></p>
-<p>而simcse具体是如何工作的呢？其实做法相当简单，即将一个样本进入模型两次，然后通过dropout 两次，获得两个不同的view，互为正样本。而dropout 由于是在feature 维度进行随机mask，所以就得到了与在embedding层随机mask相同的效果，此外，由于在transformer 中，dropout 多次使用，也进一步的增加了两个view 的差异。读完论文，看着效果，直叹“大道至简”，而对比在embedding 做扰动与直接使用dropout，从效果上看dropout 也是一种更加有效的数据扩增手段。那这个思路是不是可以扩展到有监督任务呢？<br>其实读完SimCSE后，笔者就觉得dropout 是一种更加有效的数据扩增手段，自然可以扩展到有监督任务学习中。这里的有监督任务学习有别与有监督对比学习，请读者注意区分。而在有监督任务学习中的方案也是比较直观：将样本进入模型两遍，然后在做监督任务的同时，增加一个对比学习，不过笔者实验时被之前无监督任务的思路所束缚了，一直使用encoder output 的logits来表征语义，所以调来调去效果时好时坏，好的时候也没有超过0.5的提升，所以就放弃了。<br>而最近的论文<a href="http://arxiv.org/abs/2106.14448" target="_blank" rel="noopener">R-Drop: Regularized Dropout for Neural Networks</a>却成功的将这个思路延续了下来，在读完其<a href="https://github.com/dropreg/R-Drop" target="_blank" rel="noopener">代码</a>后，才发现原来是自己姿势不对~<br>R-Drop中的完整思路是这样的：首先，我们通过将样本重复的输入到模型，然后通过dropout，获取不同的view，而dropout的目的是为了将集成模型的思路延续到深度学习中，本质目的是增加模型的鲁棒性。所以，不同的view获得的最终的输出，我们也希望其尽可能的一致。而论文中的任务都是分类任务，所以模型最终的输出是一个概率分布，衡量两个概率分别的差异通常使用kl散度，所以最终的loss增加了一个对应view之间的kl-divergence。<br>对比笔者之前的思路与R-Drop 中的思路，首先R-Drop 中是直接作用在最终的probs上，而笔者是希望encoder output logits 之间能“同性相吸，异性排斥”，而由于在做分类任务时，在logits 后都会接一个dense层来压缩维度，这个dense 层就会大大抑制前面的对比学习的效果，即前面的logits可以差异很大，但通过最后的dense层，却能得到一样的预测结果（label相同），而直接作用在最终的输出层，才会得到想要的效果；其次在R-Drop 中，不再需要与其他样本做对比，即只要相同view 的输出足够“接近”即可，而不需要其与其他的view 尽可能的“远”，考虑到同一个batch 内，存在同样label的样本的概率是极大的，而要求同时预测对label又要其结果之间尽可能不同是不合理的，所以取消掉与其他view之间的对比也是合理与必要的；而由于不需要去其他view做对比，对比学习中大batch size的要求也就不再需要，即在小的batch size 下该方法依然有效，真可谓“方法简单效果好”，在所有的NLP任务中都值得尝试。<br>前面提到笔者之前的思路的最大问题是对比的不是最后一层的输出，而同一batch内，又不可避免的会出现相同label，让相同label的logits之间相互“远离”似乎不太合理，但从对抗训练或者模型的鲁棒性上考虑，让同一样本的不同view之间相互接近而与其他view之间相互远离，可以达到让样本在一个范围内的输出尽可能的保持一致，从而能使模型更加的鲁棒，自然会增加一些泛化能力。这个思路笔者也在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_tnews_contrastive_learning_dropout.py" target="_blank" rel="noopener">之前的实验</a>上进行了修改尝试，结果显示确实能提高一些性能，但是与只拉近相同view之间的kl-divergence相比，提升就不够看了。</p>
-<h1><span id="you-jian-du-dui-bi-xue-xi">有监督对比学习</span><a href="#you-jian-du-dui-bi-xue-xi" class="header-anchor"></a></h1><p>有监督对比学习是指相同label之间互为正样本，不同label间为负样本，与上文提到的有监督任务是不同的。而有监督任务中也可以使用无监督对比学习的思路，如上文提到的R-Drop，而有监督对比学习自从<a href="https://arxiv.org/abs/2011.01403" target="_blank" rel="noopener">Supervised Contrastive Learning for Pre-trained Language Model Fine-tuning</a>后，笔者还未关注到有什么新的进展，所以还是推荐在有监督任务上使用R-Drop思路。</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文主要总结了从笔者之前对比学习实验时留下的问题，到最近一些论文中提出的解决思路，虽然整个心路历程与原作者们的肯定不一样，但希望能给读者提供对比学习到目前为止的一些进展脉络。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>图片来自大佬刑无刀（陈开江）的朋友圈：据说人工智能中有80%的部分是人工😄</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>SimCSE</tag>
-        <tag>R-Drop</tag>
       </tags>
   </entry>
   <entry>
@@ -2836,6 +2770,72 @@
       <tags>
         <tag>speed-up</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>对比学习心路历程</title>
+    <url>/2021/07/06/cl2rdrop/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#qian-yan">前言</a></li>
+<li><a href="#dui-bi-xue-xi-fan-shi">对比学习范式</a></li>
+<li><a href="#wu-jian-du-dui-bi-xue-xi">无监督对比学习</a></li>
+<li><a href="#you-jian-du-dui-bi-xue-xi">有监督对比学习</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<h1><span id="qian-yan">前言</span><a href="#qian-yan" class="header-anchor"></a></h1><p>在之前的<a href="https://xv44586.github.io/2021/01/20/ccf-qa-2/">博客</a>里，笔者介绍了在有监督任务（文本匹配）上，增加对比学习来提高模型性能的实验，而当时尝试后却发现，在新增了对比学习的任务后，模型的性能并没有得到对应的提升，经过简单分析后，笔者也尝试给出了一些可能的问题与解决方案。虽然笔者的实验都失败了，但是笔者依然认为对比学习是一个非常好的方向，所以也在持续关注，这篇就算是后续的填坑与总结吧。</p>
+<h1><span id="dui-bi-xue-xi-fan-shi">对比学习范式</span><a href="#dui-bi-xue-xi-fan-shi" class="header-anchor"></a></h1><p>之前也提到过，这里在简单称述一下对比学习目前的主要范式。对比学习主要是通过对比，拉近相似样本之间的距离，推远不相似样本之间的距离。而相似样本的构造，又可以分为有监督与无监督两种：</p>
+<ul>
+<li>有监督对比学习：通过将监督样本中的相同label的样本作为正样本，不同label的样本作为负样本，来进行对比学习；</li>
+<li>无监督对比学习：由于没有监督信号（label），此时，我们对同一个样本构造两个view，让同一样本构造的两个view互为正样本，而其他样本构造的view则全部为负样本，以此来进行对比学习。而由同一个样本构造两个view，又是数据扩增的过程，所以也可以称作是数据扩展对比学习。而不管那种范式，通常对比学习都是在batch内进行。</li>
+</ul>
+<h1><span id="wu-jian-du-dui-bi-xue-xi">无监督对比学习</span><a href="#wu-jian-du-dui-bi-xue-xi" class="header-anchor"></a></h1><p>笔者曾经在实验中，通过对样本进行eda（随机替换、随机删除、随机重复和随机互换），来构造不同view，由此进行对比学习。实验失败后，笔者也提到失败的可能原因主要有两点：batch size太小且样本上直接进行操作，获得的新样本与原来的语义可能由较大的差别甚至是完全的反义。如：“我不会再爱你” –&gt; “我会再爱你”,而强行让这两个样本的语义距离相互靠近，效果自然不会好；而batch size太小的问题，一来是换大的GPU，二来可以尝试在算法层面进行优化，如将Adam 替换为AdaFactor，re-compute等，这不是本文的重点，所以就不再细说了。<br>而针对直接对样本进行修改会导致语义不一致的问题，其主要原因是NLP中，样本的输入是one-hot形式的，我们的相似样本应该是语义上相似，对应的修改后的语义距离应该尽可能“小”，而直接对one-hot形式进行修改，对应的距离恒定是$\sqrt{2}$ ，怎么看也不小。一种解决方法是借鉴对抗训练在NLP中的方式，将修改放在Embedding 层，由于one-hot与Embedding的对应关系，就能够获得“相似语义”的样本了。对应思路的论文有美团今年的<a href="http://arxiv.org/abs/2105.11741" target="_blank" rel="noopener">ConSERT: A Contrastive Framework for Self-Supervised Sentence Representation Transfer</a>,总的来说，这篇paper就是将EDA的思路放在embedding 层，然后构建不同view后进行对比学习，最后获得的语义表示超过了当前的sota，在多个数据集上获得了提升。不过值得吐槽的是，美团也学坏了，竟然学会了谷歌那套在更多数据上进行训练然后跟只有原始数据的结果进行对比，可能是论文本身没什么亮点，只能通过“大的提升”来吸引眼球了吧~<br>而做数据扩增时，最常用的两个方式随机删除与随机互换，而位置编码在transformer 中起到的作用不是关键性的，且直接互换位置也会带来语义变化较大的风险，那只使用随机删除策略做数据扩增，进行对比学习效果如何呢？答案是非常好！女神陈丹琦最近的论文<a href="https://arxiv.org/abs/2104.08821" target="_blank" rel="noopener">SimCSE: Simple Contrastive Learning of Sentence Embeddings</a>,只使用dropout ，对同一个样本构造两个不同的view，然后进行对比学习，最终的效果在非监督学习任务下8个点提升起步，在监督任务下4个点提升起步，此外，<a href="https://github.com/bojone/SimCSE" target="_blank" rel="noopener">苏神</a>在中文任务上也进行了实验，再次验证了该方法的有效性。</p>
+<p><img src="/2021/07/06/cl2rdrop/simcse.png" alt="效果对比"></p>
+<p>而simcse具体是如何工作的呢？其实做法相当简单，即将一个样本进入模型两次，然后通过dropout 两次，获得两个不同的view，互为正样本。而dropout 由于是在feature 维度进行随机mask，所以就得到了与在embedding层随机mask相同的效果，此外，由于在transformer 中，dropout 多次使用，也进一步的增加了两个view 的差异。读完论文，看着效果，直叹“大道至简”，而对比在embedding 做扰动与直接使用dropout，从效果上看dropout 也是一种更加有效的数据扩增手段。那这个思路是不是可以扩展到有监督任务呢？<br>其实读完SimCSE后，笔者就觉得dropout 是一种更加有效的数据扩增手段，自然可以扩展到有监督任务学习中。这里的有监督任务学习有别与有监督对比学习，请读者注意区分。而在有监督任务学习中的方案也是比较直观：将样本进入模型两遍，然后在做监督任务的同时，增加一个对比学习，不过笔者实验时被之前无监督任务的思路所束缚了，一直使用encoder output 的logits来表征语义，所以调来调去效果时好时坏，好的时候也没有超过0.5的提升，所以就放弃了。<br>而最近的论文<a href="http://arxiv.org/abs/2106.14448" target="_blank" rel="noopener">R-Drop: Regularized Dropout for Neural Networks</a>却成功的将这个思路延续了下来，在读完其<a href="https://github.com/dropreg/R-Drop" target="_blank" rel="noopener">代码</a>后，才发现原来是自己姿势不对~<br>R-Drop中的完整思路是这样的：首先，我们通过将样本重复的输入到模型，然后通过dropout，获取不同的view，而dropout的目的是为了将集成模型的思路延续到深度学习中，本质目的是增加模型的鲁棒性。所以，不同的view获得的最终的输出，我们也希望其尽可能的一致。而论文中的任务都是分类任务，所以模型最终的输出是一个概率分布，衡量两个概率分别的差异通常使用kl散度，所以最终的loss增加了一个对应view之间的kl-divergence。<br>对比笔者之前的思路与R-Drop 中的思路，首先R-Drop 中是直接作用在最终的probs上，而笔者是希望encoder output logits 之间能“同性相吸，异性排斥”，而由于在做分类任务时，在logits 后都会接一个dense层来压缩维度，这个dense 层就会大大抑制前面的对比学习的效果，即前面的logits可以差异很大，但通过最后的dense层，却能得到一样的预测结果（label相同），而直接作用在最终的输出层，才会得到想要的效果；其次在R-Drop 中，不再需要与其他样本做对比，即只要相同view 的输出足够“接近”即可，而不需要其与其他的view 尽可能的“远”，考虑到同一个batch 内，存在同样label的样本的概率是极大的，而要求同时预测对label又要其结果之间尽可能不同是不合理的，所以取消掉与其他view之间的对比也是合理与必要的；而由于不需要去其他view做对比，对比学习中大batch size的要求也就不再需要，即在小的batch size 下该方法依然有效，真可谓“方法简单效果好”，在所有的NLP任务中都值得尝试。<br>前面提到笔者之前的思路的最大问题是对比的不是最后一层的输出，而同一batch内，又不可避免的会出现相同label，让相同label的logits之间相互“远离”似乎不太合理，但从对抗训练或者模型的鲁棒性上考虑，让同一样本的不同view之间相互接近而与其他view之间相互远离，可以达到让样本在一个范围内的输出尽可能的保持一致，从而能使模型更加的鲁棒，自然会增加一些泛化能力。这个思路笔者也在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_tnews_contrastive_learning_dropout.py" target="_blank" rel="noopener">之前的实验</a>上进行了修改尝试，结果显示确实能提高一些性能，但是与只拉近相同view之间的kl-divergence相比，提升就不够看了。</p>
+<h1><span id="you-jian-du-dui-bi-xue-xi">有监督对比学习</span><a href="#you-jian-du-dui-bi-xue-xi" class="header-anchor"></a></h1><p>有监督对比学习是指相同label之间互为正样本，不同label间为负样本，与上文提到的有监督任务是不同的。而有监督任务中也可以使用无监督对比学习的思路，如上文提到的R-Drop，而有监督对比学习自从<a href="https://arxiv.org/abs/2011.01403" target="_blank" rel="noopener">Supervised Contrastive Learning for Pre-trained Language Model Fine-tuning</a>后，笔者还未关注到有什么新的进展，所以还是推荐在有监督任务上使用R-Drop思路。</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文主要总结了从笔者之前对比学习实验时留下的问题，到最近一些论文中提出的解决思路，虽然整个心路历程与原作者们的肯定不一样，但希望能给读者提供对比学习到目前为止的一些进展脉络。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>图片来自大佬刑无刀（陈开江）的朋友圈：据说人工智能中有80%的部分是人工😄</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>SimCSE</tag>
+        <tag>R-Drop</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>辞旧迎新</title>
+    <url>/2021/02/19/happy-new-year/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#ci-jiu">辞旧</a></li>
+<li><a href="#ying-xin">迎新</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div><br>在新年这个重要的时间节点上，总应该做些总结与计划，来辞旧迎新，然而我总是懒惰加拖延，到了今天初八才正式开写，所以新的一年，第一个flag就是：希望能找到良药医治一下我的拖延症 - -！</p>
+<h1><span id="ci-jiu">辞旧</span><a href="#ci-jiu" class="header-anchor"></a></h1><p>2020年是神奇的一年，这一年里发生了很多意想不到的事，用网友们的话讲就是这一年总忙着见证历史了。而需要见证的历史太多，大多数我都没关注，所以只记录一下我自己”见证”的历史。<br>首先是过年回家，刚到家我就去县里的药店屯了口罩和感冒药，之后就是持续至今的新冠，而由于新冠初期，大家对其认识很少，所以限制出行，而我也就因此度过了高中以来在家最久的一次”寒假”–整整三个月，直到四月初，才买到了机票回来上班。<br>在家的三个月，对我最大的帮助可能就是心灵治愈了，<code>人间烟火气，最抚凡人心</code><br>虽然在家陪父母，但是后期还是需要正常打卡的，所以我也顺便研究了一下藏文语言模型和文本纠错，也就是这个时期，让我更坚定的想要一台自己的服务器，来实验想法。于是，回到北京后，我就开始调研硬件相关，然后自己动手搭了一台<a href="https://xv44586.github.io/2020/05/05/make-a-computer/">服务器</a>，这里还要感谢一下银翔老哥，帮我报销了2080Ti的钱，哈哈。<br>有了服务器，我就开始<code>放弃幻想，拥抱transformer </code>, 开始了看论文与写demo 的路程，期间参考<a href="https://github.com/bojone/bert4keras.git" target="_blank" rel="noopener">bert4keras</a> 与 <a href="https://github.com/CyberZHG/keras-bert" target="_blank" rel="noopener">keras-bert</a>, 实现了一下Bert，不过中间有次实验结果有些奇怪，为了查问题，API基本上改成bert4keras一致了。后面一些相transformer相关的实验代码基本也都在<a href="https://github.com/xv44586/toolkit4nlp" target="_blank" rel="noopener">toolkit4nlp</a><br>这里还有一个小插曲，王萌老哥带我打了一个脑科学的比赛，我们俩花了一天最后拿了个铜牌，这也让我了解到在很多领域，对机器学习和深度学习还是运用的相当少的，一方面是因为任务形态的原因，一方面也是这些领域接受新事物比较缓慢可能，所以我认为与机器学习做交叉，还是有很多事可以做的。<br>接着就到了十一月，由于看到群里有人讨论小学生解数学题的比赛，就去看了<a href="https://www.datafountain.cn/" target="_blank" rel="noopener">datafountain</a>，然后就写了<a href="https://www.datafountain.cn/competitions/474/datasets" target="_blank" rel="noopener">房产行业问答匹配比赛</a>的baseline：<a href="https://github.com/xv44586/ccf_2020_qa_match" target="_blank" rel="noopener">ccf_2020_qa_match</a>, 其实比赛到这就结束了，我就去看论文了，然而有时候事情就是这么奇妙，很多群里的同学看到我的baseline 邀请我去组队，后来与南大的”钞人小哥”刘猛组队，最终拿了第一还。不过答辩时发现，在看论文与做实验的纬度上，我们应该也是第一了- - ！无论如何，也要感谢一下刘猛小哥，不是他邀请我，我也不会拿到这个金牌。毕竟baseline 我写过不少，但是真的认真打到最后还是第一次～～</p>
+<p>总结一下，去年发生了新冠，直到现在大家还是备受困扰，我个人度过了最爽的一个年假，在NLP 上也有了实足的进步，不过也有很多年初的计划没有完成，比如每周一篇blog，看完花书等。</p>
+<h1><span id="ying-xin">迎新</span><a href="#ying-xin" class="header-anchor"></a></h1><p><code>凡事预则立，不预则废。</code>所以，flag还是要立的，新的一年，希望自己更少一点浮躁，做事能更多一点踏实。</p>
+<ul>
+<li>经典论文还有很多没读，最新的论文又源源不断，所以希望新的一年能找到适合自己的读论文节奏。</li>
+<li>一周一篇blog 可能太困难了，希望能一年写三十篇吧就</li>
+<li>感情上也要更成熟一些，对未来要有更清晰的规划</li>
+<li>有空就多运动</li>
+</ul>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>成都海洋馆的可爱白鲸</p>
+]]></content>
+      <categories>
+        <category>Life</category>
+      </categories>
   </entry>
   <entry>
     <title>faster-decoder之 decoder解码加速</title>
@@ -3500,6 +3500,172 @@
         <tag>In-context learning</tag>
         <tag>GPT-3</tag>
         <tag>ChatGPT</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LLM Inference串讲</title>
+    <url>/2023/03/10/llm-inf/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#generation">generation</a><ul>
+<li><a href="#greedy-search">Greedy Search</a></li>
+<li><a href="#beam-search">Beam Search</a></li>
+<li><a href="#sampling">Sampling</a><ul>
+<li><a href="#topk">topK</a></li>
+<li><a href="#topp">topP</a></li>
+<li><a href="#beam-search-sampling">beam-search sampling</a></li>
+</ul>
+</li>
+<li><a href="#generate-parameters">generate parameters</a><ul>
+<li><a href="#temperature">Temperature</a></li>
+<li><a href="#penalty">* penalty</a></li>
+<li><a href="#qiang-zhi-jin-zhi-te-ding-token-de-chu-xian">强制/禁止 特定token 的出现</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#gpu">GPU</a><ul>
+<li><a href="#performance">performance</a></li>
+</ul>
+</li>
+<li><a href="#gpt-generation">GPT generation</a><ul>
+<li><a href="#ops-vs-bytes">ops vs bytes</a></li>
+<li><a href="#attention">attention</a></li>
+<li><a href="#cache">cache</a></li>
+<li><a href="#ding-liang-ping-gu-you-hua-fang-an">定量评估优化方案</a></li>
+</ul>
+</li>
+<li><a href="#ref">ref</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div><br>本文主要概述一下利用LLM 进行文本生成相关内容。</p>
+<h1><span id="generation">generation</span><a href="#generation" class="header-anchor"></a></h1><p>上一篇我们讲了为了解决自然语言问题，我们引入了统计语言模型：$S$ 表示一连串特定顺序排列的词$w_1$, $w_2$, …, $w_n$,其中$n$ 是序列的长度，则$S$ 出现的概率$P(S)=P(w_1,w_2,…w_n)$. 通过序列的概率，来判断对应句子是否合理。而这个概率$P(S)$ 很难估算，所以我们将其转化一下。首先，利用条件概率公式将其展开:<br>$$<br>P(S)=P(w_1​,w_2​,…,w_n​)=P(w_1​)∗P(w_2​∣w_1​)∗P(w_3​∣w_1​,w_2​)∗…∗P(w_n​∣w_1​,w_2​,…,w_{n−1}​)<br>$$<br>即：<br>$$<br>P(w_1^n​)=\prod​P(w_i​∣w_1^{i−1}​)<br>$$<br>然后用深度神经网络，对$P(w_i|w_1^{i-1})$ 进行建模，即：<br>$$<br>P(w_i|w_1^{i-1}) = g(w_1^{i-1})<br>$$</p>
+<p>其中$g$ 是深度神经网络，如MLP/RNN/Transformer 等。</p>
+<p>文本生成的过程，即我们在已有的深度神经网络$g$ 下，生成（采样）合理句子（序列）的过程。其中$g$ 能生成给定context  $C$  时下一个时刻对应的词表分布, 其中$C$ 是由$w_1$, $w_2$, …, $w_m$ 组成的序列。<br>目前我们训练$g$ 通常采用Teacher-Forcing 的方式：训练阶段，每个时刻$t$ 之前的label $y_{&lt;t}$都是已知的，就像是老师讲课一样，将每一步的正确解题思路都告诉你，你只需要跟着老师的思路一步一步推导就能得到正确答案；然而在inference 阶段，我们是没法知道当前时刻之前的真实label 是什么的，所以需要将所有可能的序列的概率都求解出来，最后在所有可能性中选择概率最大的。如同考试时没了参考步骤，只能尝试多个思路，最后保留我们觉得”正确“的。</p>
+<p><img src="/2023/03/10/llm-inf/Pasted image 20230307215330.png" alt><br>求解过程是一个求解最优路径问题，然而这个计算量太大了。假设我们的词表大小是$V$, 生成序列的长度为$k$, 每一个时刻都需要对所有状态（整个词表）进行计算，即使我们的词表只有五万个词，要生成五个token 也需要计算25万次，这个计算量实在是太大了。所以我们需要一些更高效的生成策略。</p>
+<blockquote>
+<p>概率值$p$ 是一个范围在$0\sim 1$ ，多次连乘后会很快接近0，所以通常我们会将$max\prod p_i$ 转换为求$max \sum log(p_i)$ </p>
+</blockquote>
+<h2><span id="greedy-search">Greedy Search</span><a href="#greedy-search" class="header-anchor"></a></h2><p>Greedy search 的思路是：每次都选择概率最高的词作为最终采样结果，即: $w_t = argmax_wP(w|w_1^{t-1})$<br><img src="/2023/03/10/llm-inf/Pasted image 20230307223501.png" alt><br>该方法是缺点也很明显：局部最优的最终结果很可能不是全局最优，由于每次都是选局部最优，这也扼杀了模型找到全局最优的可能性。如上图中Greedy search 的结果是(The, nice, woman),而全局最优是(The, dog, has) .除此之外，模型的生成结果也不够”丰富“，甚至会出现不停重复之前的内容。</p>
+<h2><span id="beam-search">Beam Search</span><a href="#beam-search" class="header-anchor"></a></h2><p>”多一个选择，多一次机会“。为了缓解Greedy search 的问题，我们在每次选择时，不再只保留最高概率的一个，而是所有候选中保留概率最高的N 个(num_beams/beam_width) path。<br><img src="/2023/03/10/llm-inf/Pasted image 20230308095954.png" alt><br>上图是num_beams=2 的示例：</p>
+<ol>
+<li>第一步时，在(The, dog)/(The, nice)/(The car)  三个路径中选择概率最高的两条path:(The, nice), (The, dog)</li>
+<li>第二步时，在(The, nice, wowan)/(The, nice, house)/(The, nice, guy)/(The, dog, and)/(The,dog,runs)/(The,dog,has) 中选择路径概率（单步概率连乘）最高的两条path:(The, dog, has), (The, nice, woman)</li>
+<li>一次类推，直到满足终止采样.</li>
+</ol>
+<p>此前Greedy Search 未找到的最优路径，此次通过Beam Search 找到了，但是依然无法保证每次都能找到全局最优。PS: num_beams =1 时，与Greedy Search 过程相同。</p>
+<h2><span id="sampling">Sampling</span><a href="#sampling" class="header-anchor"></a></h2><p>以上两种方法都是确定性解码（deterministic），缺点就是不够丰富，不够”surprise“；为了让生成的内容更加的丰富多样有惊喜，我们可以采用另一种策略：采样（Sampling).</p>
+<p>采样的基本思路是在概率分布上进行随机采样，选择一个作为下一个词$w_t$:<br>$$<br>w_t \sim P(w|w_1^{t-1})<br>$$<br>然而由于模型$g$ 距离真实的$P(w|w_1{t-1})$ 还是会有差距，直接按照$g$ 生成的”概率分布“采样风险太大，很容易走偏；一个折中的办法是控制候选集，在“低风险”范围内采样。<br>候选集的构造方式也有多个，常用的有topK/topP/beam-search.</p>
+<h3><span id="topk">topK</span><a href="#topk" class="header-anchor"></a></h3><p>每次选择概率最大的K 个作为候选集，然后重新归一化，获取新的分布后进行采样。</p>
+<ol>
+<li>对词表进行排序，选择概率最高的K 个；</li>
+<li>对候选集中的K 个候选的概率值进行归一化，构造K 个候选对应的分布$\widetilde{P}$</li>
+<li>从分布$\widetilde{P}$ 中采样一个词作为$w_t$</li>
+</ol>
+<h3><span id="topp">topP</span><a href="#topp" class="header-anchor"></a></h3><p>topp sampling 又叫nucleus sampling,其思路是不在从通过保留最大的K 个作为候选，而是保留概率累计和范围$p$ 内的所有词作为候选集，候选集大小随着分布变化而动态调整。</p>
+<ol>
+<li>对词表进行排序，从大到小进行排列</li>
+<li>依照概率大小，依次将词加入候选集，直到新增的词进入候选集后，整个候选集内的概率累计和大于$p$ 停止；</li>
+<li>对候选集内的词进行归一化，构造新的分布$\widetilde{P}$</li>
+<li>从分布$\widetilde{P}$ 采样一个词作为$w_t$</li>
+</ol>
+<p>topk 与topp 也可以一起使用，通常实现时是先进行topk，然后在topk 归一化后的候选集上进行topp 采样。</p>
+<h3><span id="beam-search-sampling">beam-search sampling</span><a href="#beam-search-sampling" class="header-anchor"></a></h3><p>该方法是beam-search 的samling 版，其主要思路是： 在每次选择时，不在直接选择所有候选中概率最高的num_beams 个，而是从中采样。</p>
+<h2><span id="generate-parameters">generate parameters</span><a href="#generate-parameters" class="header-anchor"></a></h2><h3><span id="temperature">Temperature</span><a href="#temperature" class="header-anchor"></a></h3><p>通常模型的输出是一些值（logits)而不是分布（probability distribution),我们需要将其转换成分布，转换通常使用的是softmax 函数：<br>$$\frac{\exp(z_i)}{\sum_jexp(z_j)}$$</p>
+<p>softmax 函数的特点是：</p>
+<ol>
+<li>保持其原有的相对顺序;</li>
+<li>累计和为1。</li>
+</ol>
+<p>然而其缺点也明显：很容易扩大/缩小内部元素的差异（softmax 变 max/mean），如 [11, 12, 13 ] softmax 后为[0.0900, 0.2447, 0.6652], 这将导致最终我们采样后的结果不够丰富；而[0.01,0.02,0.03] softmax 后[0.3300, 0.3333, 0.3367],这将导致最终的采样方法是在随机采样，生成不合理的序列。为为了解决这个问题，我们需要有个办法调节，让softmax 后的分布进一步符合我们的预期，对应的办法就是增加参数$T$:<br>$$\frac{\exp(z_i/T)}{\sum_jexp(z_j/T)}$$<br><img src="/2023/03/10/llm-inf/1_p1iKxUJcXDlSEZCpMCwNgg.gif" alt></p>
+<p>$T$ 越大，分布越趋近均匀分布(uniform distribution)，采样结果随机性越大，生成的序列是不合理句子的概率就越高；<br>$T$ 越小，分布越趋近与单点分布(one-point distribution)，采样结果越趋近保持一致。</p>
+<h3><span id="penalty">* penalty</span><a href="#penalty" class="header-anchor"></a></h3><p>除了temperature 这种对整体分布进行修改外，还有些场景需要我们对特定的某些token 的分布进行修改，此时就诞生了各种penalty，如repetition_penalty/diversity_penalty等参数。注意：这里是对其分布乘以一个系数，其结果有可能并不改变其大小顺序。</p>
+<h3><span id="qiang-zhi-jin-zhi-te-ding-token-de-chu-xian">强制/禁止 特定token 的出现</span><a href="#qiang-zhi-jin-zhi-te-ding-token-de-chu-xian" class="header-anchor"></a></h3><p>一些场景下，我们要求更加苛刻：希望某些token 一定/永不 出现，同理，此时将满足条件的token 的分布直接调整为100%/0%，如bad_words_ids/no_repeat_ngram_size/force_words_ids 等参数。</p>
+<h1><span id="gpu">GPU</span><a href="#gpu" class="header-anchor"></a></h1><p>下面已A100-80G SXM 为例，了解一下GPU 的基本信息。</p>
+<p>A100 specifications<br><img src="/2023/03/10/llm-inf/Pasted image 20230307111416.png" alt><br>simplified view of the GPU architecture<br><img src="/2023/03/10/llm-inf/Pasted image 20230309090721.png" alt></p>
+<p>Multiply-add operations per clock per SM<br><img src="/2023/03/10/llm-inf/Pasted image 20230308160737.png" alt></p>
+<ul>
+<li>FP16 Tensor Core peak dense throughputs:<br>$$1024 (Tensor cores) \ast 108 (SMs) \ast 1.41 GHz (clock rate)  \ast 2 (multiply-add) =  312 TFLOPS $$</li>
+</ul>
+<h2><span id="performance">performance</span><a href="#performance" class="header-anchor"></a></h2><p>性能主要受限于三个因素：内存带宽(memory bandwidth)，计算带宽(math bandwidth), 延时(latency).</p>
+<p>假设我们访问内存花费的时间为$T_{mem}$ ,计算花费的时间为$T_{math}$, 计算和访问内存可以”你算上一个，我读/写 下一个“，这样两者的时间大部分都可以重叠，此时花费的所有时间就为$max (T_{mem}, T_{math})$.<br>$$T_{mem} = bytes/BW_{mem}$$<br>$$<br>  T_{math} = ops/BW_{math}<br>$$<br>当性能受限于计算带宽时：<br>$$<br>T_{math} &gt; T_{mem}<br>=&gt;<br>ops/BW_{math} &gt; bytes/BW_{mem} =&gt; ops/bytes &gt; BW_{math}/BW_{mem}<br>$$<br>假设我们使用float16 进行计算，而A100-80G SXM  对应的$BW_{math} / BW_{mem}=312e12 flops/2039e9 bytes=153  Flops/Byte$.<br>即在当前显卡下，如果一个函数的计算量与所需的存储量的比值&gt; 153 Flops/Byte 时，此时的性能主要受限于计算带宽，反之则受限于内存带宽。</p>
+<blockquote>
+<p> 如何计算一个矩阵乘法的flops<br> 假设$A∈R^{1×n}$  ,$B∈R^{n×1}$,计算$AB$ 则需要 n 次乘法运算(operations)和n 次加法运算，对应的就是 $2n$ operations, 即$2n$ flops；同理：$A∈R^{m×n}$, $B∈R^{n×p}$ ,则需要 $2mnp$ flops.</p>
+</blockquote>
+<blockquote>
+<p>如何计算存储大小<br>通常我们使用float16/bfloat16 存储，对应一个参数需要2 个bytes ,对于矩阵$A∈R^{m×n}$ 则需要 $2 \ast m \ast n$ bytes</p>
+</blockquote>
+<p>下面做个最简单的矩阵乘法：$A∈R^{1×n}$，$B∈R^{n×p}$<br>$$ops/bytes = 2np / (2n + 2np + 2p) &lt; 1 &lt; 153$$<br>除了需要将矩阵读进来还需要将结果写进内存，参数使用半精度(2 bytes)，所以对应的总内存为: $2n + 2np + 2p$<br>此时的性能主要受限于内存带宽，如果此时将$A$ 扩大$153$ 倍至 $A∈R^{153×n}$ 消耗的计算时间是一样的，忽略内存带宽$(152 \ast 2 \ast n + 152 \ast 2 \ast p )$ bytes新增带来的影响，则扩大batch size 整体latency 基本不变。</p>
+<p>具体深度学习Layer示例</p>
+<table>
+<thead>
+<tr>
+<th>operation</th>
+<th>ops/bytes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linear layer (4096 outputs, 1024 inputs, batch size 512)</td>
+<td>315 Flops/B</td>
+</tr>
+<tr>
+<td>Linear layer (4096 outputs, 1024 inputs, batch size 1)</td>
+<td>1 Flops/B</td>
+</tr>
+<tr>
+<td>Max pooling with 3x3 window and unit stride</td>
+<td>2.25 Flops/B</td>
+</tr>
+</tbody>
+</table>
+<h1><span id="gpt-generation">GPT generation</span><a href="#gpt-generation" class="header-anchor"></a></h1><p>GPT2 model architecture</p>
+<p><img src="/2023/03/10/llm-inf/Pasted image 20230310005359.png" alt></p>
+<h2><span id="ops-vs-bytes">ops vs bytes</span><a href="#ops-vs-bytes" class="header-anchor"></a></h2><p>我们忽略所有的bias/layernorm/activation/add 操作,计算生成一个token 时的ops vs bytes</p>
+<ol>
+<li><p>Embedding<br>multiply:$E_{token}∈R^{V\times d_{model}}$,  $E_p\in R^{s_{maxseq} \times d_{models}}$<br>mem: $2 \ast (V \ast d_{model} + s_{maxseq} \ast d_{model})$<br>flops:   0</p>
+</li>
+<li><p>attention qkv<br>multiply: $t_e \in R^{1 \times d_{model}}, W_q, W_K, W_V\in R^{d_{model}\times d_{model}}, t_e \times W_q/W_k/W_v =&gt; q/k/v$<br>mem: $ 2 \ast 3\ast d_{model}^2$<br>flops: $ 2 \ast 3 \ast d_{model}^2$</p>
+</li>
+<li><p>attention output<br> multiply: $q,k,v\in R^{1\times d_{model}}, softmax((q\cdot k)\div \sqrt{d_{head}}) \cdot v =&gt; o$<br> mem: 0<br> flops: $2 \ast 2 \ast d_{model}$</p>
+</li>
+<li><p>output projection<br>multiply: $o \in R^{1\times d_{model}}$,   $W_o\in R^{d_{model}\times d_{model}}$, $o \times W_o =&gt; a$<br>mem: $2\ast d_{model}^2$<br>flops: $2 \ast d_{model}^2$</p>
+</li>
+<li><p>feed-forward<br> multiply:$a\in R^{1\times d_{model}}$,   $W_1\in R^{d_{model}\times 4d_{model}}$, $W_2\in R^{4d_{model}\times d_{model}}$, $a\times W_1 \times W_2 =&gt;z$<br> mem: $2 \ast 2 \ast d_{model} \ast 4d_{model} = 16 d_{model}^2$<br> flops: $2 \ast 2 \ast d_{model} \ast 4d_{model} =&gt; 16 d_{model}^2$</p>
+</li>
+</ol>
+<p>剩下的计算就是重复$n\_layers$ 次2-5.现在我们来汇总一下计算总的ops / bytes:</p>
+<p>$$<br>\frac{ops}{ bytes} = \frac{n_{layers} \ast (6d_{model}^2 + 4d_{model} + 2d_{model}^2 + 16d_{model}^2)}  {2 \ast (V \ast d_{model} + s_{maxseq} \ast d_{model}) + n_{layers} \ast (6d_{model}^2 + 2d_{model}^2 + 16d_{model}^2)}<br>$$</p>
+<p>越大的模型$d_{model}$ 越大，如10B 的模型 $d_{model}=4096$, 所以这里我们去掉$d_{model}$ 的常数项：</p>
+<p>$$<br>\frac{ops} { bytes} \approx \frac{n_{layers} \ast (6d_{model}^2 + 2d_{model}^2 + 16d_{model}^2)}  { n_{layers} \ast (6d_{model}^2 + 2d_{model}^2 + 16d_{model}^2)} = 1<br>$$</p>
+<blockquote>
+<p>速记法<br>对于transformer-base encoder/decoder :<br>ops $\approx 2 \ast Parameters$,<br>float16/bfloat16 下:bytes $\approx 2 \ast Parameters$.</p>
+</blockquote>
+<p>按照上面我们的结论，此时对于A100-80G 来说，性能主要受限于内存带宽，计算1 个token 与计算153个token 对应的latency 是一样的！为了提升整体性能，我们应该增加$batch\_size \ast input\_length$直到 inputs 扩大至153倍.</p>
+<h2><span id="attention">attention</span><a href="#attention" class="header-anchor"></a></h2><p>现在回过头来再看一眼刚刚被我随意丢弃掉的一项ops：attention output<br>由于我们计算是由长度为1 的token 生成 1 个token， 假设输入的token 长度为$s$, 则：<br>$q,k,v \in R^{s\times d_{model}}$<br>flops: $ 2 \ast s \ast d_{model} \ast s + 2 \ast s \ast d_{model} \approx 2 \ast s^2 \ast d_{model}$  </p>
+<p>随着inputs 的长度增加，达到$\sqrt{d_{model}}$ 时，这一项已经不能丢弃了，进一步增加，长度到$12 \ast \sqrt{d_{model}}$ 时，这一项已经与其他部分的ops 想当了，此时的$ops/bytes \approx 2$.<br>以10B 的模型为例，$d_{model} = 4096$ ,当输入的长度为64 时，attention output 这项ops 与其他部分想当；当长度增长为768 时，对应的$ops/bytes$ 增长到2，此时整体的计算量已经扩大了768 倍，$768 &gt; (153 / 2 ) $，已经转变为性能受限于计算带宽，增大batch 不会带来性能提升。</p>
+<h2><span id="cache">cache</span><a href="#cache" class="header-anchor"></a></h2><p>随着整个生成过程的迭代，输入的长度会逐步增加，对应的每步所需的计算量也指数倍的增加，整体性能都被他拖垮了。<br>对于$Y = A \cdot X$ ,当$X$ ,$A$ 不变时，对应的结果$Y$ 是不变的；而在迭代过程中，模型的权重是不变的，即$X$ 都是一样的，对于$step_t$ 与 $step_{t-1}$ 来说，都会计算$A[:, :t-1]$ 对应的结果，既然重叠了，就不需要重复计算了，我们每次只需要计算最后一个token 就好了。<br>等等，有一个层只有计算没有weights，即其对应的$A$, $X$ 都来动态的，需要我们单独处理。这一层就是attention output。（哈，又是你。attention is all I want remove！）</p>
+<p>对于$step_t$ 来说，对应的计算是:<br>$$softmax(q[:, t-1:t] \cdot k[:,0:t] \div \sqrt(d_head) ) \cdot v[:,0:t]$$<br>此时我们缺少的是$k[:,:t-1]/v[:,:t-1]$ ,好在我们在$step_{t-1}$ 时已经计算过这两个结果了，只要把上一个时刻的这个结果“拿到”拼接回去即可。<br>完整的流程是：对于迭代$step_t$ ,把对应attention qkv 的结果$q[:,t]/k[:,t]/v[:,t]$ 拼接到之前的之前的缓存$q[:,:t-1]/k[:,:t-1]/v[:,:t-1]$ 后面，为下一个时刻准备；计算attention output 时，先将之前的$k\_cache[:,t-1]/v\_cache[:,:t-1]$ 拼接到$k[:,t]/v[:,t]$ 前面，还原真实的$k/v$.</p>
+<p>经过cache 后，attention output 的计算回到了$O(s\cdot d_{model})$ 的水平，至少在大部分时候又可以基本忽略了。此外，随着$s$ 的增长，对应的cache 也在线性增长，需要的内存带宽也在增长，所以有些情况下可能增加cache 反而降低性能。</p>
+<p>PS:不管是生成过程中的k_cache/v_cache 还是prompt cache 还是context cache，只要是可能重复计算，就值得思考要不要将之前的结果做cache，已减少后续的计算量。</p>
+<h2><span id="ding-liang-ping-gu-you-hua-fang-an">定量评估优化方案</span><a href="#ding-liang-ping-gu-you-hua-fang-an" class="header-anchor"></a></h2><p>上面是一个相对简化的思路计算，而真实情况会比较复杂。比如我们忽略了一部分操作所需的ops；中间结果的每次写入/读取所需的内存带宽；CUDA Core 与 Tensor Core 的性能差异等；此外不同的硬件参数也不相同，具体的operation 实现也不相同，所以要定量给出优化方案实在太难，通常（主要是我）只能通过测试给出大致范围。</p>
+<h1><span id="ref">ref</span><a href="#ref" class="header-anchor"></a></h1><p><a href="https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/nvidia-a100-datasheet-us-nvidia-1758950-r4-web.pdf" target="_blank" rel="noopener">NVIDIA A100 TENSOR CORE GPU</a></p>
+<p><a href="https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html#gpu-arch" target="_blank" rel="noopener">dl-performance-gpu-background</a></p>
+<p><a href="https://developer.nvidia.com/blog/nvidia-ampere-architecture-in-depth/" target="_blank" rel="noopener">nvidia-ampere-architecture-in-depth</a></p>
+<p><a href="https://huggingface.co/blog/how-to-generate" target="_blank" rel="noopener">how to generate</a></p>
+<p><a href="https://medium.com/mlearning-ai/softmax-temperature-5492e4007f71" target="_blank" rel="noopener">softmax-temperature</a></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>stable diffusion生成</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>LLM</tag>
+        <tag>Inference</tag>
+        <tag>GPU</tag>
       </tags>
   </entry>
 </search>
