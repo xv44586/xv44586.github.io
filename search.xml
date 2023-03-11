@@ -417,40 +417,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Dropout--深度神经网络中的Bagging</title>
-    <url>/2019/10/17/dropout/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</a></li>
-<li><a href="#dropout">Dropout</a></li>
-<li><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</a></li>
-<li><a href="#updating">updating…</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</span><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti" class="header-anchor"></a></h1><p>深度神经网络由于其巨大的参数量，可以很方便的拟合非常复杂的非线性关系，同时，巨大的参数量也给模型带来了过拟合的问题。为了解决这个问题，也有人提出了早停和加入正则项等手段。而在传统机器学习中，除了这些手段，还有一种手段来解决这个问题，即bagging（参考我之前的文章<a href="https://xv44586.github.io/2019/10/16/bagging/">Bagging为什么能降低过拟合</a>），最典型的就是随机森林：对样本和特征进行抽样，训练多个模型，然后进行集成（投票/求平均）。那如何将这种思路引入到深度神经网络中呢？<br>首先,由于训练单个深度神经网络就已经非常耗时，通常样本量也不够多，不适合采样，所以像随机森林一样抽样训练多个模型的方案不可取。<br>剩下的思路就是用“一个”模型来模拟多个sub-model，那如何来模拟呢？</p>
-<h1><span id="dropout">Dropout</span><a href="#dropout" class="header-anchor"></a></h1><p>对于深度神经网络，其最重要的部分就是其隐藏单元（神经元），对于一个有n个神经元的层，我们可以通过设置神经元是否激活，来模拟$2^n$ 种结构，即sub-model，而在evaluate阶段，我们将这些所有的sub-mdoel的结果进行求平均。那对于现在的结构，不可能对 $2^n$中结构都去做计算然后再求平均，一种近似的做法是用当前这“一个”模型来近似模拟：设置所有神经元都处于激活状态，同时，对每个神经元的输出乘以其激活概率keep_prob.这就是Dropout的背后思想。<br><img src="/2019/10/17/dropout/dropout.png" alt="Dropout"><br>简单总结Dropout的具体做法：训练阶段，在前向传播的时候，让某个神经元的激活值以一定的概率p停止工作；预测阶段，对每个神经元的输出乘以1-p (keep_prob)。<br>接下来思考一下，为什么这么做work:首先，训练阶段部分神经元失活，对应的结果是部分features不参与计算，本质上是对features进行采样；其次，从整个训练过程中看，每次训练（batch-data),都对应不同的失活神经元（sub-model)，对应的每个sub-model在单个epoch内，都是在对样本进行无放回的抽样，本质上是在bagging。最后，在预测阶段，为什么可以用“一个”完整的模型来模拟sub-model的求平均过程呢？从sub-model的角度看，每个sub-model被training的概率为$(1-p)$, 而神经元对所有sub-model是共享的，唯一的区别是是否激活，所以归一到每个神经元上，单个神经元被training（激活）的概率为$(1-p)$,而sub-model的总数是$2^n$，每个神经元求平均的过程即$Out_i * (1-p) * 2^n/ 2^n = Out_i * (1 -p)$.<br>具体实现时，我们的目的是在训练阶段对神经元进行随机（概率p)失活,而在test和evaluate时，对神经元的输出乘以$(1-p)$,所以在实现时，可以采用一个trick：dropout时，对样本进行mask的同时，将其除以$(1-p)$,这样就可以一次计算完成所有逻辑，同时，把所有逻辑保留在整个层中。<br><strong>tf的实现：</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dropout</span><span class="params">(x, keep_prob, noise_shape=None, seed=None, name=None)</span>:</span>  <span class="comment"># pylint: disable=invalid-name</span></span><br><span class="line">  <span class="string">"""Computes dropout.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  With probability `keep_prob`, outputs the input element scaled up by</span></span><br><span class="line"><span class="string">  `1 / keep_prob`, otherwise outputs `0`.  The scaling is so that the expected</span></span><br><span class="line"><span class="string">  sum is unchanged.</span></span><br><span class="line"><span class="string">    ...</span></span><br><span class="line"><span class="string"> """</span></span><br><span class="line">  <span class="keyword">with</span> ops.name_scope(name, <span class="string">"dropout"</span>, [x]) <span class="keyword">as</span> name:</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment"># Do nothing if we know keep_prob == 1</span></span><br><span class="line">    <span class="keyword">if</span> tensor_util.constant_value(keep_prob) == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    noise_shape = noise_shape <span class="keyword">if</span> noise_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> array_ops.shape(x)</span><br><span class="line">    <span class="comment"># uniform [keep_prob, 1.0 + keep_prob)</span></span><br><span class="line">    random_tensor = keep_prob</span><br><span class="line">    random_tensor += random_ops.random_uniform(noise_shape,</span><br><span class="line">                                               seed=seed,</span><br><span class="line">                                               dtype=x.dtype)</span><br><span class="line">    <span class="comment"># 0. if [keep_prob, 1.0) and 1. if [1.0, 1.0 + keep_prob)</span></span><br><span class="line">    binary_tensor = math_ops.floor(random_tensor)</span><br><span class="line">    ret = math_ops.div(x, keep_prob) * binary_tensor</span><br><span class="line">    <span class="keyword">if</span> context.in_graph_mode():</span><br><span class="line">      ret.set_shape(x.get_shape())</span><br><span class="line">    <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure></p>
-<h1><span id="bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</span><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan" class="header-anchor"></a></h1><p>如果在非dropout阶段不进行scaled会如何？<br>scaled<br><img src="/2019/10/17/dropout/scaled.png" alt="scaled.png"><br>without_scaled<br><img src="/2019/10/17/dropout/without-scaled.png" alt="without_scaled.png"><br>实验也说明非dropout阶段如果没有进行scaled（求平均），对应的loss会比train阶段高，同时acc也会降低。</p>
-<p><strong>桥豆麻袋，到这里好像出现了一点问题：</strong><br>按照我们上面的思路，在test和evaluate阶段，我们从对sub-model求平均转化为对每个神经元的output进行scaled down，即 $activation(x * W ) * (1 - p)$， 而我们在实现时，只是对x进行scaled up操作，如果后面接的层的激活函数是线性的，这样处理没有什么问题，但是，后面的层不总是线性激活函数，那此时，$output = activation(x * (1-p) * W)  != activation(x*W) * (1 - p)$,即我们得到的输出与我们想要的并不一样，按照以上的理解，我们对output进行scaled-down，验证一下两者的区别。<br>scaled_input<br><img src="/2019/10/17/dropout/scaled-input.png" alt="scaled_input.png"><br>scaled_output<br><img src="/2019/10/17/dropout/scaled-output.png" alt="scaled_output.png"></p>
-<p>看上去对output进行scaled-down结果稍微好一点，但是并不显著，此时的激活函数是relu，而且是在倒数第二层，换个激活函数试试。<br>scaled_input_tanh<br><img src="/2019/10/17/dropout/scaled_input_tanh.png" alt="scaled_input_tanh.png"><br>scaled_output_tanh<br><img src="/2019/10/17/dropout/scaled_output_tanh.png" alt="scaled_output_tanh.png"><br>结果看上去对output进行scaled-down效果稍微差一些，但差距不大。<br>代码地址<a href="https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout" target="_blank" rel="noopener">https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout</a>，感兴趣的可以试试其他方式。<br>既然两种方式在结果上看，效果差不多，而对output进行scaled-down需要添加一个AfterDropLayer，逻辑会在不同的层中，而对inputs直接进行scaled-up，所有逻辑都保存在一个layer中，更清晰。<br><strong>But，Why？</strong>为什么两种方式的结果效果差异不大？真让人头秃啊！</p>
-<p><strong>论文地址</strong><br><a href="http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" target="_blank" rel="noopener">http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf</a></p>
-<p>================================</p>
-<h1><span id="updating">updating…</span><a href="#updating" class="header-anchor"></a></h1><p><img src="/2019/10/17/dropout/linear.png" alt="image.png"></p>
-<p>上图是sigmoid函数在[-8,8]区间的图像，其中linear是由[-8,-4,-2,2,4,8]截断的直线，看图可以看出，sigmoid在区间内都非常的接近”linear”，梯度变化较大的部分只在几个拐点周围，大部分都是近似”linear”,所以也就解释了为什么两种方式有差异，但是差异并不大。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>大四竞赛作品截图</p>
-]]></content>
-      <categories>
-        <category>MachineLearning</category>
-      </categories>
-      <tags>
-        <tag>Deep Learning</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Glove模型</title>
     <url>/2019/10/17/glove/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -502,6 +468,40 @@
       </categories>
       <tags>
         <tag>Glove</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Dropout--深度神经网络中的Bagging</title>
+    <url>/2019/10/17/dropout/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</a></li>
+<li><a href="#dropout">Dropout</a></li>
+<li><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</a></li>
+<li><a href="#updating">updating…</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<h1><span id="shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</span><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti" class="header-anchor"></a></h1><p>深度神经网络由于其巨大的参数量，可以很方便的拟合非常复杂的非线性关系，同时，巨大的参数量也给模型带来了过拟合的问题。为了解决这个问题，也有人提出了早停和加入正则项等手段。而在传统机器学习中，除了这些手段，还有一种手段来解决这个问题，即bagging（参考我之前的文章<a href="https://xv44586.github.io/2019/10/16/bagging/">Bagging为什么能降低过拟合</a>），最典型的就是随机森林：对样本和特征进行抽样，训练多个模型，然后进行集成（投票/求平均）。那如何将这种思路引入到深度神经网络中呢？<br>首先,由于训练单个深度神经网络就已经非常耗时，通常样本量也不够多，不适合采样，所以像随机森林一样抽样训练多个模型的方案不可取。<br>剩下的思路就是用“一个”模型来模拟多个sub-model，那如何来模拟呢？</p>
+<h1><span id="dropout">Dropout</span><a href="#dropout" class="header-anchor"></a></h1><p>对于深度神经网络，其最重要的部分就是其隐藏单元（神经元），对于一个有n个神经元的层，我们可以通过设置神经元是否激活，来模拟$2^n$ 种结构，即sub-model，而在evaluate阶段，我们将这些所有的sub-mdoel的结果进行求平均。那对于现在的结构，不可能对 $2^n$中结构都去做计算然后再求平均，一种近似的做法是用当前这“一个”模型来近似模拟：设置所有神经元都处于激活状态，同时，对每个神经元的输出乘以其激活概率keep_prob.这就是Dropout的背后思想。<br><img src="/2019/10/17/dropout/dropout.png" alt="Dropout"><br>简单总结Dropout的具体做法：训练阶段，在前向传播的时候，让某个神经元的激活值以一定的概率p停止工作；预测阶段，对每个神经元的输出乘以1-p (keep_prob)。<br>接下来思考一下，为什么这么做work:首先，训练阶段部分神经元失活，对应的结果是部分features不参与计算，本质上是对features进行采样；其次，从整个训练过程中看，每次训练（batch-data),都对应不同的失活神经元（sub-model)，对应的每个sub-model在单个epoch内，都是在对样本进行无放回的抽样，本质上是在bagging。最后，在预测阶段，为什么可以用“一个”完整的模型来模拟sub-model的求平均过程呢？从sub-model的角度看，每个sub-model被training的概率为$(1-p)$, 而神经元对所有sub-model是共享的，唯一的区别是是否激活，所以归一到每个神经元上，单个神经元被training（激活）的概率为$(1-p)$,而sub-model的总数是$2^n$，每个神经元求平均的过程即$Out_i * (1-p) * 2^n/ 2^n = Out_i * (1 -p)$.<br>具体实现时，我们的目的是在训练阶段对神经元进行随机（概率p)失活,而在test和evaluate时，对神经元的输出乘以$(1-p)$,所以在实现时，可以采用一个trick：dropout时，对样本进行mask的同时，将其除以$(1-p)$,这样就可以一次计算完成所有逻辑，同时，把所有逻辑保留在整个层中。<br><strong>tf的实现：</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dropout</span><span class="params">(x, keep_prob, noise_shape=None, seed=None, name=None)</span>:</span>  <span class="comment"># pylint: disable=invalid-name</span></span><br><span class="line">  <span class="string">"""Computes dropout.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  With probability `keep_prob`, outputs the input element scaled up by</span></span><br><span class="line"><span class="string">  `1 / keep_prob`, otherwise outputs `0`.  The scaling is so that the expected</span></span><br><span class="line"><span class="string">  sum is unchanged.</span></span><br><span class="line"><span class="string">    ...</span></span><br><span class="line"><span class="string"> """</span></span><br><span class="line">  <span class="keyword">with</span> ops.name_scope(name, <span class="string">"dropout"</span>, [x]) <span class="keyword">as</span> name:</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment"># Do nothing if we know keep_prob == 1</span></span><br><span class="line">    <span class="keyword">if</span> tensor_util.constant_value(keep_prob) == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    noise_shape = noise_shape <span class="keyword">if</span> noise_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> array_ops.shape(x)</span><br><span class="line">    <span class="comment"># uniform [keep_prob, 1.0 + keep_prob)</span></span><br><span class="line">    random_tensor = keep_prob</span><br><span class="line">    random_tensor += random_ops.random_uniform(noise_shape,</span><br><span class="line">                                               seed=seed,</span><br><span class="line">                                               dtype=x.dtype)</span><br><span class="line">    <span class="comment"># 0. if [keep_prob, 1.0) and 1. if [1.0, 1.0 + keep_prob)</span></span><br><span class="line">    binary_tensor = math_ops.floor(random_tensor)</span><br><span class="line">    ret = math_ops.div(x, keep_prob) * binary_tensor</span><br><span class="line">    <span class="keyword">if</span> context.in_graph_mode():</span><br><span class="line">      ret.set_shape(x.get_shape())</span><br><span class="line">    <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure></p>
+<h1><span id="bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</span><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan" class="header-anchor"></a></h1><p>如果在非dropout阶段不进行scaled会如何？<br>scaled<br><img src="/2019/10/17/dropout/scaled.png" alt="scaled.png"><br>without_scaled<br><img src="/2019/10/17/dropout/without-scaled.png" alt="without_scaled.png"><br>实验也说明非dropout阶段如果没有进行scaled（求平均），对应的loss会比train阶段高，同时acc也会降低。</p>
+<p><strong>桥豆麻袋，到这里好像出现了一点问题：</strong><br>按照我们上面的思路，在test和evaluate阶段，我们从对sub-model求平均转化为对每个神经元的output进行scaled down，即 $activation(x * W ) * (1 - p)$， 而我们在实现时，只是对x进行scaled up操作，如果后面接的层的激活函数是线性的，这样处理没有什么问题，但是，后面的层不总是线性激活函数，那此时，$output = activation(x * (1-p) * W)  != activation(x*W) * (1 - p)$,即我们得到的输出与我们想要的并不一样，按照以上的理解，我们对output进行scaled-down，验证一下两者的区别。<br>scaled_input<br><img src="/2019/10/17/dropout/scaled-input.png" alt="scaled_input.png"><br>scaled_output<br><img src="/2019/10/17/dropout/scaled-output.png" alt="scaled_output.png"></p>
+<p>看上去对output进行scaled-down结果稍微好一点，但是并不显著，此时的激活函数是relu，而且是在倒数第二层，换个激活函数试试。<br>scaled_input_tanh<br><img src="/2019/10/17/dropout/scaled_input_tanh.png" alt="scaled_input_tanh.png"><br>scaled_output_tanh<br><img src="/2019/10/17/dropout/scaled_output_tanh.png" alt="scaled_output_tanh.png"><br>结果看上去对output进行scaled-down效果稍微差一些，但差距不大。<br>代码地址<a href="https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout" target="_blank" rel="noopener">https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout</a>，感兴趣的可以试试其他方式。<br>既然两种方式在结果上看，效果差不多，而对output进行scaled-down需要添加一个AfterDropLayer，逻辑会在不同的层中，而对inputs直接进行scaled-up，所有逻辑都保存在一个layer中，更清晰。<br><strong>But，Why？</strong>为什么两种方式的结果效果差异不大？真让人头秃啊！</p>
+<p><strong>论文地址</strong><br><a href="http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" target="_blank" rel="noopener">http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf</a></p>
+<p>================================</p>
+<h1><span id="updating">updating…</span><a href="#updating" class="header-anchor"></a></h1><p><img src="/2019/10/17/dropout/linear.png" alt="image.png"></p>
+<p>上图是sigmoid函数在[-8,8]区间的图像，其中linear是由[-8,-4,-2,2,4,8]截断的直线，看图可以看出，sigmoid在区间内都非常的接近”linear”，梯度变化较大的部分只在几个拐点周围，大部分都是近似”linear”,所以也就解释了为什么两种方式有差异，但是差异并不大。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>大四竞赛作品截图</p>
+]]></content>
+      <categories>
+        <category>MachineLearning</category>
+      </categories>
+      <tags>
+        <tag>Deep Learning</tag>
       </tags>
   </entry>
   <entry>
@@ -903,33 +903,6 @@
       </tags>
   </entry>
   <entry>
-    <title>有趣的概率统计题</title>
-    <url>/2019/11/30/statistics/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-
-<p>昨晚下雪了，开心😄！</p>
-<h1><span id="fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</span><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti" class="header-anchor"></a></h1><p>一段线段上，任意取两不重合的点，将这条线段切分成三段，问，这三条线段组成三角形点概率是多少？</p>
-<p>现在我们将问题转化一下，假设原始线段长度为1，即$(0，1)$表示原始线段，此时，随机在$(0，1)$范围内选两个点a，b，组成$(0，a)$，$(a，b)$，$(b，1)$三个线段，<br>此时原始问题等价于现在的三个线段组成三角形的概率。<br>现在我们来考虑一下，三条线段分别为$A$， $B$，$C$，其中$A &gt;= B &gt;= C$,则A的长度必定在$[1/3, 1)$,而要组成三角形，则需要 $B + C &gt; A$,所以 B + C 的长度为$(1/2, 1)$,<br>而对应的A的长度也就在[1/3, 1/2)内，所以，最终能构成三角形的概率即为 $A_{triangle} / A_{all} = (1/2 - 1/3) / (1 - 1/3) = 1/4$</p>
-<p>看似非常复杂的问题，从最基本的数学知识就能解答，还真是有趣！ </p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>2019年的第一场雪，摄于望京地铁站</p>
-]]></content>
-      <categories>
-        <category>Math</category>
-      </categories>
-      <tags>
-        <tag>Statistics</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>分享一个有趣的游戏</title>
     <url>/2019/12/09/longton/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -957,163 +930,30 @@
       </tags>
   </entry>
   <entry>
-    <title>from softmax to crf</title>
-    <url>/2019/12/26/from-softmax-to-crf/</url>
+    <title>有趣的概率统计题</title>
+    <url>/2019/11/30/statistics/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
 
 <!-- toc -->
 <ul>
-<li><a href="#xu-lie-biao-zhu">序列标注</a><ul>
-<li><a href="#mo-xing">模型</a></li>
-<li><a href="#shu-xue-xing-shi">数学形式</a></li>
-</ul>
-</li>
-<li><a href="#yan-shi-jian-zhou-softmax">沿时间轴Softmax</a></li>
-<li><a href="#crf">CRF</a></li>
-<li><a href="#xian-xing-lian-crf">线性链CRF</a></li>
-<li><a href="#qiu-jie">求解</a></li>
-<li><a href="#demo">demo</a></li>
+<li><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</a></li>
 <li><a href="#guan-yu-tou-tu">关于头图</a></li>
 </ul>
 <!-- tocstop -->
 </div>
 
-<p>又做NER相关东西， 用到了CRF，所以想给组里人从头一步一步的将CRF讲一遍，希望大家看完能明白CRF的数学模型已经工程上的使用。<br>网上关于CRF大多数都是将他与HMM及概率图模型一起对比着讲，但是我觉得这需要一些背景知识，鉴于上次分享发现大家并没有什么背景知识，<br>所以这次希望能尽量减少背景知识就能让人搞懂CRF。</p>
-<h1><span id="xu-lie-biao-zhu">序列标注</span><a href="#xu-lie-biao-zhu" class="header-anchor"></a></h1><h2><span id="mo-xing">模型</span><a href="#mo-xing" class="header-anchor"></a></h2><p>通常CRF出现在序列标注任务中，所以我们先来看看序列标注主要是做什么的。<br>序列标注是NLP中一个重要的任务，它包括分词、词性标注、命名实体识等。下面用一个分词的例子来简单说明。（<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a>)<br>假设我们现在用$bmes$四标签来进行分词，其中b 代表begin即词的开头， m代表middle即词内，e代表end即词的结尾，s代表single即单独成词。<br>现在我们有一个字符串序列 “今天天气不错”，如果对应的分词结果为“今天/天气/不/错”，则其标签序列为“bebess”。由于在序列标注中，我们认为正确的标签序列是唯一的，<br>所以我们的目标就是在所有可能的标签序列中（如bbbbbb,ssssss)挑选出真实的标签序列（bebess), 即最大化概率$P(bebess|今天天气不错）$。<br><img src="/2019/12/26/from-softmax-to-crf/seg.png" alt="4tag分词网络示意图"><br>即在上图中，所有从左至右的连线中，选出黄色的那条。</p>
-<h2><span id="shu-xue-xing-shi">数学形式</span><a href="#shu-xue-xing-shi" class="header-anchor"></a></h2><p>我们假设输入序列是$X=[x_1, x_2, x_3, …, x_n]$,对应的输出序列是 $Y = [y_1, y_2, …, y_n]$,<br>label的集合为$L = [l_1, l_2, … , l_k]$. 任务目标是让真实的输出序列的概率最大，即：<br>$$<br>Max(P(y_1,y_2,..y_n|X))<br>$$</p>
-<h1><span id="yan-shi-jian-zhou-softmax">沿时间轴Softmax</span><a href="#yan-shi-jian-zhou-softmax" class="header-anchor"></a></h1><p>直接对上述模型进行求解比较困难，所以我们先将问题简化，然后在对简化后的问题进行求解。<br>首先，我们引入朴素假设：即标签之间独立不相关，对应的目标就简化为：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>$$<br>为了对$P(y_i|X)$进行建模，通常我们先通过RNNs（LSTM，BiLSTM, etc)来捕获输入X的全局信息，获得隐藏状态序列$\bar{x_1}, \bar{x_2}, …, \bar{x_n}$,<br>此时的$\bar{x_i}$可以看作是$x_i$ 通过X获取的特征，由于RNNs可以捕获全局信息，所以我们认为特征$\bar{x_i}$之间互不相关，对应的<br>$$P(y_i|X) = P(y_i|\bar{x_i})$$<br>我们的目标：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>= Max(P(y_1|\bar{x_1})P(y_2|\bar{x_2})..P(y_n|\bar{x_n}))<br>= Max(\prod(P(y_i|\bar{x_i})))<br>$$<br>此时只需要$Max(P(y_i|\bar{x_i}))$进行求解，即沿时间轴一步一步的对RNNs的隐藏输出通过softmax来最大化对应目标标签概率。<br><img src="/2019/12/26/from-softmax-to-crf/softmax.png" alt="沿时间轴softmax"></p>
-<h1><span id="crf">CRF</span><a href="#crf" class="header-anchor"></a></h1><p>因为在上一个方案中，我们做了朴素建设，将输出序列看作是相互独立的一元模型，这样会引入一些问题，如在分词中（bmes），m- 标签不能出现在s- 后面，<br>s- 标签不能出现在b- 和m-后面等，所以即使在上述方案中，至少也需要人为的设置一个“转移矩阵”，将不合理的转移方式得分置为0，来避免不合理方案的出现。<br>而上述方案出现错误的原因，本质上是因为我们的朴素假设：标签之间相互独立。为了解决上述方案的问题，我们至少需要在输出端显式考虑标签的关联性，即输出标签与上下文相关。<br><img src="/2019/12/26/from-softmax-to-crf/crf_example.png" alt="显式考虑输出端上下文"><br>显式考虑输出端上下文相关</p>
-<p>现在我们回到原始目标上来，原始目标是$Max(P(y_1,y_2,..y_n|X)) $, 上个方案中我们是因为直接对$P(y_1, y_2,…y_n|x_1, x_2, …,x_n)$直接建模很难，<br>所以才做出了假设，简化目标。现在让我们换个思路，为了求解上述概率，我们还可以穷举出输出序列所有的可能结果$Y_1, Y_2, …, Y_{k^n}$,<br>然后如果能计算出当前输入X对应每种可能的输出序列的“值”， 则我们可以通过Softmax计算出真实输出序列的概率，即得到$P(Y_{true}|X)$。<br><code>假设一：我们可以学习一个打分函数f，通过函数f可以得到输出序列关于输入的得分，即$score_i = f(Y_i, X)$</code><br>此时，我们的目标就转化为 $P(Y|X) = \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}$.<br>其中$Z(X) = \sum_{i=1}^{k^n}(exp(f(Y_i, X)))$。即此时的概率P是一个指数分布。<br>此时我们的方案是<code>1</code>个<code>$k^n$</code>多分类问题，即我们是对一个完整的输出序列为单位来计算概率（路径积分），而上一个方案中，是<code>n</code>个<code>k</code>分类问题，<br>这是两个方案的不同点之一。<br>在方案一中我们也说过，直接对完整序列建模比较困难，此时我们直接对$f(Y_i, X)$求解也会面临相同的困难，为了避免方案一的问题，我们不再使用一元模型，改为二元模型。<br><code>引入一阶马尔可夫假设，且其关联性是加性的。即当前输出标签只与前一个输出标签相关，其总得分是对所有得分求和。</code><br>此时的目标就转化为<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= P(y_1|X)P(y_2|y_1;X)…P(y_n|y_{n-1}|X)<br>= P(y_1|X)\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)} P(y_2|X) … \frac{P(y_{n-1}, y_n|X)}{P(y_{n-1}|X)P(y_n|X)} P(y_n|X)<br>$$<br>假设一中我们假设P是一个指数分布，所以此时我们引入两个函数e 和 t：e对$P(y_i|X)$建模, t 对$\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)}$建模，即：<br>$$<br>P(y_i|X) = exp(e(y_i, X))<br>\frac{P(y_{i-1},y_1|X)}{P(y_{i-1}|X)P(y_i|X)} = P(y_i|X)exp(t(y_{i-i}, y_i; X))<br>$$</p>
-<p>此时的目标就化简为：<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}<br>= \frac{1}{Z(X)} exp(e(y_i,X) + t(y_1, y_2; X) + e(y_2, X) + … + t(y_{n-1}, y_n; X) + e(y_n, X))<br>$$<br>此时我们只需要对每个标签和相邻标签打分，然后将所有打分求和，即可得到总得分，然后对目标进行求解。</p>
-<h1><span id="xian-xing-lian-crf">线性链CRF</span><a href="#xian-xing-lian-crf" class="header-anchor"></a></h1><p>虽然上面已经做了大量简化，但是求解时依然比较困难，主要是在求解t中，因为需要同时对输入X与标签$y_i$, $y_{i-1}$同时考虑，而在e中，<br>已经将输入与输出的关联进行了建模，此时我们引入线性链假设：假设t与输入X无关，则此时$ t(y_{i-1}, y_i;X) = t(y_{i-1}, y_i)$，那打分函数f简化为：<br>$$<br>f(y_1, y_2, …, y_n;X)<br>= e(y_1,X) + t(y_1, y_2) + e(y_2, X) + … + t(y_{n-1},y_n;X) + e(y_n,X)<br>$$<br>此时t就是一个待训练的参数矩阵，而e则可以通过RNNs来建模，概率分布也变为：</p>
-<p>$$<br>P(y_1, y_2,…,y_n|x_1, x_2,…,x_n)<br>= exp(e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e(y_{i+1}, X)])) \frac{1}{Z(X)}<br>$$</p>
-<h1><span id="qiu-jie">求解</span><a href="#qiu-jie" class="header-anchor"></a></h1><p>为了求解模型，我们用最大似然法， 即：</p>
-<p>$$loss = -logP(y_1, y_2, …, y_n|x_1, x_2, …, x_n)$$<br>将上式代入：</p>
-<p>$$loss = logZ(X) - (e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e( y_{i+1} , X)]) $$</p>
-<p>减号后面的项通过添加一个待训练的参数矩阵循环计算即可得到结果，难算的前面的归一化因子Z(X)。前面我们也说了，我们此时是以路径为单位，<br>则此时Z(X) 需要我们穷举所有可能的路径比对其打分求和，而此时的路径有 $k^n$条，是指数级的，直接算效率太低，几乎不可能。<br>在假设二中，我们引入了一阶马尔可夫假设，当前标签只与前一个标签有联系，因此我们可以递归的计算归一化因子，这使得原来是指数级的计算量降低为线性级别。<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a><br>（这点是求解归一化因子的关键，最初我在推导时一直卡在这点上）<br>具体的: 将计算到时刻t的归一化因子记为Zt，并将它安装标签分为k个部分，即：</p>
-<p>$$Zt = Zt^1 + Zt^2 + … + Zt^k$$<br>其中$Zt^i$表示以标签i为终点的所有路径的得分指数和，此时，我们写出递归公式：</p>
-<p>$$Z_{t+1}^1 = (Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X)$$</p>
-<p>$$…  $$</p>
-<p>$$Z_{t+1}^k = (Zt^1 T_{1k} + Zt^2 T{2k} + … + Zt^k T_{kk})E_{t+1}(k|X)$$</p>
-<p>其中T是矩阵t的各个元素取指数形式，即$T_{ij} = exp(t_{ij})$, E是e的指数形式，即$E_{ij} = exp(e_{ij})$, 而$e_{ij}$是指时刻i时RNNs对label j的打分。<br><img src="/2019/12/26/from-softmax-to-crf/logz.png" alt="logz"></p>
-<p>上式带有指数形式，我们取对数来简化计算过程。<br>$$<br>log(Z_{t+1}^1) = log((Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X) )  \\<br>=log(exp(log(Zt^1) + t_{11}) + exp(log(Zt^2) + t_{21}) + … + exp(log(Zt^k) + t_{k1}) exp(e_{t+1}(1|X)))  \\<br>= log(exp(log(Zt^1) + t_{11} + e_{t+1}(1|X)) + exp(log(Zt^2) + t_{21} + e_{t+1}(1|X)) + … + exp(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))\\<br>= log(\sum_k(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))<br>$$</p>
-<p>上面的过程比较曲折，对有些同学可能不太好理解，我们用一个简单的例子来帮助理解。<br>我们假设我们现在有一个输入$X=[w_0,w_1, w_2]$, 标签集合为$L=[l_1, l_2]$. RNNs对e完成了建模，即：</p>
-<table>
-<thead>
-<tr>
-<th>&nbsp;</th>
-<th>l1</th>
-<th>l2     </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>w0</td>
-<td>$e_{01}$</td>
-<td>$e_{02}$ </td>
-</tr>
-<tr>
-<td>w1</td>
-<td>$e_{11}$</td>
-<td>$e_{12}$ </td>
-</tr>
-<tr>
-<td>w2</td>
-<td>$e_{21}$</td>
-<td>$e_{22}$ </td>
-</tr>
-</tbody>
-</table>
-<p>其中$e_{ij}$代表第i个字是第j个标签的得分。<br>转移矩阵t:</p>
-<table>
-<thead>
-<tr>
-<th>&nbsp;</th>
-<th>l1</th>
-<th>l2 </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>l1</td>
-<td>t11</td>
-<td>t12  </td>
-</tr>
-<tr>
-<td>l2</td>
-<td>t21</td>
-<td>t22  </td>
-</tr>
-</tbody>
-</table>
-<p>其中$t_{ij}$代表第i个标签转换为第j个标签的得分。<br>接下来我们按从$w_0$到$w_2$的方向一步一步来进行计算。首先，我们引入两个变量: states, cur，其中:  </p>
-<ul>
-<li>states代表上一个时刻计算的最终结果，即对应$log(Z_t^i)$</li>
-<li><p>cur代表当前时刻各个标签的得分，即对应$e_t^i$</p>
-</li>
-<li><p><code>$w_0$:</code></p>
-</li>
-<li>states = None</li>
-<li>$cur = [e_{01}, e_{02}]$<br>此时:<br>$$log(Z) = exp(e_{01}) + exp(e_{02})$$</li>
-</ul>
-<ul>
-<li><code>$w_0$ –&gt; $w_1$:</code></li>
-<li>states = $[e_{01}, e_{02}]$</li>
-<li>cur = $[e_{11}, e{12}]$</li>
-</ul>
-<ol>
-<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="2">
-<li>扩展cur:<br>$<br>cur = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="3">
-<li>将cur, states 与转移矩阵t 求和:</li>
-</ol>
-<p>$<br>score = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>t_{11}&amp;t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix}$$<br>$=$ $$\begin{pmatrix}<br>e_{01} + e_{11} + t_{11} &amp; e_{01} + e_{12} + t_{12}\\<br>e_{02} + e_{11} + t_{21} &amp; e_{02} + e_{12} + t_{22}\\<br>\end{pmatrix}$$<br>$</p>
-<ol start="4">
-<li>对score取指数形式然后求和，得到新的states:<br>$$<br>states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))]<br>$$<br>其中，states中的每个元素即对应着式中$logZ_{t}^i$, 此时的$log(Z)= \sum_k(exp(log(Z^k)))$:</li>
-</ol>
-<p>$$<br>log(Z_{0,1}) = log(exp(log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))) + exp(log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22})))) \\<br>= log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}) + exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))<br>$$</p>
-<p>当序列长度为2，标签有两个时，所有可能的标签序列为$(label_1-&gt;label_1, label_2-&gt;label_1, label_1-&gt;label_2, label_2-&gt;label_2)$,而对应的序列得分，即对应上式中的项，即：</p>
-<ul>
-<li>$ S_1: label_1-&gt;label_1:$<br>$ S_1 = e_{01} + e_{11} + t_{11} $</li>
-<li>$S_2: label_2-&gt;label_1:$<br>$ S_2 = e_{02} + e_{11} + t_{21}$</li>
-<li>$S_3 = label_1-&gt;label_2:$<br>$ S_3 = e_{01} + e_{12} + t_{12}$</li>
-<li>$S_4 = label_2-&gt;label_2:$<br>$ S_4 = e_{02} + e_{12} + t_{22}$</li>
-</ul>
-<ul>
-<li><code>$w_0$ -&gt; $w_1$ -&gt; $w_2$:</code></li>
-<li>$states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))] $</li>
-<li>$cur = [e_{21}, e_{22}]$</li>
-</ul>
-<p>与上面的做法一样，也分为4步：</p>
-<ol>
-<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))&amp;log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))\\<br>log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))&amp;log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="2">
-<li>cur：<br>$<br>cur = $$\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="3">
-<li>将states，cur与转义矩阵t求和：</li>
-</ol>
-<p>$$<br>scores = \begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) &amp; log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) \\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) &amp; log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>t_{11}&amp; t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix} \\=<br>\begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11} &amp;log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12}\\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21} &amp;log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22}\\<br>\end{pmatrix}<br>$$</p>
-<ol start="4">
-<li>对score取指数形式然后求和，得到新的states:</li>
-</ol>
-<p>$$ states = [\\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11})+exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21})), \\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12})+ exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22})))] \\<br> = [log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})),\\<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22}))]<br>$$</p>
-<p>现在，我们用states计算一下$(Z_2)$:</p>
-<p>$$<br>log(Z_{(0-&gt;1-&gt;2)}) = log(exp(states[0]) + exp(states[1])) \\<br>=log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})) \\+<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22})) \\<br>= log(exp(e_{01}+e_{11}+t_{11}+e_{21}+t_{11}) + exp(e_{02}+e_{11}+t_{21}+e_{21}+t_{11}) \\ +<br>exp(e_{01}+e_{12}+t_{12} +e_{21}+t_{21}) + exp(e_{02}+e_{12}+t_{22}+e_{21}+t_{21}) \\+<br>exp(e_{01}+e_{11}+t_{11} +e_{22}+t_{12}) + exp(e_{01}+e_{11}+t_{11}+e_{22}+t_{12}) \\+<br>exp(e_{01}+e_{12}+t_{12} +e_{22}+t_{22}) + exp(e_{01}+e_{12}+t_{12}+e_{22}+t_{21}))<br>$$</p>
-<p>上式也就是我们要求的最终结果$log(Z)$,其中指数内对应着所有路径的得分。<br>到此，上例中的整个归一化因子的计算过程也就完成了，而CRF中最难的部分也就解决了。</p>
-<h1><span id="demo">demo</span><a href="#demo" class="header-anchor"></a></h1><p>搞懂了理论部分，下面写一个demo来验证一下。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CRF</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mask_label=False, **kwargs)</span>:</span></span><br><span class="line">        self.mask_label = <span class="number">1</span> <span class="keyword">if</span> mask_label <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        super(CRF, self).__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">build</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        self.num_label = input_shape[<span class="number">-1</span>] - self.mask_label</span><br><span class="line">        self.trans = self.add_weight(name=<span class="string">'crf_trans'</span>,</span><br><span class="line">                                     shape=(self.num_label, self.num_label),</span><br><span class="line">                                     trainable=<span class="literal">True</span>,</span><br><span class="line">                                     initializer=<span class="string">'glorot_uniform'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">path_score</span><span class="params">(self, inputs, labels)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label), obtained from rnn(lstm, bilstm. etc.)</span></span><br><span class="line"><span class="string">        :param labels: one-hot, (batch_size, timesteps, num_label) , real target series</span></span><br><span class="line"><span class="string">        :return:  path score</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        point_score = K.sum(K.sum(inputs * labels, <span class="number">2</span>), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        label_pre = K.expand_dims(labels[:, :<span class="number">-1</span>], <span class="number">3</span>)</span><br><span class="line">        label_next = K.expand_dims(labels[:, <span class="number">1</span>:], <span class="number">2</span>)</span><br><span class="line">        label_trans = label_pre * label_next</span><br><span class="line">        trans = K.expand_dims(K.expand_dims(self.trans, <span class="number">0</span>), <span class="number">0</span>)</span><br><span class="line">        trans_score = K.sum(K.sum(label_trans * trans, [<span class="number">2</span>, <span class="number">3</span>]), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> point_score + trans_score</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">log_norm_pre</span><span class="params">(self, inputs, states)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        expand previous states and inputs, sum with trans</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, num_label), current word emission scores</span></span><br><span class="line"><span class="string">        :param states: (batch_size, num_label), all paths  score of previous word</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        states = K.expand_dims(states[<span class="number">0</span>], <span class="number">2</span>)</span><br><span class="line">        inputs = K.expand_dims(inputs, <span class="number">1</span>)</span><br><span class="line">        trans = K.expand_dims(self.trans, <span class="number">0</span>)</span><br><span class="line">        scores = states + trans + inputs</span><br><span class="line">        output = K.logsumexp(scores, <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> output, [output]</span><br><span class="line">        <span class="comment"># states = K.expand_dims(states[0], 2)  # (batch_size, output_dim, 1)</span></span><br><span class="line">        <span class="comment"># trans = K.expand_dims(self.trans, 0)  # (1, output_dim, output_dim)</span></span><br><span class="line">        <span class="comment"># output = K.logsumexp(states + trans, 1)  # (batch_size, output_dim)</span></span><br><span class="line">        <span class="comment"># return output + inputs, [output + inputs]</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">loss</span><span class="params">(self, y_true, y_pre)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label)</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># mask = 1 - y_true[:, 1: -1] if self.mask_label else None</span></span><br><span class="line">        <span class="comment"># # y_true, y_pred = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span></span><br><span class="line">        <span class="comment"># real_path_score = self.path_score(y_pre, y_true)</span></span><br><span class="line">        <span class="comment"># init_states = [y_pre[:, 0]]</span></span><br><span class="line">        <span class="comment"># log_norm, _ = K.rnn(self.log_norm_pre, initial_states=init_states, inputs=y_pre[:, 1:], mask=mask)  # log(Z)</span></span><br><span class="line">        <span class="comment"># log_norm_score = K.logsumexp(log_norm, 1, keepdims=True)</span></span><br><span class="line">        <span class="comment"># return log_norm_score - real_path_score</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, <span class="number">1</span>:, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pre = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span><br><span class="line">        init_states = [y_pre[:, <span class="number">0</span>]]  <span class="comment"># 初始状态</span></span><br><span class="line">        log_norm, _, _ = K.rnn(self.log_norm_pre, y_pre[:, <span class="number">1</span>:], init_states, mask=mask)  <span class="comment"># 计算Z向量（对数）</span></span><br><span class="line">        log_norm = K.logsumexp(log_norm, <span class="number">1</span>, keepdims=<span class="literal">True</span>)  <span class="comment"># 计算Z（对数）</span></span><br><span class="line">        path_score = self.path_score(y_pre, y_true)  <span class="comment"># 计算分子（对数）</span></span><br><span class="line">        <span class="keyword">return</span> log_norm - path_score  <span class="comment"># 即log(分子/分母)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span>  <span class="comment"># crf 只是loss，不改变inputs</span></span><br><span class="line">        <span class="keyword">return</span> inputs</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accuracy</span><span class="params">(self, y_true, y_pred)</span>:</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, :, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pred = y_true[:, :, :self.num_label], y_pred[:, :, :self.num_label]</span><br><span class="line">        isequal = K.equal(K.argmax(y_true, <span class="number">2</span>), K.argmax(y_pred, <span class="number">2</span>))</span><br><span class="line">        isequal = K.cast(isequal, <span class="string">'float32'</span>)</span><br><span class="line">        <span class="keyword">if</span> mask == <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> K.mean(isequal)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> K.sum(isequal * mask) / K.sum(mask)</span><br></pre></td></tr></table></figure></p>
-<p>结果：<br><img src="/2019/12/26/from-softmax-to-crf/result.png" alt="result"></p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>初雪下的红果果</p>
+
+<p>昨晚下雪了，开心😄！</p>
+<h1><span id="fen-xiang-yi-ge-you-qu-de-gai-lu-ti">分享一个有趣的概率题</span><a href="#fen-xiang-yi-ge-you-qu-de-gai-lu-ti" class="header-anchor"></a></h1><p>一段线段上，任意取两不重合的点，将这条线段切分成三段，问，这三条线段组成三角形点概率是多少？</p>
+<p>现在我们将问题转化一下，假设原始线段长度为1，即$(0，1)$表示原始线段，此时，随机在$(0，1)$范围内选两个点a，b，组成$(0，a)$，$(a，b)$，$(b，1)$三个线段，<br>此时原始问题等价于现在的三个线段组成三角形的概率。<br>现在我们来考虑一下，三条线段分别为$A$， $B$，$C$，其中$A &gt;= B &gt;= C$,则A的长度必定在$[1/3, 1)$,而要组成三角形，则需要 $B + C &gt; A$,所以 B + C 的长度为$(1/2, 1)$,<br>而对应的A的长度也就在[1/3, 1/2)内，所以，最终能构成三角形的概率即为 $A_{triangle} / A_{all} = (1/2 - 1/3) / (1 - 1/3) = 1/4$</p>
+<p>看似非常复杂的问题，从最基本的数学知识就能解答，还真是有趣！ </p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>2019年的第一场雪，摄于望京地铁站</p>
 ]]></content>
       <categories>
-        <category>NLP</category>
+        <category>Math</category>
       </categories>
       <tags>
-        <tag>CRF</tag>
+        <tag>Statistics</tag>
       </tags>
   </entry>
   <entry>
@@ -1287,6 +1127,166 @@
       <tags>
         <tag>Hexo</tag>
         <tag>MarkDown</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>from softmax to crf</title>
+    <url>/2019/12/26/from-softmax-to-crf/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#xu-lie-biao-zhu">序列标注</a><ul>
+<li><a href="#mo-xing">模型</a></li>
+<li><a href="#shu-xue-xing-shi">数学形式</a></li>
+</ul>
+</li>
+<li><a href="#yan-shi-jian-zhou-softmax">沿时间轴Softmax</a></li>
+<li><a href="#crf">CRF</a></li>
+<li><a href="#xian-xing-lian-crf">线性链CRF</a></li>
+<li><a href="#qiu-jie">求解</a></li>
+<li><a href="#demo">demo</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>又做NER相关东西， 用到了CRF，所以想给组里人从头一步一步的将CRF讲一遍，希望大家看完能明白CRF的数学模型已经工程上的使用。<br>网上关于CRF大多数都是将他与HMM及概率图模型一起对比着讲，但是我觉得这需要一些背景知识，鉴于上次分享发现大家并没有什么背景知识，<br>所以这次希望能尽量减少背景知识就能让人搞懂CRF。</p>
+<h1><span id="xu-lie-biao-zhu">序列标注</span><a href="#xu-lie-biao-zhu" class="header-anchor"></a></h1><h2><span id="mo-xing">模型</span><a href="#mo-xing" class="header-anchor"></a></h2><p>通常CRF出现在序列标注任务中，所以我们先来看看序列标注主要是做什么的。<br>序列标注是NLP中一个重要的任务，它包括分词、词性标注、命名实体识等。下面用一个分词的例子来简单说明。（<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a>)<br>假设我们现在用$bmes$四标签来进行分词，其中b 代表begin即词的开头， m代表middle即词内，e代表end即词的结尾，s代表single即单独成词。<br>现在我们有一个字符串序列 “今天天气不错”，如果对应的分词结果为“今天/天气/不/错”，则其标签序列为“bebess”。由于在序列标注中，我们认为正确的标签序列是唯一的，<br>所以我们的目标就是在所有可能的标签序列中（如bbbbbb,ssssss)挑选出真实的标签序列（bebess), 即最大化概率$P(bebess|今天天气不错）$。<br><img src="/2019/12/26/from-softmax-to-crf/seg.png" alt="4tag分词网络示意图"><br>即在上图中，所有从左至右的连线中，选出黄色的那条。</p>
+<h2><span id="shu-xue-xing-shi">数学形式</span><a href="#shu-xue-xing-shi" class="header-anchor"></a></h2><p>我们假设输入序列是$X=[x_1, x_2, x_3, …, x_n]$,对应的输出序列是 $Y = [y_1, y_2, …, y_n]$,<br>label的集合为$L = [l_1, l_2, … , l_k]$. 任务目标是让真实的输出序列的概率最大，即：<br>$$<br>Max(P(y_1,y_2,..y_n|X))<br>$$</p>
+<h1><span id="yan-shi-jian-zhou-softmax">沿时间轴Softmax</span><a href="#yan-shi-jian-zhou-softmax" class="header-anchor"></a></h1><p>直接对上述模型进行求解比较困难，所以我们先将问题简化，然后在对简化后的问题进行求解。<br>首先，我们引入朴素假设：即标签之间独立不相关，对应的目标就简化为：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>$$<br>为了对$P(y_i|X)$进行建模，通常我们先通过RNNs（LSTM，BiLSTM, etc)来捕获输入X的全局信息，获得隐藏状态序列$\bar{x_1}, \bar{x_2}, …, \bar{x_n}$,<br>此时的$\bar{x_i}$可以看作是$x_i$ 通过X获取的特征，由于RNNs可以捕获全局信息，所以我们认为特征$\bar{x_i}$之间互不相关，对应的<br>$$P(y_i|X) = P(y_i|\bar{x_i})$$<br>我们的目标：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>= Max(P(y_1|\bar{x_1})P(y_2|\bar{x_2})..P(y_n|\bar{x_n}))<br>= Max(\prod(P(y_i|\bar{x_i})))<br>$$<br>此时只需要$Max(P(y_i|\bar{x_i}))$进行求解，即沿时间轴一步一步的对RNNs的隐藏输出通过softmax来最大化对应目标标签概率。<br><img src="/2019/12/26/from-softmax-to-crf/softmax.png" alt="沿时间轴softmax"></p>
+<h1><span id="crf">CRF</span><a href="#crf" class="header-anchor"></a></h1><p>因为在上一个方案中，我们做了朴素建设，将输出序列看作是相互独立的一元模型，这样会引入一些问题，如在分词中（bmes），m- 标签不能出现在s- 后面，<br>s- 标签不能出现在b- 和m-后面等，所以即使在上述方案中，至少也需要人为的设置一个“转移矩阵”，将不合理的转移方式得分置为0，来避免不合理方案的出现。<br>而上述方案出现错误的原因，本质上是因为我们的朴素假设：标签之间相互独立。为了解决上述方案的问题，我们至少需要在输出端显式考虑标签的关联性，即输出标签与上下文相关。<br><img src="/2019/12/26/from-softmax-to-crf/crf_example.png" alt="显式考虑输出端上下文"><br>显式考虑输出端上下文相关</p>
+<p>现在我们回到原始目标上来，原始目标是$Max(P(y_1,y_2,..y_n|X)) $, 上个方案中我们是因为直接对$P(y_1, y_2,…y_n|x_1, x_2, …,x_n)$直接建模很难，<br>所以才做出了假设，简化目标。现在让我们换个思路，为了求解上述概率，我们还可以穷举出输出序列所有的可能结果$Y_1, Y_2, …, Y_{k^n}$,<br>然后如果能计算出当前输入X对应每种可能的输出序列的“值”， 则我们可以通过Softmax计算出真实输出序列的概率，即得到$P(Y_{true}|X)$。<br><code>假设一：我们可以学习一个打分函数f，通过函数f可以得到输出序列关于输入的得分，即$score_i = f(Y_i, X)$</code><br>此时，我们的目标就转化为 $P(Y|X) = \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}$.<br>其中$Z(X) = \sum_{i=1}^{k^n}(exp(f(Y_i, X)))$。即此时的概率P是一个指数分布。<br>此时我们的方案是<code>1</code>个<code>$k^n$</code>多分类问题，即我们是对一个完整的输出序列为单位来计算概率（路径积分），而上一个方案中，是<code>n</code>个<code>k</code>分类问题，<br>这是两个方案的不同点之一。<br>在方案一中我们也说过，直接对完整序列建模比较困难，此时我们直接对$f(Y_i, X)$求解也会面临相同的困难，为了避免方案一的问题，我们不再使用一元模型，改为二元模型。<br><code>引入一阶马尔可夫假设，且其关联性是加性的。即当前输出标签只与前一个输出标签相关，其总得分是对所有得分求和。</code><br>此时的目标就转化为<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= P(y_1|X)P(y_2|y_1;X)…P(y_n|y_{n-1}|X)<br>= P(y_1|X)\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)} P(y_2|X) … \frac{P(y_{n-1}, y_n|X)}{P(y_{n-1}|X)P(y_n|X)} P(y_n|X)<br>$$<br>假设一中我们假设P是一个指数分布，所以此时我们引入两个函数e 和 t：e对$P(y_i|X)$建模, t 对$\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)}$建模，即：<br>$$<br>P(y_i|X) = exp(e(y_i, X))<br>\frac{P(y_{i-1},y_1|X)}{P(y_{i-1}|X)P(y_i|X)} = P(y_i|X)exp(t(y_{i-i}, y_i; X))<br>$$</p>
+<p>此时的目标就化简为：<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}<br>= \frac{1}{Z(X)} exp(e(y_i,X) + t(y_1, y_2; X) + e(y_2, X) + … + t(y_{n-1}, y_n; X) + e(y_n, X))<br>$$<br>此时我们只需要对每个标签和相邻标签打分，然后将所有打分求和，即可得到总得分，然后对目标进行求解。</p>
+<h1><span id="xian-xing-lian-crf">线性链CRF</span><a href="#xian-xing-lian-crf" class="header-anchor"></a></h1><p>虽然上面已经做了大量简化，但是求解时依然比较困难，主要是在求解t中，因为需要同时对输入X与标签$y_i$, $y_{i-1}$同时考虑，而在e中，<br>已经将输入与输出的关联进行了建模，此时我们引入线性链假设：假设t与输入X无关，则此时$ t(y_{i-1}, y_i;X) = t(y_{i-1}, y_i)$，那打分函数f简化为：<br>$$<br>f(y_1, y_2, …, y_n;X)<br>= e(y_1,X) + t(y_1, y_2) + e(y_2, X) + … + t(y_{n-1},y_n;X) + e(y_n,X)<br>$$<br>此时t就是一个待训练的参数矩阵，而e则可以通过RNNs来建模，概率分布也变为：</p>
+<p>$$<br>P(y_1, y_2,…,y_n|x_1, x_2,…,x_n)<br>= exp(e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e(y_{i+1}, X)])) \frac{1}{Z(X)}<br>$$</p>
+<h1><span id="qiu-jie">求解</span><a href="#qiu-jie" class="header-anchor"></a></h1><p>为了求解模型，我们用最大似然法， 即：</p>
+<p>$$loss = -logP(y_1, y_2, …, y_n|x_1, x_2, …, x_n)$$<br>将上式代入：</p>
+<p>$$loss = logZ(X) - (e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e( y_{i+1} , X)]) $$</p>
+<p>减号后面的项通过添加一个待训练的参数矩阵循环计算即可得到结果，难算的前面的归一化因子Z(X)。前面我们也说了，我们此时是以路径为单位，<br>则此时Z(X) 需要我们穷举所有可能的路径比对其打分求和，而此时的路径有 $k^n$条，是指数级的，直接算效率太低，几乎不可能。<br>在假设二中，我们引入了一阶马尔可夫假设，当前标签只与前一个标签有联系，因此我们可以递归的计算归一化因子，这使得原来是指数级的计算量降低为线性级别。<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a><br>（这点是求解归一化因子的关键，最初我在推导时一直卡在这点上）<br>具体的: 将计算到时刻t的归一化因子记为Zt，并将它安装标签分为k个部分，即：</p>
+<p>$$Zt = Zt^1 + Zt^2 + … + Zt^k$$<br>其中$Zt^i$表示以标签i为终点的所有路径的得分指数和，此时，我们写出递归公式：</p>
+<p>$$Z_{t+1}^1 = (Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X)$$</p>
+<p>$$…  $$</p>
+<p>$$Z_{t+1}^k = (Zt^1 T_{1k} + Zt^2 T{2k} + … + Zt^k T_{kk})E_{t+1}(k|X)$$</p>
+<p>其中T是矩阵t的各个元素取指数形式，即$T_{ij} = exp(t_{ij})$, E是e的指数形式，即$E_{ij} = exp(e_{ij})$, 而$e_{ij}$是指时刻i时RNNs对label j的打分。<br><img src="/2019/12/26/from-softmax-to-crf/logz.png" alt="logz"></p>
+<p>上式带有指数形式，我们取对数来简化计算过程。<br>$$<br>log(Z_{t+1}^1) = log((Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X) )  \\<br>=log(exp(log(Zt^1) + t_{11}) + exp(log(Zt^2) + t_{21}) + … + exp(log(Zt^k) + t_{k1}) exp(e_{t+1}(1|X)))  \\<br>= log(exp(log(Zt^1) + t_{11} + e_{t+1}(1|X)) + exp(log(Zt^2) + t_{21} + e_{t+1}(1|X)) + … + exp(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))\\<br>= log(\sum_k(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))<br>$$</p>
+<p>上面的过程比较曲折，对有些同学可能不太好理解，我们用一个简单的例子来帮助理解。<br>我们假设我们现在有一个输入$X=[w_0,w_1, w_2]$, 标签集合为$L=[l_1, l_2]$. RNNs对e完成了建模，即：</p>
+<table>
+<thead>
+<tr>
+<th>&nbsp;</th>
+<th>l1</th>
+<th>l2     </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>w0</td>
+<td>$e_{01}$</td>
+<td>$e_{02}$ </td>
+</tr>
+<tr>
+<td>w1</td>
+<td>$e_{11}$</td>
+<td>$e_{12}$ </td>
+</tr>
+<tr>
+<td>w2</td>
+<td>$e_{21}$</td>
+<td>$e_{22}$ </td>
+</tr>
+</tbody>
+</table>
+<p>其中$e_{ij}$代表第i个字是第j个标签的得分。<br>转移矩阵t:</p>
+<table>
+<thead>
+<tr>
+<th>&nbsp;</th>
+<th>l1</th>
+<th>l2 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>l1</td>
+<td>t11</td>
+<td>t12  </td>
+</tr>
+<tr>
+<td>l2</td>
+<td>t21</td>
+<td>t22  </td>
+</tr>
+</tbody>
+</table>
+<p>其中$t_{ij}$代表第i个标签转换为第j个标签的得分。<br>接下来我们按从$w_0$到$w_2$的方向一步一步来进行计算。首先，我们引入两个变量: states, cur，其中:  </p>
+<ul>
+<li>states代表上一个时刻计算的最终结果，即对应$log(Z_t^i)$</li>
+<li><p>cur代表当前时刻各个标签的得分，即对应$e_t^i$</p>
+</li>
+<li><p><code>$w_0$:</code></p>
+</li>
+<li>states = None</li>
+<li>$cur = [e_{01}, e_{02}]$<br>此时:<br>$$log(Z) = exp(e_{01}) + exp(e_{02})$$</li>
+</ul>
+<ul>
+<li><code>$w_0$ –&gt; $w_1$:</code></li>
+<li>states = $[e_{01}, e_{02}]$</li>
+<li>cur = $[e_{11}, e{12}]$</li>
+</ul>
+<ol>
+<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="2">
+<li>扩展cur:<br>$<br>cur = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="3">
+<li>将cur, states 与转移矩阵t 求和:</li>
+</ol>
+<p>$<br>score = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>t_{11}&amp;t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix}$$<br>$=$ $$\begin{pmatrix}<br>e_{01} + e_{11} + t_{11} &amp; e_{01} + e_{12} + t_{12}\\<br>e_{02} + e_{11} + t_{21} &amp; e_{02} + e_{12} + t_{22}\\<br>\end{pmatrix}$$<br>$</p>
+<ol start="4">
+<li>对score取指数形式然后求和，得到新的states:<br>$$<br>states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))]<br>$$<br>其中，states中的每个元素即对应着式中$logZ_{t}^i$, 此时的$log(Z)= \sum_k(exp(log(Z^k)))$:</li>
+</ol>
+<p>$$<br>log(Z_{0,1}) = log(exp(log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))) + exp(log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22})))) \\<br>= log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}) + exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))<br>$$</p>
+<p>当序列长度为2，标签有两个时，所有可能的标签序列为$(label_1-&gt;label_1, label_2-&gt;label_1, label_1-&gt;label_2, label_2-&gt;label_2)$,而对应的序列得分，即对应上式中的项，即：</p>
+<ul>
+<li>$ S_1: label_1-&gt;label_1:$<br>$ S_1 = e_{01} + e_{11} + t_{11} $</li>
+<li>$S_2: label_2-&gt;label_1:$<br>$ S_2 = e_{02} + e_{11} + t_{21}$</li>
+<li>$S_3 = label_1-&gt;label_2:$<br>$ S_3 = e_{01} + e_{12} + t_{12}$</li>
+<li>$S_4 = label_2-&gt;label_2:$<br>$ S_4 = e_{02} + e_{12} + t_{22}$</li>
+</ul>
+<ul>
+<li><code>$w_0$ -&gt; $w_1$ -&gt; $w_2$:</code></li>
+<li>$states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))] $</li>
+<li>$cur = [e_{21}, e_{22}]$</li>
+</ul>
+<p>与上面的做法一样，也分为4步：</p>
+<ol>
+<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))&amp;log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))\\<br>log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))&amp;log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="2">
+<li>cur：<br>$<br>cur = $$\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="3">
+<li>将states，cur与转义矩阵t求和：</li>
+</ol>
+<p>$$<br>scores = \begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) &amp; log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) \\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) &amp; log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>t_{11}&amp; t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix} \\=<br>\begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11} &amp;log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12}\\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21} &amp;log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22}\\<br>\end{pmatrix}<br>$$</p>
+<ol start="4">
+<li>对score取指数形式然后求和，得到新的states:</li>
+</ol>
+<p>$$ states = [\\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11})+exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21})), \\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12})+ exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22})))] \\<br> = [log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})),\\<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22}))]<br>$$</p>
+<p>现在，我们用states计算一下$(Z_2)$:</p>
+<p>$$<br>log(Z_{(0-&gt;1-&gt;2)}) = log(exp(states[0]) + exp(states[1])) \\<br>=log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})) \\+<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22})) \\<br>= log(exp(e_{01}+e_{11}+t_{11}+e_{21}+t_{11}) + exp(e_{02}+e_{11}+t_{21}+e_{21}+t_{11}) \\ +<br>exp(e_{01}+e_{12}+t_{12} +e_{21}+t_{21}) + exp(e_{02}+e_{12}+t_{22}+e_{21}+t_{21}) \\+<br>exp(e_{01}+e_{11}+t_{11} +e_{22}+t_{12}) + exp(e_{01}+e_{11}+t_{11}+e_{22}+t_{12}) \\+<br>exp(e_{01}+e_{12}+t_{12} +e_{22}+t_{22}) + exp(e_{01}+e_{12}+t_{12}+e_{22}+t_{21}))<br>$$</p>
+<p>上式也就是我们要求的最终结果$log(Z)$,其中指数内对应着所有路径的得分。<br>到此，上例中的整个归一化因子的计算过程也就完成了，而CRF中最难的部分也就解决了。</p>
+<h1><span id="demo">demo</span><a href="#demo" class="header-anchor"></a></h1><p>搞懂了理论部分，下面写一个demo来验证一下。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CRF</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mask_label=False, **kwargs)</span>:</span></span><br><span class="line">        self.mask_label = <span class="number">1</span> <span class="keyword">if</span> mask_label <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        super(CRF, self).__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">build</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        self.num_label = input_shape[<span class="number">-1</span>] - self.mask_label</span><br><span class="line">        self.trans = self.add_weight(name=<span class="string">'crf_trans'</span>,</span><br><span class="line">                                     shape=(self.num_label, self.num_label),</span><br><span class="line">                                     trainable=<span class="literal">True</span>,</span><br><span class="line">                                     initializer=<span class="string">'glorot_uniform'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">path_score</span><span class="params">(self, inputs, labels)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label), obtained from rnn(lstm, bilstm. etc.)</span></span><br><span class="line"><span class="string">        :param labels: one-hot, (batch_size, timesteps, num_label) , real target series</span></span><br><span class="line"><span class="string">        :return:  path score</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        point_score = K.sum(K.sum(inputs * labels, <span class="number">2</span>), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        label_pre = K.expand_dims(labels[:, :<span class="number">-1</span>], <span class="number">3</span>)</span><br><span class="line">        label_next = K.expand_dims(labels[:, <span class="number">1</span>:], <span class="number">2</span>)</span><br><span class="line">        label_trans = label_pre * label_next</span><br><span class="line">        trans = K.expand_dims(K.expand_dims(self.trans, <span class="number">0</span>), <span class="number">0</span>)</span><br><span class="line">        trans_score = K.sum(K.sum(label_trans * trans, [<span class="number">2</span>, <span class="number">3</span>]), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> point_score + trans_score</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">log_norm_pre</span><span class="params">(self, inputs, states)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        expand previous states and inputs, sum with trans</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, num_label), current word emission scores</span></span><br><span class="line"><span class="string">        :param states: (batch_size, num_label), all paths  score of previous word</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        states = K.expand_dims(states[<span class="number">0</span>], <span class="number">2</span>)</span><br><span class="line">        inputs = K.expand_dims(inputs, <span class="number">1</span>)</span><br><span class="line">        trans = K.expand_dims(self.trans, <span class="number">0</span>)</span><br><span class="line">        scores = states + trans + inputs</span><br><span class="line">        output = K.logsumexp(scores, <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> output, [output]</span><br><span class="line">        <span class="comment"># states = K.expand_dims(states[0], 2)  # (batch_size, output_dim, 1)</span></span><br><span class="line">        <span class="comment"># trans = K.expand_dims(self.trans, 0)  # (1, output_dim, output_dim)</span></span><br><span class="line">        <span class="comment"># output = K.logsumexp(states + trans, 1)  # (batch_size, output_dim)</span></span><br><span class="line">        <span class="comment"># return output + inputs, [output + inputs]</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">loss</span><span class="params">(self, y_true, y_pre)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label)</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># mask = 1 - y_true[:, 1: -1] if self.mask_label else None</span></span><br><span class="line">        <span class="comment"># # y_true, y_pred = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span></span><br><span class="line">        <span class="comment"># real_path_score = self.path_score(y_pre, y_true)</span></span><br><span class="line">        <span class="comment"># init_states = [y_pre[:, 0]]</span></span><br><span class="line">        <span class="comment"># log_norm, _ = K.rnn(self.log_norm_pre, initial_states=init_states, inputs=y_pre[:, 1:], mask=mask)  # log(Z)</span></span><br><span class="line">        <span class="comment"># log_norm_score = K.logsumexp(log_norm, 1, keepdims=True)</span></span><br><span class="line">        <span class="comment"># return log_norm_score - real_path_score</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, <span class="number">1</span>:, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pre = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span><br><span class="line">        init_states = [y_pre[:, <span class="number">0</span>]]  <span class="comment"># 初始状态</span></span><br><span class="line">        log_norm, _, _ = K.rnn(self.log_norm_pre, y_pre[:, <span class="number">1</span>:], init_states, mask=mask)  <span class="comment"># 计算Z向量（对数）</span></span><br><span class="line">        log_norm = K.logsumexp(log_norm, <span class="number">1</span>, keepdims=<span class="literal">True</span>)  <span class="comment"># 计算Z（对数）</span></span><br><span class="line">        path_score = self.path_score(y_pre, y_true)  <span class="comment"># 计算分子（对数）</span></span><br><span class="line">        <span class="keyword">return</span> log_norm - path_score  <span class="comment"># 即log(分子/分母)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span>  <span class="comment"># crf 只是loss，不改变inputs</span></span><br><span class="line">        <span class="keyword">return</span> inputs</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accuracy</span><span class="params">(self, y_true, y_pred)</span>:</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, :, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pred = y_true[:, :, :self.num_label], y_pred[:, :, :self.num_label]</span><br><span class="line">        isequal = K.equal(K.argmax(y_true, <span class="number">2</span>), K.argmax(y_pred, <span class="number">2</span>))</span><br><span class="line">        isequal = K.cast(isequal, <span class="string">'float32'</span>)</span><br><span class="line">        <span class="keyword">if</span> mask == <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> K.mean(isequal)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> K.sum(isequal * mask) / K.sum(mask)</span><br></pre></td></tr></table></figure></p>
+<p>结果：<br><img src="/2019/12/26/from-softmax-to-crf/result.png" alt="result"></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>初雪下的红果果</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>CRF</tag>
       </tags>
   </entry>
   <entry>
@@ -3035,40 +3035,6 @@
       </tags>
   </entry>
   <entry>
-    <title>nohup踩坑记</title>
-    <url>/2022/07/05/nohup-debug/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#bei-jing">背景</a></li>
-<li><a href="#nohup">nohup</a></li>
-<li><a href="#ti-dai">替代</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="bei-jing">背景</span><a href="#bei-jing" class="header-anchor"></a></h1><p>最近在测试<a href="https://xv44586.github.io/2022/05/25/horovod/">horovod</a>下的单机多卡/多机多卡的性能，结果遇到一个神奇的现象：训练总是会在一段时间后意外停止，停止后从系统到程序，没有任何异常，没有任何错误日志。而训练停止这个现象总是能复现，但是复现时又不完全一样，即同样的训练脚本，其每次训练意外停止时完成的更新次数还不一样。<br>为了解决这个神奇的bug，我们尝试从物理机、系统资源、驱动、软件环境、训练脚本、训练数据等多个环节进行检查，均未发现任何问题，最终无意间发现使用xshell （之前使用的WSL2)后训练停止的现象不在发生。最终发现竟然是因为对nohup 的坑，特此记录一下。</p>
-<h1><span id="nohup">nohup</span><a href="#nohup" class="header-anchor"></a></h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nohup is a POSIX command which means &quot;no hang up&quot;. Its purpose is to execute a command such that it ignores the HUP (hangup) signal and therefore does not stop when the user logs out.</span><br></pre></td></tr></table></figure>
-<p>上面这段是引自<a href="https://en.wikipedia.org/wiki/Nohup#Overcoming_hanging" target="_blank" rel="noopener">wikipedia</a>，即nohup 的作用是忽略HUP 信号，从而让用户log out 时，程序依然保持执行而不中断。</p>
-<p>然而有些场景下，nohup 依然会失效，即使用了nohup 后程序依然可能被中断，如<a href="https://unix.stackexchange.com/questions/420594/why-process-killed-with-nohup" target="_blank" rel="noopener">hy-process-killed-with-nohup</a>提到的两个场景，此外，通常我们使用nohup 的场景时ssh 下，而ssh 为了避免丢失数据，会拒绝log out。 参考wiki中提到的：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Note that nohupping backgrounded jobs is typically used to avoid terminating them when logging off from a remote SSH session. A different issue that often arises in this situation is that ssh is refusing to log off (&quot;hangs&quot;), since it refuses to lose any data from/to the background job(s).[6][7] This problem can also be overcome by redirecting all three I/O streams:</span><br><span class="line"></span><br><span class="line">$ nohup ./myprogram &gt; foo.out 2&gt; foo.err &lt; /dev/null &amp;</span><br></pre></td></tr></table></figure></p>
-<p>我的训练脚本使用时，对stdout/stderr 进行了重定向，未对stdin 进行重定向，即：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nohup ./myprogram &gt; foo.out 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure></p>
-<p>最终导致训练在进行一段时间后意外中断而没有任何异常信息。而这个像幽灵一样无声无息的“小问题”让我们花了接近三周时间debug，最终在猜测中定位到nohup 。</p>
-<h1><span id="ti-dai">替代</span><a href="#ti-dai" class="header-anchor"></a></h1><p>由上面可以看出，nohup 并不是一个”好” 的后台执行解决方案，而对应的替代品，推荐使用<a href="https://github.com/tmux/tmux/wiki" target="_blank" rel="noopener">tmux</a><br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">tmux is a terminal multiplexer. It lets you switch easily between several programs in one terminal, detach them (they keep running in the background) and reattach them to a different terminal.</span><br></pre></td></tr></table></figure></p>
-<p>tmux稳定可靠，利用tmux，将session 与 terminal 进行detach，从而让程序在后台执行。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>深度debug</p>
-]]></content>
-      <categories>
-        <category>Programming</category>
-      </categories>
-      <tags>
-        <tag>horovod</tag>
-        <tag>nohup</tag>
-        <tag>debug</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>训练加速篇（3）horovod之多机多卡</title>
     <url>/2022/07/06/horovod-multi-nodes/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -3160,6 +3126,40 @@
       </tags>
   </entry>
   <entry>
+    <title>nohup踩坑记</title>
+    <url>/2022/07/05/nohup-debug/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#bei-jing">背景</a></li>
+<li><a href="#nohup">nohup</a></li>
+<li><a href="#ti-dai">替代</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<h1><span id="bei-jing">背景</span><a href="#bei-jing" class="header-anchor"></a></h1><p>最近在测试<a href="https://xv44586.github.io/2022/05/25/horovod/">horovod</a>下的单机多卡/多机多卡的性能，结果遇到一个神奇的现象：训练总是会在一段时间后意外停止，停止后从系统到程序，没有任何异常，没有任何错误日志。而训练停止这个现象总是能复现，但是复现时又不完全一样，即同样的训练脚本，其每次训练意外停止时完成的更新次数还不一样。<br>为了解决这个神奇的bug，我们尝试从物理机、系统资源、驱动、软件环境、训练脚本、训练数据等多个环节进行检查，均未发现任何问题，最终无意间发现使用xshell （之前使用的WSL2)后训练停止的现象不在发生。最终发现竟然是因为对nohup 的坑，特此记录一下。</p>
+<h1><span id="nohup">nohup</span><a href="#nohup" class="header-anchor"></a></h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nohup is a POSIX command which means &quot;no hang up&quot;. Its purpose is to execute a command such that it ignores the HUP (hangup) signal and therefore does not stop when the user logs out.</span><br></pre></td></tr></table></figure>
+<p>上面这段是引自<a href="https://en.wikipedia.org/wiki/Nohup#Overcoming_hanging" target="_blank" rel="noopener">wikipedia</a>，即nohup 的作用是忽略HUP 信号，从而让用户log out 时，程序依然保持执行而不中断。</p>
+<p>然而有些场景下，nohup 依然会失效，即使用了nohup 后程序依然可能被中断，如<a href="https://unix.stackexchange.com/questions/420594/why-process-killed-with-nohup" target="_blank" rel="noopener">hy-process-killed-with-nohup</a>提到的两个场景，此外，通常我们使用nohup 的场景时ssh 下，而ssh 为了避免丢失数据，会拒绝log out。 参考wiki中提到的：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Note that nohupping backgrounded jobs is typically used to avoid terminating them when logging off from a remote SSH session. A different issue that often arises in this situation is that ssh is refusing to log off (&quot;hangs&quot;), since it refuses to lose any data from/to the background job(s).[6][7] This problem can also be overcome by redirecting all three I/O streams:</span><br><span class="line"></span><br><span class="line">$ nohup ./myprogram &gt; foo.out 2&gt; foo.err &lt; /dev/null &amp;</span><br></pre></td></tr></table></figure></p>
+<p>我的训练脚本使用时，对stdout/stderr 进行了重定向，未对stdin 进行重定向，即：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nohup ./myprogram &gt; foo.out 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure></p>
+<p>最终导致训练在进行一段时间后意外中断而没有任何异常信息。而这个像幽灵一样无声无息的“小问题”让我们花了接近三周时间debug，最终在猜测中定位到nohup 。</p>
+<h1><span id="ti-dai">替代</span><a href="#ti-dai" class="header-anchor"></a></h1><p>由上面可以看出，nohup 并不是一个”好” 的后台执行解决方案，而对应的替代品，推荐使用<a href="https://github.com/tmux/tmux/wiki" target="_blank" rel="noopener">tmux</a><br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">tmux is a terminal multiplexer. It lets you switch easily between several programs in one terminal, detach them (they keep running in the background) and reattach them to a different terminal.</span><br></pre></td></tr></table></figure></p>
+<p>tmux稳定可靠，利用tmux，将session 与 terminal 进行detach，从而让程序在后台执行。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>深度debug</p>
+]]></content>
+      <categories>
+        <category>Programming</category>
+      </categories>
+      <tags>
+        <tag>horovod</tag>
+        <tag>nohup</tag>
+        <tag>debug</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>tokenizers 总结</title>
     <url>/2022/09/08/tokenizers/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -3202,6 +3202,49 @@
         <tag>BPE</tag>
         <tag>WordPiece</tag>
         <tag>Unigram</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>few-shot视角下的fine-tuning</title>
+    <url>/2023/02/01/fine-tuning-at-few-shot/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#few-shot">few-shot</a></li>
+<li><a href="#fine-tuning">fine-tuning</a><ul>
+<li><a href="#supervised-fine-tuning">supervised fine-tuning</a></li>
+<li><a href="#instruction-tuning">instruction-tuning</a></li>
+<li><a href="#prompt-tuning">prompt tuning</a></li>
+<li><a href="#reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</a></li>
+</ul>
+</li>
+<li><a href="#qi-fa">启发</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div><br>LLM 目前的使用方式主要是zero-shot/few-shot,其是从context中的examle 数量来区分的，如果按这个角度进一步概括目前的fine-tuning 方案，感觉是个有趣的视角。<br><img src="/2023/02/01/fine-tuning-at-few-shot/few-shot.PNG" alt></p>
+<h1><span id="few-shot">few-shot</span><a href="#few-shot" class="header-anchor"></a></h1><p>目前LLM 的使用方式主要是zero-shot/few-shot，而通常few-shot 的性能也比zero-shot 要好，而且随着example 的数量的增加，few-shot 的性能也可能进一步提升；zero-shot 时只给出task input 效果可能不佳，通常需要给出对应的task description，而更”精准“ 的task description 通常也能得到更好的zero-shot 效果。<br>所以，提升LLM zero-shot /few-shot 的性能，主要的方式有两个：</p>
+<ol>
+<li>给出更”好“的task description</li>
+<li>给出更多的example</li>
+</ol>
+<h1><span id="fine-tuning">fine-tuning</span><a href="#fine-tuning" class="header-anchor"></a></h1><h2><span id="supervised-fine-tuning">supervised fine-tuning</span><a href="#supervised-fine-tuning" class="header-anchor"></a></h2><p>对于小模型来说，其in-context learning 能力较弱，性能不理想。为了提升模型的性能，一个可以尝试的方向是增加context 中的example 数量，但是由于模型的context 窗口有限，不支持我们无限制的将更多的example 塞进context 中，所以我们变通一下，采用通过更新参数的方式将example 塞进“context”。此时可以看作是无限example（inf-shot)；</p>
+<h2><span id="instruction-tuning">instruction-tuning</span><a href="#instruction-tuning" class="header-anchor"></a></h2><p>通常在supervised fine-tuning 时，我们是将一个任务的example “塞”进context，而instruction-tuning 可以看作是同时将多个任务的example “塞”进context，为了在使用时区分应该当前context 里应该使用哪些example，我们在不同的task 前面增加对应的description，作为判断依据。即：同时将多个任务的多个example 塞进模型的context 中，使用时通过不同的task description 来区分当前context 内的example 应该是哪些。</p>
+<h2><span id="prompt-tuning">prompt tuning</span><a href="#prompt-tuning" class="header-anchor"></a></h2><p>由于pretrain model 的任务是预测下一个token，而非处理用户的指令（instruction），为了提升模型zero-shot 的性能，一个可以尝试的方法就是找到模型视角下更好的task description（pattern），prompt-tuning 的思路即通过大量的监督样本，尝试寻找到更适应模型的task description，然后期望这个task description 能提高模型的zero-shot 的性能。</p>
+<h2><span id="reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</span><a href="#reinforcement-learning-with-human-feedback" class="header-anchor"></a></h2><p>prompt-tuning 时，我们尝试找到模型视角下更好的task description，而这个方法显然是不利于交互的，更好的方式是让模型理解人类视角下的task description。rlhf 就是按照这个思路，让模型反过来更好的理解人类视角下的task description，使得交互更方便。</p>
+<h1><span id="qi-fa">启发</span><a href="#qi-fa" class="header-anchor"></a></h1><p>从这个视角看，我们发现即使是小模型，也是有一定的in-context learning 的能力的，只是不够强，所以我们需要更多的example 他才能发挥出更好的效果；<br>pretrain+fine-tuning 的模式之所以能work，是因为pretrain 后的model 有in-context learning 的能力，in-context learning 并不要求task 的形式与pretrain 的一致，所以我们才能在pretrain 的基础上根据下游任务的不同，来构造不同的fine-tuning 过程，在few-shot 视角下，其对应的是在context 中”塞“进更多的example；<br>in-context learning 的增强，对应的是所需的样本逐渐减少，从supervised fine-tuning 的大量样本到few-shot 的少量样本最终到zero-shot 的不需要提供样本，只需提供任务描述。</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文是笔者最近思考pretrain + fine-tuning 模式为什么能work 时，通过在few-shot 视角下的一个解释。通过该思路，笔者尝试将目前的fine-tuning 主流思路统一起来。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>太空视角下的喜马拉雅山脉</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>LLM</tag>
+        <tag>In-context learning</tag>
+        <tag>fine-tuning</tag>
       </tags>
   </entry>
   <entry>
@@ -3453,53 +3496,10 @@
         <category>NLP</category>
       </categories>
       <tags>
+        <tag>LLM</tag>
+        <tag>In-context learning</tag>
         <tag>GPT-3</tag>
-        <tag>In-context learning</tag>
-        <tag>LLM</tag>
         <tag>ChatGPT</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>few-shot视角下的fine-tuning</title>
-    <url>/2023/02/01/fine-tuning-at-few-shot/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#few-shot">few-shot</a></li>
-<li><a href="#fine-tuning">fine-tuning</a><ul>
-<li><a href="#supervised-fine-tuning">supervised fine-tuning</a></li>
-<li><a href="#instruction-tuning">instruction-tuning</a></li>
-<li><a href="#prompt-tuning">prompt tuning</a></li>
-<li><a href="#reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</a></li>
-</ul>
-</li>
-<li><a href="#qi-fa">启发</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-<p></div><br>LLM 目前的使用方式主要是zero-shot/few-shot,其是从context中的examle 数量来区分的，如果按这个角度进一步概括目前的fine-tuning 方案，感觉是个有趣的视角。<br><img src="/2023/02/01/fine-tuning-at-few-shot/few-shot.PNG" alt></p>
-<h1><span id="few-shot">few-shot</span><a href="#few-shot" class="header-anchor"></a></h1><p>目前LLM 的使用方式主要是zero-shot/few-shot，而通常few-shot 的性能也比zero-shot 要好，而且随着example 的数量的增加，few-shot 的性能也可能进一步提升；zero-shot 时只给出task input 效果可能不佳，通常需要给出对应的task description，而更”精准“ 的task description 通常也能得到更好的zero-shot 效果。<br>所以，提升LLM zero-shot /few-shot 的性能，主要的方式有两个：</p>
-<ol>
-<li>给出更”好“的task description</li>
-<li>给出更多的example</li>
-</ol>
-<h1><span id="fine-tuning">fine-tuning</span><a href="#fine-tuning" class="header-anchor"></a></h1><h2><span id="supervised-fine-tuning">supervised fine-tuning</span><a href="#supervised-fine-tuning" class="header-anchor"></a></h2><p>对于小模型来说，其in-context learning 能力较弱，性能不理想。为了提升模型的性能，一个可以尝试的方向是增加context 中的example 数量，但是由于模型的context 窗口有限，不支持我们无限制的将更多的example 塞进context 中，所以我们变通一下，采用通过更新参数的方式将example 塞进“context”。此时可以看作是无限example（inf-shot)；</p>
-<h2><span id="instruction-tuning">instruction-tuning</span><a href="#instruction-tuning" class="header-anchor"></a></h2><p>通常在supervised fine-tuning 时，我们是将一个任务的example “塞”进context，而instruction-tuning 可以看作是同时将多个任务的example “塞”进context，为了在使用时区分应该当前context 里应该使用哪些example，我们在不同的task 前面增加对应的description，作为判断依据。即：同时将多个任务的多个example 塞进模型的context 中，使用时通过不同的task description 来区分当前context 内的example 应该是哪些。</p>
-<h2><span id="prompt-tuning">prompt tuning</span><a href="#prompt-tuning" class="header-anchor"></a></h2><p>由于pretrain model 的任务是预测下一个token，而非处理用户的指令（instruction），为了提升模型zero-shot 的性能，一个可以尝试的方法就是找到模型视角下更好的task description（pattern），prompt-tuning 的思路即通过大量的监督样本，尝试寻找到更适应模型的task description，然后期望这个task description 能提高模型的zero-shot 的性能。</p>
-<h2><span id="reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</span><a href="#reinforcement-learning-with-human-feedback" class="header-anchor"></a></h2><p>prompt-tuning 时，我们尝试找到模型视角下更好的task description，而这个方法显然是不利于交互的，更好的方式是让模型理解人类视角下的task description。rlhf 就是按照这个思路，让模型反过来更好的理解人类视角下的task description，使得交互更方便。</p>
-<h1><span id="qi-fa">启发</span><a href="#qi-fa" class="header-anchor"></a></h1><p>从这个视角看，我们发现即使是小模型，也是有一定的in-context learning 的能力的，只是不够强，所以我们需要更多的example 他才能发挥出更好的效果；<br>pretrain+fine-tuning 的模式之所以能work，是因为pretrain 后的model 有in-context learning 的能力，in-context learning 并不要求task 的形式与pretrain 的一致，所以我们才能在pretrain 的基础上根据下游任务的不同，来构造不同的fine-tuning 过程，在few-shot 视角下，其对应的是在context 中”塞“进更多的example；<br>in-context learning 的增强，对应的是所需的样本逐渐减少，从supervised fine-tuning 的大量样本到few-shot 的少量样本最终到zero-shot 的不需要提供样本，只需提供任务描述。</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文是笔者最近思考pretrain + fine-tuning 模式为什么能work 时，通过在few-shot 视角下的一个解释。通过该思路，笔者尝试将目前的fine-tuning 主流思路统一起来。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>太空视角下的喜马拉雅山脉</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>In-context learning</tag>
-        <tag>LLM</tag>
-        <tag>fine-tuning</tag>
       </tags>
   </entry>
   <entry>
@@ -3537,11 +3537,12 @@
 <li><a href="#ding-liang-ping-gu-you-hua-fang-an">定量评估优化方案</a></li>
 </ul>
 </li>
+<li><a href="#jie-lun">结论</a></li>
 <li><a href="#ref">ref</a></li>
 <li><a href="#guan-yu-tou-tu">关于头图</a></li>
 </ul>
 <!-- tocstop -->
-<p></div><br>本文主要概述一下利用LLM 进行文本生成相关内容。</p>
+<p></div><br>本文主要概述一下当前LLM 是如何生成文本及为什么对应的资源（cost/latency)与prompt 和completion 都有关系。</p>
 <h1><span id="generation">generation</span><a href="#generation" class="header-anchor"></a></h1><p>上一篇我们讲了为了解决自然语言问题，我们引入了统计语言模型：$S$ 表示一连串特定顺序排列的词$w_1$, $w_2$, …, $w_n$,其中$n$ 是序列的长度，则$S$ 出现的概率$P(S)=P(w_1,w_2,…w_n)$. 通过序列的概率，来判断对应句子是否合理。而这个概率$P(S)$ 很难估算，所以我们将其转化一下。首先，利用条件概率公式将其展开:<br>$$<br>P(S)=P(w_1​,w_2​,…,w_n​)=P(w_1​)∗P(w_2​∣w_1​)∗P(w_3​∣w_1​,w_2​)∗…∗P(w_n​∣w_1​,w_2​,…,w_{n−1}​)<br>$$<br>即：<br>$$<br>P(w_1^n​)=\prod​P(w_i​∣w_1^{i−1}​)<br>$$<br>然后用深度神经网络，对$P(w_i|w_1^{i-1})$ 进行建模，即：<br>$$<br>P(w_i|w_1^{i-1}) = g(w_1^{i-1})<br>$$</p>
 <p>其中$g$ 是深度神经网络，如MLP/RNN/Transformer 等。</p>
 <p>文本生成的过程，即我们在已有的深度神经网络$g$ 下，生成（采样）合理句子（序列）的过程。其中$g$ 能生成给定context  $C$  时下一个时刻对应的词表分布, 其中$C$ 是由$w_1$, $w_2$, …, $w_m$ 组成的序列。<br>目前我们训练$g$ 通常采用Teacher-Forcing 的方式：训练阶段，每个时刻$t$ 之前的label $y_{&lt;t}$都是已知的，就像是老师讲课一样，将每一步的正确解题思路都告诉你，你只需要跟着老师的思路一步一步推导就能得到正确答案；然而在inference 阶段，我们是没法知道当前时刻之前的真实label 是什么的，所以需要将所有可能的序列的概率都求解出来，最后在所有可能性中选择概率最大的。如同考试时没了参考步骤，只能尝试多个思路，最后保留我们觉得”正确“的。</p>
@@ -3624,7 +3625,7 @@
 </table>
 <h1><span id="gpt-generation">GPT generation</span><a href="#gpt-generation" class="header-anchor"></a></h1><p>GPT2 model architecture</p>
 <p><img src="/2023/03/10/llm-inf/Pasted image 20230310005359.png" alt></p>
-<h2><span id="ops-vs-bytes">ops vs bytes</span><a href="#ops-vs-bytes" class="header-anchor"></a></h2><p>我们忽略所有的bias/layernorm/activation/add 操作,计算生成一个token 时的ops vs bytes</p>
+<h2><span id="ops-vs-bytes">ops vs bytes</span><a href="#ops-vs-bytes" class="header-anchor"></a></h2><p>我们忽略所有的bias/layernorm/activation/add 操作,计算生成一个token 时的ops vs bytes, q切分head 与不切对应的ops/bytes 是一样的，我们按不切计算。</p>
 <ol>
 <li><p>Embedding<br>multiply:$E_{token}∈R^{V\times d_{model}}$,  $E_p\in R^{s_{maxseq} \times d_{models}}$<br>mem: $2 \ast (V \ast d_{model} + s_{maxseq} \ast d_{model})$<br>flops:   0</p>
 </li>
@@ -3652,6 +3653,11 @@
 <p>经过cache 后，attention output 的计算回到了$O(s\cdot d_{model})$ 的水平，至少在大部分时候又可以基本忽略了。此外，随着$s$ 的增长，对应的cache 也在线性增长，需要的内存带宽也在增长，所以有些情况下可能增加cache 反而降低性能。</p>
 <p>PS:不管是生成过程中的k_cache/v_cache 还是prompt cache 还是context cache，只要是可能重复计算，就值得思考要不要将之前的结果做cache，已减少后续的计算量。</p>
 <h2><span id="ding-liang-ping-gu-you-hua-fang-an">定量评估优化方案</span><a href="#ding-liang-ping-gu-you-hua-fang-an" class="header-anchor"></a></h2><p>上面是一个相对简化的思路计算，而真实情况会比较复杂。比如我们忽略了一部分操作所需的ops；中间结果的每次写入/读取所需的内存带宽；CUDA Core 与 Tensor Core 的性能差异等；此外不同的硬件参数也不相同，具体的operation 实现也不相同，所以要定量给出优化方案实在太难，通常（主要是我）只能通过测试给出大致范围。</p>
+<h1><span id="jie-lun">结论</span><a href="#jie-lun" class="header-anchor"></a></h1><p>现在回到最初的问题：为什么当前的LLM 生成文本时对应的资源与prompt 与 completion 都有关系：</p>
+<ol>
+<li>需要迭代$n$ 次，其中$n = len(completion)$</li>
+<li>每次迭代所需要的资源都接近$O(s)$ ,其中$s_i=len_(prompt) + step_i$</li>
+</ol>
 <h1><span id="ref">ref</span><a href="#ref" class="header-anchor"></a></h1><p><a href="https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/nvidia-a100-datasheet-us-nvidia-1758950-r4-web.pdf" target="_blank" rel="noopener">NVIDIA A100 TENSOR CORE GPU</a></p>
 <p><a href="https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html#gpu-arch" target="_blank" rel="noopener">dl-performance-gpu-background</a></p>
 <p><a href="https://developer.nvidia.com/blog/nvidia-ampere-architecture-in-depth/" target="_blank" rel="noopener">nvidia-ampere-architecture-in-depth</a></p>
