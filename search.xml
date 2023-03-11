@@ -130,34 +130,6 @@
       </tags>
   </entry>
   <entry>
-    <title>python中实现单例模式</title>
-    <url>/2019/10/13/singleton/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<!-- tocstop -->
-</div>
-
-<p>python中实现单例模式的方式大致有四种：<br>1.模块<br>2.改写类的<strong>new</strong>方法，控制实例生成<br>3.装饰器<br>4.元类</p>
-<p>1.模块<br>python中的模块是天然的单例模式，并且是线程安全的，所有的模块只会在运行时加载一次。<br>所以，利用模块就可以实现一个线程安全的单例。如：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># my singleton.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">My_singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">my_singleton = My_singleton()</span><br></pre></td></tr></table></figure></p>
-<ol start="2">
-<li><strong>new</strong>方法<br>python中每个类在实例化对象时，首先会调用<strong>new</strong>方法创建一个实例，然后再调用<strong>init</strong>方法动态绑定其他属性.如：<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    _instance = <span class="literal">None</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(cls, *args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> cls._instance:</span><br><span class="line">            cls._instance = super(Singleton, cls).__new__(cls, *args, **kw)  </span><br><span class="line">        <span class="keyword">return</span> cls._instance  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(Singleton)</span>:</span>  </span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>3.装饰器<br>装饰器可以动态的修改一个类或方法的表现，利用装饰器生成单例<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">singleton</span><span class="params">(cls)</span>:</span></span><br><span class="line">    instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @wraps(cls)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getinstance</span><span class="params">(*args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> instances:</span><br><span class="line">            instances[cls] = cls(*args, **kw)</span><br><span class="line">        <span class="keyword">return</span> instances[cls]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> getinstance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@singleton</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
-<p>4.元类<br>元类可以控制其子类的类对象(<strong>new</strong>)及类实例对象(<strong>call</strong>)的创建。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(type)</span>:</span></span><br><span class="line">    _instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(cls, *args, **kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> cls._instances:</span><br><span class="line">            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> cls._instances[cls]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Python2</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    __metaclass__ = Singleton</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Python3</span></span><br><span class="line">    <span class="comment"># class MyClass(metaclass=Singleton):</span></span><br><span class="line">    <span class="comment">#    pass</span></span><br></pre></td></tr></table></figure></p>
-<p>最著名的就是Django中的ORM，其model中就使用了元类来控制所有model的表现</p>
-<p><strong>关于头图</strong></p>
-<p>摄于内蒙古乌兰布统草原</p>
-]]></content>
-      <categories>
-        <category>Programming</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>神经网络语言模型(NNLM)</title>
     <url>/2019/10/13/nnlm/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -225,6 +197,34 @@
       </categories>
       <tags>
         <tag>Language Model</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>python中实现单例模式</title>
+    <url>/2019/10/13/singleton/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<!-- tocstop -->
+</div>
+
+<p>python中实现单例模式的方式大致有四种：<br>1.模块<br>2.改写类的<strong>new</strong>方法，控制实例生成<br>3.装饰器<br>4.元类</p>
+<p>1.模块<br>python中的模块是天然的单例模式，并且是线程安全的，所有的模块只会在运行时加载一次。<br>所以，利用模块就可以实现一个线程安全的单例。如：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># my singleton.py</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">My_singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">my_singleton = My_singleton()</span><br></pre></td></tr></table></figure></p>
+<ol start="2">
+<li><strong>new</strong>方法<br>python中每个类在实例化对象时，首先会调用<strong>new</strong>方法创建一个实例，然后再调用<strong>init</strong>方法动态绑定其他属性.如：<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(object)</span>:</span></span><br><span class="line">    _instance = <span class="literal">None</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__new__</span><span class="params">(cls, *args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> cls._instance:</span><br><span class="line">            cls._instance = super(Singleton, cls).__new__(cls, *args, **kw)  </span><br><span class="line">        <span class="keyword">return</span> cls._instance  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(Singleton)</span>:</span>  </span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>3.装饰器<br>装饰器可以动态的修改一个类或方法的表现，利用装饰器生成单例<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">singleton</span><span class="params">(cls)</span>:</span></span><br><span class="line">    instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">    @wraps(cls)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getinstance</span><span class="params">(*args, **kw)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> instances:</span><br><span class="line">            instances[cls] = cls(*args, **kw)</span><br><span class="line">        <span class="keyword">return</span> instances[cls]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> getinstance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@singleton</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    a = <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>4.元类<br>元类可以控制其子类的类对象(<strong>new</strong>)及类实例对象(<strong>call</strong>)的创建。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Singleton</span><span class="params">(type)</span>:</span></span><br><span class="line">    _instances = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(cls, *args, **kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> cls <span class="keyword">not</span> <span class="keyword">in</span> cls._instances:</span><br><span class="line">            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)</span><br><span class="line">        <span class="keyword">return</span> cls._instances[cls]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Python2</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyClass</span><span class="params">(object)</span>:</span></span><br><span class="line">    __metaclass__ = Singleton</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Python3</span></span><br><span class="line">    <span class="comment"># class MyClass(metaclass=Singleton):</span></span><br><span class="line">    <span class="comment">#    pass</span></span><br></pre></td></tr></table></figure></p>
+<p>最著名的就是Django中的ORM，其model中就使用了元类来控制所有model的表现</p>
+<p><strong>关于头图</strong></p>
+<p>摄于内蒙古乌兰布统草原</p>
+]]></content>
+      <categories>
+        <category>Programming</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -451,29 +451,6 @@
       </tags>
   </entry>
   <entry>
-    <title>随机森林模型中是不是树越多越好</title>
-    <url>/2019/10/17/randomForest/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao">随机森林中树越多越好？</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao">随机森林中树越多越好？</span><a href="#sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao" class="header-anchor"></a></h1><p>面试时被问到在随机森林的树是否数量越多越好？开始只考虑构建更多的树一来浪费资源，二来数量一定后模型的性能基本保持稳定，随着树的增加提升非常小。<br>回来后又想了想，随机森林中通过引入随机抽样和随机抽列，使模型对异常点有更好的鲁棒性，模型的泛化能力更强。如果是无限颗树，那其实会抵消随机性的引入，最后的模型会是一个过拟合的模型，其泛化性能也会降低。此外，噪音较大时，模型也会学习到更多噪音相关的信息，发生过拟合，降低泛化性能。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于玉渊潭公园</p>
-]]></content>
-      <categories>
-        <category>MachineLearning</category>
-      </categories>
-      <tags>
-        <tag>Random Forest</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Glove模型</title>
     <url>/2019/10/17/glove/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -525,6 +502,29 @@
       </categories>
       <tags>
         <tag>Glove</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>随机森林模型中是不是树越多越好</title>
+    <url>/2019/10/17/randomForest/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao">随机森林中树越多越好？</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<h1><span id="sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao">随机森林中树越多越好？</span><a href="#sui-ji-sen-lin-zhong-shu-yue-duo-yue-hao" class="header-anchor"></a></h1><p>面试时被问到在随机森林的树是否数量越多越好？开始只考虑构建更多的树一来浪费资源，二来数量一定后模型的性能基本保持稳定，随着树的增加提升非常小。<br>回来后又想了想，随机森林中通过引入随机抽样和随机抽列，使模型对异常点有更好的鲁棒性，模型的泛化能力更强。如果是无限颗树，那其实会抵消随机性的引入，最后的模型会是一个过拟合的模型，其泛化性能也会降低。此外，噪音较大时，模型也会学习到更多噪音相关的信息，发生过拟合，降低泛化性能。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于玉渊潭公园</p>
+]]></content>
+      <categories>
+        <category>MachineLearning</category>
+      </categories>
+      <tags>
+        <tag>Random Forest</tag>
       </tags>
   </entry>
   <entry>
@@ -728,42 +728,6 @@
       </tags>
   </entry>
   <entry>
-    <title>文档查重之SimHash算法</title>
-    <url>/2019/10/26/simhash/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#simhash">SimHash</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="simhash">SimHash</span><a href="#simhash" class="header-anchor"></a></h1><p>不同网站间相互转载内容的情况非常常见，即使同一网站，不同的URL地址也可能对应相同内容，只是以不同的形式显示出来（不同的UI），而我们在爬取大量内容时，除了靠URL去重外，还需按文档内容排重<br>指纹可以判断人的身份，比如侦探把从犯罪现场采集的指纹与指纹库中的指纹做个对比，就能确定犯罪嫌疑人的身份。类似的，我们用一个文档的语义指纹来代表文档的语义，如采用一个二进制数组来代表。从而判断文档之间的相似性转化为判断两个语义指纹之间的相似性。<br>SimHash是Google在2007年发表的论文《Detecting Near-Duplicates for Web Crawling 》中提到的一种指纹生成算法或者叫指纹提取算法，被Google广泛应用在亿级的网页去重的Job中，作为locality sensitive hash（局部敏感哈希）的一种，其主要思想是降维，即将一篇若干数量的文本内容用一个长度较短的数组来表示，而这个数组与这篇文档的主要的特征所对应。如在没有犯罪嫌疑人的身份证和指纹时，一个人的特征有无数多个，而我们可以通过调查犯罪嫌疑人的姓名，性别，出生日期，身高，体重，当天穿的衣服，外貌等一些主要特征来甄别嫌疑人的身份。simhash也是将复杂的特征，降维来简化。<br>SimHash计算过程：<br><img src="/2019/10/26/simhash/sim.png" alt="simhash计算流程"></p>
-<ul>
-<li>1.对文档提取特征及特征对应的权重</li>
-<li>2.对特征进行hash，生成对应的hash值</li>
-<li>3.hash值加权：对特征hash值的每一位做循环处理：如果该位值为1，则用weight代替，否则，用-weight代替</li>
-<li>4.求和：将特征hash加权后的结果，按位求和，然后将结果按位二值化：大于0则为1，否则为0，即得到最后的SimHash值。</li>
-</ul>
-<p>SimHash的计算依据是要比较的对象的特征，对于结构化的记录，可以按列提取特征；对于非结构化的文档，特征可以用全文提取topk关键词、标题、最长的几句话、每段的首句、尾句等。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> jieba</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> jieba.analyse <span class="keyword">as</span> analyse</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimHash</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, content, topK=<span class="number">50</span>)</span>:</span></span><br><span class="line"></span><br><span class="line">        self.topK = topK</span><br><span class="line"></span><br><span class="line">        self.simhash = self.getSimHash(content)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getSimHash</span><span class="params">(self, content)</span>:</span></span><br><span class="line"></span><br><span class="line">        seg = jieba.cut(content)</span><br><span class="line"></span><br><span class="line"><span class="comment">#        jieba.analyse.set_stop_words('stopword.txt')</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">#topk words and it's tf/idf</span></span><br><span class="line"></span><br><span class="line">        keyWords = jieba.analyse.extract_tags(</span><br><span class="line"></span><br><span class="line">            <span class="string">'|'</span>.join(seg), topK=self.topK, withWeight=<span class="literal">True</span>, allowPOS=())</span><br><span class="line"></span><br><span class="line"><span class="comment">#        print(keyWords)</span></span><br><span class="line"></span><br><span class="line">        word_list = []</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> feature, weight <span class="keyword">in</span> keyWords:</span><br><span class="line"></span><br><span class="line">            feature = self.string_hash(feature)</span><br><span class="line"></span><br><span class="line">            temp = []</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> feature:</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> i == <span class="string">'1'</span>:</span><br><span class="line"></span><br><span class="line">                    temp.append(weight)</span><br><span class="line"></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line"></span><br><span class="line">                    temp.append(-weight)</span><br><span class="line"></span><br><span class="line">            word_list.append(temp)</span><br><span class="line"></span><br><span class="line">        hashSum = np.sum(np.array(word_list), axis=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">        simhash = <span class="string">''</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> code <span class="keyword">in</span> hashSum:</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> code &gt; <span class="number">0</span>:</span><br><span class="line"></span><br><span class="line">                simhash += <span class="string">'1'</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line"></span><br><span class="line">                simhash += <span class="string">'0'</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> simhash</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">string_hash</span><span class="params">(self,source)</span>:</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> source == <span class="string">""</span>:</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line"></span><br><span class="line">            x = ord(source[<span class="number">0</span>]) &lt;&lt; <span class="number">7</span></span><br><span class="line"></span><br><span class="line">            m = <span class="number">1000003</span></span><br><span class="line"></span><br><span class="line">            mask = <span class="number">2</span> ** <span class="number">128</span> - <span class="number">1</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> c <span class="keyword">in</span> source:</span><br><span class="line"></span><br><span class="line">                x = ((x * m) ^ ord(c)) &amp; mask</span><br><span class="line"></span><br><span class="line">            x ^= len(source)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> x == <span class="number">-1</span>:</span><br><span class="line"></span><br><span class="line">                x = <span class="number">-2</span></span><br><span class="line"></span><br><span class="line">            x = bin(x).replace(<span class="string">'0b'</span>, <span class="string">''</span>).zfill(<span class="number">64</span>)[<span class="number">-64</span>:]</span><br><span class="line"></span><br><span class="line"><span class="comment">#            print(source,x)</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> x</span><br></pre></td></tr></table></figure>
-<p><strong>海明距离</strong></p>
-<p>得到文档的SimHash值后，我们还需要判断两个文档是否相似。对相同长度的数字序列，我们采用海明距离来衡量其相似性。海明距离是指两个码字对应比特位（数字序列对应位置）不同的比特位个数。如1011101和1001001的第三位和第五位有差别，所以对应的海明距离为2。<br>计算两个数的海明距离时，我们先把两个数按位异或（XOR），然后计算结果中1的个数，结果就是海明距离。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hamDis</span><span class="params">(l1, l2)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#异或</span></span><br><span class="line"></span><br><span class="line">    lxor = int(l1,<span class="number">2</span>) ^ int(l2,<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    c = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#计算异或结果1的个数</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(lxor):</span><br><span class="line"></span><br><span class="line">        lxor &amp;= lxor<span class="number">-1</span></span><br><span class="line"></span><br><span class="line">        c += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> c</span><br></pre></td></tr></table></figure>
-<p>把文档转化成SimHash后，文档的排重就变成了海明距离计算问题：给出一个f位的语义指纹集合F和一个语义指纹fg，找出F中是否存在与fg只有k位差异的语义指纹。<br>当k值很小而要找的语义指纹集合中的元素不多时，可以用逐次探查法：先把所有和当前指纹差k位的指纹扩展出来，然后用折半查找法在排好序的指纹集合中查找；<br>如果是面对的是海量的数据，且动态的增加，逐次探查法的效率将越来越慢。当k值较小，如不大于3时，我们使用一种快速方法。首先，我们将64位分成4份，当k为3时，则有一份中两者相等。<br><img src="/2019/10/26/simhash/match.png" alt><br>所以我们在存储时，将数据扩展为4份，每份以其中16位为k，剩余的部分为v，查找时精确匹配这16位。<br><img src="/2019/10/26/simhash/search.png" alt><br>除此之外，对于一个已经排序的容量为$2^d$的f位指纹集合，由于指纹集合中有很多的位组合存在，所以高d位只有少量重复存在，所以在搜索时，也可以找出高d位与当前指纹相同的集合f‘，缩小查找份范围。</p>
-<p>Simhash算法对长文本500字+比较适用，短文本可能偏差较大，最后使用海明距离，求相似，在google的论文给出的数据中，64位的签名，在海明距离为3的情况下，可认为两篇文档是相似的或者是重复的，当然这个值只是参考值，针对自己的应用可以自测取值。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于河南老家冬雪</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>Words Distance</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>词向量总结</title>
     <url>/2019/10/22/w2v-summary/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -822,6 +786,42 @@
       <tags>
         <tag>word2vec</tag>
         <tag>Glove</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>文档查重之SimHash算法</title>
+    <url>/2019/10/26/simhash/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#simhash">SimHash</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<h1><span id="simhash">SimHash</span><a href="#simhash" class="header-anchor"></a></h1><p>不同网站间相互转载内容的情况非常常见，即使同一网站，不同的URL地址也可能对应相同内容，只是以不同的形式显示出来（不同的UI），而我们在爬取大量内容时，除了靠URL去重外，还需按文档内容排重<br>指纹可以判断人的身份，比如侦探把从犯罪现场采集的指纹与指纹库中的指纹做个对比，就能确定犯罪嫌疑人的身份。类似的，我们用一个文档的语义指纹来代表文档的语义，如采用一个二进制数组来代表。从而判断文档之间的相似性转化为判断两个语义指纹之间的相似性。<br>SimHash是Google在2007年发表的论文《Detecting Near-Duplicates for Web Crawling 》中提到的一种指纹生成算法或者叫指纹提取算法，被Google广泛应用在亿级的网页去重的Job中，作为locality sensitive hash（局部敏感哈希）的一种，其主要思想是降维，即将一篇若干数量的文本内容用一个长度较短的数组来表示，而这个数组与这篇文档的主要的特征所对应。如在没有犯罪嫌疑人的身份证和指纹时，一个人的特征有无数多个，而我们可以通过调查犯罪嫌疑人的姓名，性别，出生日期，身高，体重，当天穿的衣服，外貌等一些主要特征来甄别嫌疑人的身份。simhash也是将复杂的特征，降维来简化。<br>SimHash计算过程：<br><img src="/2019/10/26/simhash/sim.png" alt="simhash计算流程"></p>
+<ul>
+<li>1.对文档提取特征及特征对应的权重</li>
+<li>2.对特征进行hash，生成对应的hash值</li>
+<li>3.hash值加权：对特征hash值的每一位做循环处理：如果该位值为1，则用weight代替，否则，用-weight代替</li>
+<li>4.求和：将特征hash加权后的结果，按位求和，然后将结果按位二值化：大于0则为1，否则为0，即得到最后的SimHash值。</li>
+</ul>
+<p>SimHash的计算依据是要比较的对象的特征，对于结构化的记录，可以按列提取特征；对于非结构化的文档，特征可以用全文提取topk关键词、标题、最长的几句话、每段的首句、尾句等。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> jieba</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> jieba.analyse <span class="keyword">as</span> analyse</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SimHash</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, content, topK=<span class="number">50</span>)</span>:</span></span><br><span class="line"></span><br><span class="line">        self.topK = topK</span><br><span class="line"></span><br><span class="line">        self.simhash = self.getSimHash(content)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getSimHash</span><span class="params">(self, content)</span>:</span></span><br><span class="line"></span><br><span class="line">        seg = jieba.cut(content)</span><br><span class="line"></span><br><span class="line"><span class="comment">#        jieba.analyse.set_stop_words('stopword.txt')</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">#topk words and it's tf/idf</span></span><br><span class="line"></span><br><span class="line">        keyWords = jieba.analyse.extract_tags(</span><br><span class="line"></span><br><span class="line">            <span class="string">'|'</span>.join(seg), topK=self.topK, withWeight=<span class="literal">True</span>, allowPOS=())</span><br><span class="line"></span><br><span class="line"><span class="comment">#        print(keyWords)</span></span><br><span class="line"></span><br><span class="line">        word_list = []</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> feature, weight <span class="keyword">in</span> keyWords:</span><br><span class="line"></span><br><span class="line">            feature = self.string_hash(feature)</span><br><span class="line"></span><br><span class="line">            temp = []</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> feature:</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> i == <span class="string">'1'</span>:</span><br><span class="line"></span><br><span class="line">                    temp.append(weight)</span><br><span class="line"></span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line"></span><br><span class="line">                    temp.append(-weight)</span><br><span class="line"></span><br><span class="line">            word_list.append(temp)</span><br><span class="line"></span><br><span class="line">        hashSum = np.sum(np.array(word_list), axis=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">        simhash = <span class="string">''</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> code <span class="keyword">in</span> hashSum:</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> code &gt; <span class="number">0</span>:</span><br><span class="line"></span><br><span class="line">                simhash += <span class="string">'1'</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line"></span><br><span class="line">                simhash += <span class="string">'0'</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> simhash</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">string_hash</span><span class="params">(self,source)</span>:</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> source == <span class="string">""</span>:</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line"></span><br><span class="line">            x = ord(source[<span class="number">0</span>]) &lt;&lt; <span class="number">7</span></span><br><span class="line"></span><br><span class="line">            m = <span class="number">1000003</span></span><br><span class="line"></span><br><span class="line">            mask = <span class="number">2</span> ** <span class="number">128</span> - <span class="number">1</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> c <span class="keyword">in</span> source:</span><br><span class="line"></span><br><span class="line">                x = ((x * m) ^ ord(c)) &amp; mask</span><br><span class="line"></span><br><span class="line">            x ^= len(source)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> x == <span class="number">-1</span>:</span><br><span class="line"></span><br><span class="line">                x = <span class="number">-2</span></span><br><span class="line"></span><br><span class="line">            x = bin(x).replace(<span class="string">'0b'</span>, <span class="string">''</span>).zfill(<span class="number">64</span>)[<span class="number">-64</span>:]</span><br><span class="line"></span><br><span class="line"><span class="comment">#            print(source,x)</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> x</span><br></pre></td></tr></table></figure>
+<p><strong>海明距离</strong></p>
+<p>得到文档的SimHash值后，我们还需要判断两个文档是否相似。对相同长度的数字序列，我们采用海明距离来衡量其相似性。海明距离是指两个码字对应比特位（数字序列对应位置）不同的比特位个数。如1011101和1001001的第三位和第五位有差别，所以对应的海明距离为2。<br>计算两个数的海明距离时，我们先把两个数按位异或（XOR），然后计算结果中1的个数，结果就是海明距离。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hamDis</span><span class="params">(l1, l2)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#异或</span></span><br><span class="line"></span><br><span class="line">    lxor = int(l1,<span class="number">2</span>) ^ int(l2,<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    c = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#计算异或结果1的个数</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(lxor):</span><br><span class="line"></span><br><span class="line">        lxor &amp;= lxor<span class="number">-1</span></span><br><span class="line"></span><br><span class="line">        c += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> c</span><br></pre></td></tr></table></figure>
+<p>把文档转化成SimHash后，文档的排重就变成了海明距离计算问题：给出一个f位的语义指纹集合F和一个语义指纹fg，找出F中是否存在与fg只有k位差异的语义指纹。<br>当k值很小而要找的语义指纹集合中的元素不多时，可以用逐次探查法：先把所有和当前指纹差k位的指纹扩展出来，然后用折半查找法在排好序的指纹集合中查找；<br>如果是面对的是海量的数据，且动态的增加，逐次探查法的效率将越来越慢。当k值较小，如不大于3时，我们使用一种快速方法。首先，我们将64位分成4份，当k为3时，则有一份中两者相等。<br><img src="/2019/10/26/simhash/match.png" alt><br>所以我们在存储时，将数据扩展为4份，每份以其中16位为k，剩余的部分为v，查找时精确匹配这16位。<br><img src="/2019/10/26/simhash/search.png" alt><br>除此之外，对于一个已经排序的容量为$2^d$的f位指纹集合，由于指纹集合中有很多的位组合存在，所以高d位只有少量重复存在，所以在搜索时，也可以找出高d位与当前指纹相同的集合f‘，缩小查找份范围。</p>
+<p>Simhash算法对长文本500字+比较适用，短文本可能偏差较大，最后使用海明距离，求相似，在google的论文给出的数据中，64位的签名，在海明距离为3的情况下，可认为两篇文档是相似的或者是重复的，当然这个值只是参考值，针对自己的应用可以自测取值。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于河南老家冬雪</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>Words Distance</tag>
       </tags>
   </entry>
   <entry>
@@ -1557,6 +1557,50 @@
       </tags>
   </entry>
   <entry>
+    <title>Knowledge Distillation (1) &amp;#58; 模块替换之bert-of-theseus-下篇</title>
+    <url>/2020/08/19/bert-of-theseus-2/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#fu-xian-shi-de-wen-ti">复现时的问题</a><ul>
+<li><a href="#si-kao-1-wei-shi-me-shi-xiao">思考1：为什么失效</a></li>
+<li><a href="#si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me">思考二 ：bert-of–theseus有效的本质是什么</a></li>
+<li><a href="#shi-yan-1">实验1</a></li>
+<li><a href="#si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing">思考三：直接在predecessor 上抽successor行不行？</a></li>
+<li><a href="#shi-yan-2">实验2</a></li>
+</ul>
+</li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>上一篇<a href="https://xv44586.github.io/2020/08/09/bert-of-theseus/">模块替换之bert-of-theseus-上篇</a>中介绍了bert-of-theseus论文的主要思路，并贴了两组实验的结论，这篇是对上篇的后续一些思考与实验。</p>
+<h1><span id="fu-xian-shi-de-wen-ti">复现时的问题</span><a href="#fu-xian-shi-de-wen-ti" class="header-anchor"></a></h1><p>在复现时，遇到最大的问题就是结果不稳定。首先每次训练predecessor时，其最优结果就会有上下1个点左右的波动，而因为theseus 中引入了随机数<br>来概率替换对应block，所以结果上一言难尽，有时能比12层bert低0.6个点, 有时只能达到直接3层fine tuning 的效果，于是我做了些观察与思考。</p>
+<h2><span id="si-kao-1-wei-shi-me-shi-xiao">思考1：为什么失效</span><a href="#si-kao-1-wei-shi-me-shi-xiao" class="header-anchor"></a></h2><p>在训练theseus model时，其中抽出的successor在每个epoch结束后在验证集上的结果有时会很高，基本到达只比三层fine-tuning低6个点，有时又很<br>低，基本不到0.1%, 第一种明显是successor在theseus中训练太多，以至于接近直接fine tuning，而另一种情况下可能是successor训练不充足，<br>也可能是替换次数太少导致没有被训练，而且大多数情况下successor的验证集上都是不到0.1%。<br>为了验证第二种情况下是否是未替换导致successor在做fine tuning，我将successor进行单独fine tuning后,将得到的classifier 拼回predecessor，<br>发现此时在验证集上d结果只下降了2个点，所以此时大概率是替换次数过少，基本没有训练到successor，所以导致结果不好，而这里开始我以为是我<br>实现问题，后来来来回回检查了一周，也没发现问题，于是我就想换一种更稳定的方式。</p>
+<h2><span id="si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me">思考二 ：bert-of–theseus有效的本质是什么</span><a href="#si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me" class="header-anchor"></a></h2><p>熟悉bert的同学肯定对warm up不陌生，而warm up之所以有效，我认为比较重要的一点是如果在最初的steps中，模型提前拟合了样本，进入了一个局部最优区域，后期无论你怎么迭代他都跳不出来，而由已经<code>fine tuned predecessor</code>带着一起再进行训练，也和warm up有些相似，即用小的<br>步子带着你朝着更优的方向走几步，跳出来，让你有进入更好的局部最优点的可能，此外，概率替换的思路也与<code>Dropout</code>有几分相似，让successor<br>有一定的几率参与训练，从而让successor在缺少predecessor的情况下也有一定的robust。<br><a href="https://spaces.ac.cn/archives/7575" target="_blank" rel="noopener">苏剑林的博客</a>里也提到了替换的数学形式：<br>$$<br>\begin{equation}\begin{aligned}<br>&amp;\varepsilon^{(l)}\sim U(\{0, 1\})\\<br>&amp;x^{(l)} = x_p^{(l)} \times \varepsilon^{(l)} + x_s^{(l)} \times \left(1 - \varepsilon^{(l)}\right)\\<br>&amp;x_p^{(l+1)} = F_p^{(l+1)}\left(x^{(l)}\right)\\<br>&amp;x_s^{(l+1)} = F_s^{(l+1)}\left(x^{(l)}\right)<br>\end{aligned}\end{equation}<br>$$<br>同时，他也提到$\epsilon$能否不取非0即1，那既然我们是想让successor在task方向上warm up一下，那直接相加，即此时 $\epsilon = k$,<br>k是常数也是可以的。此时只要调节k 就能避免successor训练不充分或太充分的情况了，模型也就稳定了，可以满足我们的要求了。</p>
+<h2><span id="shi-yan-1">实验1</span><a href="#shi-yan-1" class="header-anchor"></a></h2><p>实验代码其实比较容易修改，只需将BinaryRandomChoice 层替换为相加即可。具体代码在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_bert_of_theseus.py" target="_blank" rel="noopener">classification_ifytek_bert_of_theseus</a><br>中可以看到。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProportionalAdd</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="string">"""将两层的结果乘比例后相加，output = (input_1 * proportion + input_2 * (1 - proportion)) / 2</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, proportion=<span class="number">0.5</span>, **kwargs)</span>:</span></span><br><span class="line">        super(ProportionalAdd, self).__init__(**kwargs)</span><br><span class="line">        self.supports_masking = <span class="literal">True</span></span><br><span class="line">        self.proportion = proportion</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">compute_mask</span><span class="params">(self, inputs, mask=None)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> mask[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span></span><br><span class="line">        source, target = inputs</span><br><span class="line">        source = source * self.proportion</span><br><span class="line">        target = target * (<span class="number">1</span> - self.proportion)</span><br><span class="line">        output = (source + target)/<span class="number">2</span></span><br><span class="line">        <span class="keyword">return</span> K.in_train_phase(output, target)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">compute_output_shape</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> input_shape[<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+<p>文本分类：CLUE的iflytek数据集</p>
+<p>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 60.11\% &amp; 58.99\%  &amp; 57.96\%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 59.7\%  &amp; 59.5\% \end{array}\\<br>\hline<br>\end{array}<br>$$</p>
+<p>结果上看确实更稳定了，也更好一点点了，基本比predecessor低<code>0.5%~1%</code> .</p>
+<h2><span id="si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing">思考三：直接在predecessor 上抽successor行不行？</span><a href="#si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing" class="header-anchor"></a></h2><p>既然我们说bert-of-theseus有效的原因是在task 的方向进行了warm up，那predecessor已经在task上fine tuned了，能不能<code>直接抽取某几<br>层作为successor来直接fine tuning?</code>此外，之前我们也说了，predecessor与successor的classifer差距很小，那我们能不能改变successor<br>的classifer的学习率，让他进一步学习，来弥补一部分前三层无法拟合的分布呢？</p>
+<h2><span id="shi-yan-2">实验2</span><a href="#shi-yan-2" class="header-anchor"></a></h2><p>具体实验代码<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/two_stage_fine_tuning.py" target="_blank" rel="noopener">two-stage-fine-tuning</a><br>实验时尝试了<code>随机初始化classifier/predecessor classifier初始化classifier/ 放大classifier lr</code>组合策略，最后的结果就不贴了，基本都没有<br>超过3层bert fine tuning的效果。</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>尝试分析了bert-of-theseus复现中的问题，并尝试了一些修复方案，同时，实验测试了theseus model的必要性，最后结论是binary random choice<br>策略不如 proportion add 策略稳定，同时，theseus是必须的。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p><a href="https://github.com/JetRunner/BERT-of-Theseus" target="_blank" rel="noopener">论文原作者配图</a></p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>BERT</tag>
+        <tag>Distillation</tag>
+        <tag>speed-up</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>模型增强（1）&amp;#58; 利用NLG 增强QA 任务性能</title>
     <url>/2020/08/22/qa-augmentation/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -1600,50 +1644,6 @@
         <tag>QA</tag>
         <tag>NLG</tag>
         <tag>UniLM</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Knowledge Distillation (1) &amp;#58; 模块替换之bert-of-theseus-下篇</title>
-    <url>/2020/08/19/bert-of-theseus-2/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#fu-xian-shi-de-wen-ti">复现时的问题</a><ul>
-<li><a href="#si-kao-1-wei-shi-me-shi-xiao">思考1：为什么失效</a></li>
-<li><a href="#si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me">思考二 ：bert-of–theseus有效的本质是什么</a></li>
-<li><a href="#shi-yan-1">实验1</a></li>
-<li><a href="#si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing">思考三：直接在predecessor 上抽successor行不行？</a></li>
-<li><a href="#shi-yan-2">实验2</a></li>
-</ul>
-</li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>上一篇<a href="https://xv44586.github.io/2020/08/09/bert-of-theseus/">模块替换之bert-of-theseus-上篇</a>中介绍了bert-of-theseus论文的主要思路，并贴了两组实验的结论，这篇是对上篇的后续一些思考与实验。</p>
-<h1><span id="fu-xian-shi-de-wen-ti">复现时的问题</span><a href="#fu-xian-shi-de-wen-ti" class="header-anchor"></a></h1><p>在复现时，遇到最大的问题就是结果不稳定。首先每次训练predecessor时，其最优结果就会有上下1个点左右的波动，而因为theseus 中引入了随机数<br>来概率替换对应block，所以结果上一言难尽，有时能比12层bert低0.6个点, 有时只能达到直接3层fine tuning 的效果，于是我做了些观察与思考。</p>
-<h2><span id="si-kao-1-wei-shi-me-shi-xiao">思考1：为什么失效</span><a href="#si-kao-1-wei-shi-me-shi-xiao" class="header-anchor"></a></h2><p>在训练theseus model时，其中抽出的successor在每个epoch结束后在验证集上的结果有时会很高，基本到达只比三层fine-tuning低6个点，有时又很<br>低，基本不到0.1%, 第一种明显是successor在theseus中训练太多，以至于接近直接fine tuning，而另一种情况下可能是successor训练不充足，<br>也可能是替换次数太少导致没有被训练，而且大多数情况下successor的验证集上都是不到0.1%。<br>为了验证第二种情况下是否是未替换导致successor在做fine tuning，我将successor进行单独fine tuning后,将得到的classifier 拼回predecessor，<br>发现此时在验证集上d结果只下降了2个点，所以此时大概率是替换次数过少，基本没有训练到successor，所以导致结果不好，而这里开始我以为是我<br>实现问题，后来来来回回检查了一周，也没发现问题，于是我就想换一种更稳定的方式。</p>
-<h2><span id="si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me">思考二 ：bert-of–theseus有效的本质是什么</span><a href="#si-kao-er-bert-of-theseus-you-xiao-de-ben-zhi-shi-shi-me" class="header-anchor"></a></h2><p>熟悉bert的同学肯定对warm up不陌生，而warm up之所以有效，我认为比较重要的一点是如果在最初的steps中，模型提前拟合了样本，进入了一个局部最优区域，后期无论你怎么迭代他都跳不出来，而由已经<code>fine tuned predecessor</code>带着一起再进行训练，也和warm up有些相似，即用小的<br>步子带着你朝着更优的方向走几步，跳出来，让你有进入更好的局部最优点的可能，此外，概率替换的思路也与<code>Dropout</code>有几分相似，让successor<br>有一定的几率参与训练，从而让successor在缺少predecessor的情况下也有一定的robust。<br><a href="https://spaces.ac.cn/archives/7575" target="_blank" rel="noopener">苏剑林的博客</a>里也提到了替换的数学形式：<br>$$<br>\begin{equation}\begin{aligned}<br>&amp;\varepsilon^{(l)}\sim U(\{0, 1\})\\<br>&amp;x^{(l)} = x_p^{(l)} \times \varepsilon^{(l)} + x_s^{(l)} \times \left(1 - \varepsilon^{(l)}\right)\\<br>&amp;x_p^{(l+1)} = F_p^{(l+1)}\left(x^{(l)}\right)\\<br>&amp;x_s^{(l+1)} = F_s^{(l+1)}\left(x^{(l)}\right)<br>\end{aligned}\end{equation}<br>$$<br>同时，他也提到$\epsilon$能否不取非0即1，那既然我们是想让successor在task方向上warm up一下，那直接相加，即此时 $\epsilon = k$,<br>k是常数也是可以的。此时只要调节k 就能避免successor训练不充分或太充分的情况了，模型也就稳定了，可以满足我们的要求了。</p>
-<h2><span id="shi-yan-1">实验1</span><a href="#shi-yan-1" class="header-anchor"></a></h2><p>实验代码其实比较容易修改，只需将BinaryRandomChoice 层替换为相加即可。具体代码在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_bert_of_theseus.py" target="_blank" rel="noopener">classification_ifytek_bert_of_theseus</a><br>中可以看到。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProportionalAdd</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="string">"""将两层的结果乘比例后相加，output = (input_1 * proportion + input_2 * (1 - proportion)) / 2</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, proportion=<span class="number">0.5</span>, **kwargs)</span>:</span></span><br><span class="line">        super(ProportionalAdd, self).__init__(**kwargs)</span><br><span class="line">        self.supports_masking = <span class="literal">True</span></span><br><span class="line">        self.proportion = proportion</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">compute_mask</span><span class="params">(self, inputs, mask=None)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> mask[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span></span><br><span class="line">        source, target = inputs</span><br><span class="line">        source = source * self.proportion</span><br><span class="line">        target = target * (<span class="number">1</span> - self.proportion)</span><br><span class="line">        output = (source + target)/<span class="number">2</span></span><br><span class="line">        <span class="keyword">return</span> K.in_train_phase(output, target)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">compute_output_shape</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> input_shape[<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
-<p>文本分类：CLUE的iflytek数据集</p>
-<p>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 60.11\% &amp; 58.99\%  &amp; 57.96\%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 59.7\%  &amp; 59.5\% \end{array}\\<br>\hline<br>\end{array}<br>$$</p>
-<p>结果上看确实更稳定了，也更好一点点了，基本比predecessor低<code>0.5%~1%</code> .</p>
-<h2><span id="si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing">思考三：直接在predecessor 上抽successor行不行？</span><a href="#si-kao-san-zhi-jie-zai-predecessor-shang-chou-successor-xing-bu-xing" class="header-anchor"></a></h2><p>既然我们说bert-of-theseus有效的原因是在task 的方向进行了warm up，那predecessor已经在task上fine tuned了，能不能<code>直接抽取某几<br>层作为successor来直接fine tuning?</code>此外，之前我们也说了，predecessor与successor的classifer差距很小，那我们能不能改变successor<br>的classifer的学习率，让他进一步学习，来弥补一部分前三层无法拟合的分布呢？</p>
-<h2><span id="shi-yan-2">实验2</span><a href="#shi-yan-2" class="header-anchor"></a></h2><p>具体实验代码<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/two_stage_fine_tuning.py" target="_blank" rel="noopener">two-stage-fine-tuning</a><br>实验时尝试了<code>随机初始化classifier/predecessor classifier初始化classifier/ 放大classifier lr</code>组合策略，最后的结果就不贴了，基本都没有<br>超过3层bert fine tuning的效果。</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>尝试分析了bert-of-theseus复现中的问题，并尝试了一些修复方案，同时，实验测试了theseus model的必要性，最后结论是binary random choice<br>策略不如 proportion add 策略稳定，同时，theseus是必须的。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p><a href="https://github.com/JetRunner/BERT-of-Theseus" target="_blank" rel="noopener">论文原作者配图</a></p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>BERT</tag>
-        <tag>Distillation</tag>
-        <tag>speed-up</tag>
       </tags>
   </entry>
   <entry>
@@ -1879,36 +1879,6 @@
       </tags>
   </entry>
   <entry>
-    <title>一切三段成三角形</title>
-    <url>/2020/10/19/triangle/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#ti-mu">题目</a></li>
-<li><a href="#jie-da">解答</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>听到一个题目，还挺有意思，所以记录一下。</p>
-<h1><span id="ti-mu">题目</span><a href="#ti-mu" class="header-anchor"></a></h1><p>问：一个绳子长<code>a</code>，任意剪两刀变成三段后，可以组成一个三角形的概率是多少？</p>
-<h1><span id="jie-da">解答</span><a href="#jie-da" class="header-anchor"></a></h1><p>分析一下题目，一段长度固定的绳子，切割为三段，则：<br>1.<em> 任意一段绳子的长度大于0小于<code>a</code>；</em><br>2.<em> 任意两段绳子的长度大于0小于<code>a</code>。</em></p>
-<p>而三段绳子可以组成一个三角形，而三角形中两边之和大于第三边，所以意味着：<br>1.<em>任意一段的长度小于<code>a/2</code>；</em><br>2.<em>任意两段的长度和大于<code>a/2</code>.</em></p>
-<p>现在设其中两段的长度分别为 <code>x</code>, <code>y</code>，画出一个直角坐标系，如下图所示。<br><img src="/2020/10/19/triangle/triangle.png" alt></p>
-<p>同时连接<code>(0, a), (a, 0)</code>两点，则切割绳子后其中两段的长度的所有可取的值对应由<code>(0, 0),(a, 0), (0, a)</code>组成的三角形区域。<br>简单证明如下：对于任意一点<code>B</code>,我们做其对<code>y</code>轴的垂线，相交与点<code>P</code>,而点<code>B</code>位于<code>(a, 0) (0, a)</code>的连线时，对应$\angle PAB  = 45^o$,此时<br>$PB=PA \Rightarrow  PB + PO = PA + PO = a$,而当<code>P</code>位于连线外侧，则$\angle PAB  &gt; 45^o$,对应$PO + PB &gt; PO + PA = a$,不满足约束。而$\Delta A O C$ 的面积为 $a^2 / 2$.</p>
-<p>而对于能组成三角形时，首先任意一条长度小于$a/2$，对应<code>(0, a/2),(a/2,a/2)</code>连线与<code>(a/2,0)(a/2,a/2)</code>连线围城的矩形区域，而任意两边之和大于$a/2$,利用之前的方法可以证明是(0,a/2)(a/2, 0)连线右侧区域，两者的交即图中绿色三角形区域，其面积为$(a/2)^2/2 = a^2 / 8$</p>
-<p>所以最后结论是组成三角形的概率为两个面积之比：<br>$$<br>pro = \frac{a^2/8}{a^2/2} = 1/4<br>$$</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
-      <categories>
-        <category>Math</category>
-      </categories>
-      <tags>
-        <tag>Statistics</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>样本不均衡之难易不均衡</title>
     <url>/2020/10/14/focal-loss/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -1961,6 +1931,36 @@
       <tags>
         <tag>样本不均衡</tag>
         <tag>Loss</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一切三段成三角形</title>
+    <url>/2020/10/19/triangle/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#ti-mu">题目</a></li>
+<li><a href="#jie-da">解答</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>听到一个题目，还挺有意思，所以记录一下。</p>
+<h1><span id="ti-mu">题目</span><a href="#ti-mu" class="header-anchor"></a></h1><p>问：一个绳子长<code>a</code>，任意剪两刀变成三段后，可以组成一个三角形的概率是多少？</p>
+<h1><span id="jie-da">解答</span><a href="#jie-da" class="header-anchor"></a></h1><p>分析一下题目，一段长度固定的绳子，切割为三段，则：<br>1.<em> 任意一段绳子的长度大于0小于<code>a</code>；</em><br>2.<em> 任意两段绳子的长度大于0小于<code>a</code>。</em></p>
+<p>而三段绳子可以组成一个三角形，而三角形中两边之和大于第三边，所以意味着：<br>1.<em>任意一段的长度小于<code>a/2</code>；</em><br>2.<em>任意两段的长度和大于<code>a/2</code>.</em></p>
+<p>现在设其中两段的长度分别为 <code>x</code>, <code>y</code>，画出一个直角坐标系，如下图所示。<br><img src="/2020/10/19/triangle/triangle.png" alt></p>
+<p>同时连接<code>(0, a), (a, 0)</code>两点，则切割绳子后其中两段的长度的所有可取的值对应由<code>(0, 0),(a, 0), (0, a)</code>组成的三角形区域。<br>简单证明如下：对于任意一点<code>B</code>,我们做其对<code>y</code>轴的垂线，相交与点<code>P</code>,而点<code>B</code>位于<code>(a, 0) (0, a)</code>的连线时，对应$\angle PAB  = 45^o$,此时<br>$PB=PA \Rightarrow  PB + PO = PA + PO = a$,而当<code>P</code>位于连线外侧，则$\angle PAB  &gt; 45^o$,对应$PO + PB &gt; PO + PA = a$,不满足约束。而$\Delta A O C$ 的面积为 $a^2 / 2$.</p>
+<p>而对于能组成三角形时，首先任意一条长度小于$a/2$，对应<code>(0, a/2),(a/2,a/2)</code>连线与<code>(a/2,0)(a/2,a/2)</code>连线围城的矩形区域，而任意两边之和大于$a/2$,利用之前的方法可以证明是(0,a/2)(a/2, 0)连线右侧区域，两者的交即图中绿色三角形区域，其面积为$(a/2)^2/2 = a^2 / 8$</p>
+<p>所以最后结论是组成三角形的概率为两个面积之比：<br>$$<br>pro = \frac{a^2/8}{a^2/2} = 1/4<br>$$</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
+      <categories>
+        <category>Math</category>
+      </categories>
+      <tags>
+        <tag>Statistics</tag>
       </tags>
   </entry>
   <entry>
@@ -2536,6 +2536,34 @@
       </tags>
   </entry>
   <entry>
+    <title>辞旧迎新</title>
+    <url>/2021/02/19/happy-new-year/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#ci-jiu">辞旧</a></li>
+<li><a href="#ying-xin">迎新</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div><br>在新年这个重要的时间节点上，总应该做些总结与计划，来辞旧迎新，然而我总是懒惰加拖延，到了今天初八才正式开写，所以新的一年，第一个flag就是：希望能找到良药医治一下我的拖延症 - -！</p>
+<h1><span id="ci-jiu">辞旧</span><a href="#ci-jiu" class="header-anchor"></a></h1><p>2020年是神奇的一年，这一年里发生了很多意想不到的事，用网友们的话讲就是这一年总忙着见证历史了。而需要见证的历史太多，大多数我都没关注，所以只记录一下我自己”见证”的历史。<br>首先是过年回家，刚到家我就去县里的药店屯了口罩和感冒药，之后就是持续至今的新冠，而由于新冠初期，大家对其认识很少，所以限制出行，而我也就因此度过了高中以来在家最久的一次”寒假”–整整三个月，直到四月初，才买到了机票回来上班。<br>在家的三个月，对我最大的帮助可能就是心灵治愈了，<code>人间烟火气，最抚凡人心</code><br>虽然在家陪父母，但是后期还是需要正常打卡的，所以我也顺便研究了一下藏文语言模型和文本纠错，也就是这个时期，让我更坚定的想要一台自己的服务器，来实验想法。于是，回到北京后，我就开始调研硬件相关，然后自己动手搭了一台<a href="https://xv44586.github.io/2020/05/05/make-a-computer/">服务器</a>，这里还要感谢一下银翔老哥，帮我报销了2080Ti的钱，哈哈。<br>有了服务器，我就开始<code>放弃幻想，拥抱transformer </code>, 开始了看论文与写demo 的路程，期间参考<a href="https://github.com/bojone/bert4keras.git" target="_blank" rel="noopener">bert4keras</a> 与 <a href="https://github.com/CyberZHG/keras-bert" target="_blank" rel="noopener">keras-bert</a>, 实现了一下Bert，不过中间有次实验结果有些奇怪，为了查问题，API基本上改成bert4keras一致了。后面一些相transformer相关的实验代码基本也都在<a href="https://github.com/xv44586/toolkit4nlp" target="_blank" rel="noopener">toolkit4nlp</a><br>这里还有一个小插曲，王萌老哥带我打了一个脑科学的比赛，我们俩花了一天最后拿了个铜牌，这也让我了解到在很多领域，对机器学习和深度学习还是运用的相当少的，一方面是因为任务形态的原因，一方面也是这些领域接受新事物比较缓慢可能，所以我认为与机器学习做交叉，还是有很多事可以做的。<br>接着就到了十一月，由于看到群里有人讨论小学生解数学题的比赛，就去看了<a href="https://www.datafountain.cn/" target="_blank" rel="noopener">datafountain</a>，然后就写了<a href="https://www.datafountain.cn/competitions/474/datasets" target="_blank" rel="noopener">房产行业问答匹配比赛</a>的baseline：<a href="https://github.com/xv44586/ccf_2020_qa_match" target="_blank" rel="noopener">ccf_2020_qa_match</a>, 其实比赛到这就结束了，我就去看论文了，然而有时候事情就是这么奇妙，很多群里的同学看到我的baseline 邀请我去组队，后来与南大的”钞人小哥”刘猛组队，最终拿了第一还。不过答辩时发现，在看论文与做实验的纬度上，我们应该也是第一了- - ！无论如何，也要感谢一下刘猛小哥，不是他邀请我，我也不会拿到这个金牌。毕竟baseline 我写过不少，但是真的认真打到最后还是第一次～～</p>
+<p>总结一下，去年发生了新冠，直到现在大家还是备受困扰，我个人度过了最爽的一个年假，在NLP 上也有了实足的进步，不过也有很多年初的计划没有完成，比如每周一篇blog，看完花书等。</p>
+<h1><span id="ying-xin">迎新</span><a href="#ying-xin" class="header-anchor"></a></h1><p><code>凡事预则立，不预则废。</code>所以，flag还是要立的，新的一年，希望自己更少一点浮躁，做事能更多一点踏实。</p>
+<ul>
+<li>经典论文还有很多没读，最新的论文又源源不断，所以希望新的一年能找到适合自己的读论文节奏。</li>
+<li>一周一篇blog 可能太困难了，希望能一年写三十篇吧就</li>
+<li>感情上也要更成熟一些，对未来要有更清晰的规划</li>
+<li>有空就多运动</li>
+</ul>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>成都海洋馆的可爱白鲸</p>
+]]></content>
+      <categories>
+        <category>Life</category>
+      </categories>
+  </entry>
+  <entry>
     <title>多任务学习-以天池比赛为例的三种思路</title>
     <url>/2021/03/28/multi-task/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -2576,32 +2604,42 @@
       </tags>
   </entry>
   <entry>
-    <title>辞旧迎新</title>
-    <url>/2021/02/19/happy-new-year/</url>
+    <title>对比学习心路历程</title>
+    <url>/2021/07/06/cl2rdrop/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
 
 <!-- toc -->
 <ul>
-<li><a href="#ci-jiu">辞旧</a></li>
-<li><a href="#ying-xin">迎新</a></li>
+<li><a href="#qian-yan">前言</a></li>
+<li><a href="#dui-bi-xue-xi-fan-shi">对比学习范式</a></li>
+<li><a href="#wu-jian-du-dui-bi-xue-xi">无监督对比学习</a></li>
+<li><a href="#you-jian-du-dui-bi-xue-xi">有监督对比学习</a></li>
+<li><a href="#zong-jie">总结</a></li>
 <li><a href="#guan-yu-tou-tu">关于头图</a></li>
 </ul>
 <!-- tocstop -->
-<p></div><br>在新年这个重要的时间节点上，总应该做些总结与计划，来辞旧迎新，然而我总是懒惰加拖延，到了今天初八才正式开写，所以新的一年，第一个flag就是：希望能找到良药医治一下我的拖延症 - -！</p>
-<h1><span id="ci-jiu">辞旧</span><a href="#ci-jiu" class="header-anchor"></a></h1><p>2020年是神奇的一年，这一年里发生了很多意想不到的事，用网友们的话讲就是这一年总忙着见证历史了。而需要见证的历史太多，大多数我都没关注，所以只记录一下我自己”见证”的历史。<br>首先是过年回家，刚到家我就去县里的药店屯了口罩和感冒药，之后就是持续至今的新冠，而由于新冠初期，大家对其认识很少，所以限制出行，而我也就因此度过了高中以来在家最久的一次”寒假”–整整三个月，直到四月初，才买到了机票回来上班。<br>在家的三个月，对我最大的帮助可能就是心灵治愈了，<code>人间烟火气，最抚凡人心</code><br>虽然在家陪父母，但是后期还是需要正常打卡的，所以我也顺便研究了一下藏文语言模型和文本纠错，也就是这个时期，让我更坚定的想要一台自己的服务器，来实验想法。于是，回到北京后，我就开始调研硬件相关，然后自己动手搭了一台<a href="https://xv44586.github.io/2020/05/05/make-a-computer/">服务器</a>，这里还要感谢一下银翔老哥，帮我报销了2080Ti的钱，哈哈。<br>有了服务器，我就开始<code>放弃幻想，拥抱transformer </code>, 开始了看论文与写demo 的路程，期间参考<a href="https://github.com/bojone/bert4keras.git" target="_blank" rel="noopener">bert4keras</a> 与 <a href="https://github.com/CyberZHG/keras-bert" target="_blank" rel="noopener">keras-bert</a>, 实现了一下Bert，不过中间有次实验结果有些奇怪，为了查问题，API基本上改成bert4keras一致了。后面一些相transformer相关的实验代码基本也都在<a href="https://github.com/xv44586/toolkit4nlp" target="_blank" rel="noopener">toolkit4nlp</a><br>这里还有一个小插曲，王萌老哥带我打了一个脑科学的比赛，我们俩花了一天最后拿了个铜牌，这也让我了解到在很多领域，对机器学习和深度学习还是运用的相当少的，一方面是因为任务形态的原因，一方面也是这些领域接受新事物比较缓慢可能，所以我认为与机器学习做交叉，还是有很多事可以做的。<br>接着就到了十一月，由于看到群里有人讨论小学生解数学题的比赛，就去看了<a href="https://www.datafountain.cn/" target="_blank" rel="noopener">datafountain</a>，然后就写了<a href="https://www.datafountain.cn/competitions/474/datasets" target="_blank" rel="noopener">房产行业问答匹配比赛</a>的baseline：<a href="https://github.com/xv44586/ccf_2020_qa_match" target="_blank" rel="noopener">ccf_2020_qa_match</a>, 其实比赛到这就结束了，我就去看论文了，然而有时候事情就是这么奇妙，很多群里的同学看到我的baseline 邀请我去组队，后来与南大的”钞人小哥”刘猛组队，最终拿了第一还。不过答辩时发现，在看论文与做实验的纬度上，我们应该也是第一了- - ！无论如何，也要感谢一下刘猛小哥，不是他邀请我，我也不会拿到这个金牌。毕竟baseline 我写过不少，但是真的认真打到最后还是第一次～～</p>
-<p>总结一下，去年发生了新冠，直到现在大家还是备受困扰，我个人度过了最爽的一个年假，在NLP 上也有了实足的进步，不过也有很多年初的计划没有完成，比如每周一篇blog，看完花书等。</p>
-<h1><span id="ying-xin">迎新</span><a href="#ying-xin" class="header-anchor"></a></h1><p><code>凡事预则立，不预则废。</code>所以，flag还是要立的，新的一年，希望自己更少一点浮躁，做事能更多一点踏实。</p>
+</div>
+
+<h1><span id="qian-yan">前言</span><a href="#qian-yan" class="header-anchor"></a></h1><p>在之前的<a href="https://xv44586.github.io/2021/01/20/ccf-qa-2/">博客</a>里，笔者介绍了在有监督任务（文本匹配）上，增加对比学习来提高模型性能的实验，而当时尝试后却发现，在新增了对比学习的任务后，模型的性能并没有得到对应的提升，经过简单分析后，笔者也尝试给出了一些可能的问题与解决方案。虽然笔者的实验都失败了，但是笔者依然认为对比学习是一个非常好的方向，所以也在持续关注，这篇就算是后续的填坑与总结吧。</p>
+<h1><span id="dui-bi-xue-xi-fan-shi">对比学习范式</span><a href="#dui-bi-xue-xi-fan-shi" class="header-anchor"></a></h1><p>之前也提到过，这里在简单称述一下对比学习目前的主要范式。对比学习主要是通过对比，拉近相似样本之间的距离，推远不相似样本之间的距离。而相似样本的构造，又可以分为有监督与无监督两种：</p>
 <ul>
-<li>经典论文还有很多没读，最新的论文又源源不断，所以希望新的一年能找到适合自己的读论文节奏。</li>
-<li>一周一篇blog 可能太困难了，希望能一年写三十篇吧就</li>
-<li>感情上也要更成熟一些，对未来要有更清晰的规划</li>
-<li>有空就多运动</li>
+<li>有监督对比学习：通过将监督样本中的相同label的样本作为正样本，不同label的样本作为负样本，来进行对比学习；</li>
+<li>无监督对比学习：由于没有监督信号（label），此时，我们对同一个样本构造两个view，让同一样本构造的两个view互为正样本，而其他样本构造的view则全部为负样本，以此来进行对比学习。而由同一个样本构造两个view，又是数据扩增的过程，所以也可以称作是数据扩展对比学习。而不管那种范式，通常对比学习都是在batch内进行。</li>
 </ul>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>成都海洋馆的可爱白鲸</p>
+<h1><span id="wu-jian-du-dui-bi-xue-xi">无监督对比学习</span><a href="#wu-jian-du-dui-bi-xue-xi" class="header-anchor"></a></h1><p>笔者曾经在实验中，通过对样本进行eda（随机替换、随机删除、随机重复和随机互换），来构造不同view，由此进行对比学习。实验失败后，笔者也提到失败的可能原因主要有两点：batch size太小且样本上直接进行操作，获得的新样本与原来的语义可能由较大的差别甚至是完全的反义。如：“我不会再爱你” –&gt; “我会再爱你”,而强行让这两个样本的语义距离相互靠近，效果自然不会好；而batch size太小的问题，一来是换大的GPU，二来可以尝试在算法层面进行优化，如将Adam 替换为AdaFactor，re-compute等，这不是本文的重点，所以就不再细说了。<br>而针对直接对样本进行修改会导致语义不一致的问题，其主要原因是NLP中，样本的输入是one-hot形式的，我们的相似样本应该是语义上相似，对应的修改后的语义距离应该尽可能“小”，而直接对one-hot形式进行修改，对应的距离恒定是$\sqrt{2}$ ，怎么看也不小。一种解决方法是借鉴对抗训练在NLP中的方式，将修改放在Embedding 层，由于one-hot与Embedding的对应关系，就能够获得“相似语义”的样本了。对应思路的论文有美团今年的<a href="http://arxiv.org/abs/2105.11741" target="_blank" rel="noopener">ConSERT: A Contrastive Framework for Self-Supervised Sentence Representation Transfer</a>,总的来说，这篇paper就是将EDA的思路放在embedding 层，然后构建不同view后进行对比学习，最后获得的语义表示超过了当前的sota，在多个数据集上获得了提升。不过值得吐槽的是，美团也学坏了，竟然学会了谷歌那套在更多数据上进行训练然后跟只有原始数据的结果进行对比，可能是论文本身没什么亮点，只能通过“大的提升”来吸引眼球了吧~<br>而做数据扩增时，最常用的两个方式随机删除与随机互换，而位置编码在transformer 中起到的作用不是关键性的，且直接互换位置也会带来语义变化较大的风险，那只使用随机删除策略做数据扩增，进行对比学习效果如何呢？答案是非常好！女神陈丹琦最近的论文<a href="https://arxiv.org/abs/2104.08821" target="_blank" rel="noopener">SimCSE: Simple Contrastive Learning of Sentence Embeddings</a>,只使用dropout ，对同一个样本构造两个不同的view，然后进行对比学习，最终的效果在非监督学习任务下8个点提升起步，在监督任务下4个点提升起步，此外，<a href="https://github.com/bojone/SimCSE" target="_blank" rel="noopener">苏神</a>在中文任务上也进行了实验，再次验证了该方法的有效性。</p>
+<p><img src="/2021/07/06/cl2rdrop/simcse.png" alt="效果对比"></p>
+<p>而simcse具体是如何工作的呢？其实做法相当简单，即将一个样本进入模型两次，然后通过dropout 两次，获得两个不同的view，互为正样本。而dropout 由于是在feature 维度进行随机mask，所以就得到了与在embedding层随机mask相同的效果，此外，由于在transformer 中，dropout 多次使用，也进一步的增加了两个view 的差异。读完论文，看着效果，直叹“大道至简”，而对比在embedding 做扰动与直接使用dropout，从效果上看dropout 也是一种更加有效的数据扩增手段。那这个思路是不是可以扩展到有监督任务呢？<br>其实读完SimCSE后，笔者就觉得dropout 是一种更加有效的数据扩增手段，自然可以扩展到有监督任务学习中。这里的有监督任务学习有别与有监督对比学习，请读者注意区分。而在有监督任务学习中的方案也是比较直观：将样本进入模型两遍，然后在做监督任务的同时，增加一个对比学习，不过笔者实验时被之前无监督任务的思路所束缚了，一直使用encoder output 的logits来表征语义，所以调来调去效果时好时坏，好的时候也没有超过0.5的提升，所以就放弃了。<br>而最近的论文<a href="http://arxiv.org/abs/2106.14448" target="_blank" rel="noopener">R-Drop: Regularized Dropout for Neural Networks</a>却成功的将这个思路延续了下来，在读完其<a href="https://github.com/dropreg/R-Drop" target="_blank" rel="noopener">代码</a>后，才发现原来是自己姿势不对~<br>R-Drop中的完整思路是这样的：首先，我们通过将样本重复的输入到模型，然后通过dropout，获取不同的view，而dropout的目的是为了将集成模型的思路延续到深度学习中，本质目的是增加模型的鲁棒性。所以，不同的view获得的最终的输出，我们也希望其尽可能的一致。而论文中的任务都是分类任务，所以模型最终的输出是一个概率分布，衡量两个概率分别的差异通常使用kl散度，所以最终的loss增加了一个对应view之间的kl-divergence。<br>对比笔者之前的思路与R-Drop 中的思路，首先R-Drop 中是直接作用在最终的probs上，而笔者是希望encoder output logits 之间能“同性相吸，异性排斥”，而由于在做分类任务时，在logits 后都会接一个dense层来压缩维度，这个dense 层就会大大抑制前面的对比学习的效果，即前面的logits可以差异很大，但通过最后的dense层，却能得到一样的预测结果（label相同），而直接作用在最终的输出层，才会得到想要的效果；其次在R-Drop 中，不再需要与其他样本做对比，即只要相同view 的输出足够“接近”即可，而不需要其与其他的view 尽可能的“远”，考虑到同一个batch 内，存在同样label的样本的概率是极大的，而要求同时预测对label又要其结果之间尽可能不同是不合理的，所以取消掉与其他view之间的对比也是合理与必要的；而由于不需要去其他view做对比，对比学习中大batch size的要求也就不再需要，即在小的batch size 下该方法依然有效，真可谓“方法简单效果好”，在所有的NLP任务中都值得尝试。<br>前面提到笔者之前的思路的最大问题是对比的不是最后一层的输出，而同一batch内，又不可避免的会出现相同label，让相同label的logits之间相互“远离”似乎不太合理，但从对抗训练或者模型的鲁棒性上考虑，让同一样本的不同view之间相互接近而与其他view之间相互远离，可以达到让样本在一个范围内的输出尽可能的保持一致，从而能使模型更加的鲁棒，自然会增加一些泛化能力。这个思路笔者也在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_tnews_contrastive_learning_dropout.py" target="_blank" rel="noopener">之前的实验</a>上进行了修改尝试，结果显示确实能提高一些性能，但是与只拉近相同view之间的kl-divergence相比，提升就不够看了。</p>
+<h1><span id="you-jian-du-dui-bi-xue-xi">有监督对比学习</span><a href="#you-jian-du-dui-bi-xue-xi" class="header-anchor"></a></h1><p>有监督对比学习是指相同label之间互为正样本，不同label间为负样本，与上文提到的有监督任务是不同的。而有监督任务中也可以使用无监督对比学习的思路，如上文提到的R-Drop，而有监督对比学习自从<a href="https://arxiv.org/abs/2011.01403" target="_blank" rel="noopener">Supervised Contrastive Learning for Pre-trained Language Model Fine-tuning</a>后，笔者还未关注到有什么新的进展，所以还是推荐在有监督任务上使用R-Drop思路。</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文主要总结了从笔者之前对比学习实验时留下的问题，到最近一些论文中提出的解决思路，虽然整个心路历程与原作者们的肯定不一样，但希望能给读者提供对比学习到目前为止的一些进展脉络。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>图片来自大佬刑无刀（陈开江）的朋友圈：据说人工智能中有80%的部分是人工😄</p>
 ]]></content>
       <categories>
-        <category>Life</category>
+        <category>NLP</category>
       </categories>
+      <tags>
+        <tag>SimCSE</tag>
+        <tag>R-Drop</tag>
+      </tags>
   </entry>
   <entry>
     <title>speed-up</title>
@@ -2800,41 +2838,67 @@
       </tags>
   </entry>
   <entry>
-    <title>对比学习心路历程</title>
-    <url>/2021/07/06/cl2rdrop/</url>
+    <title>faster-decoder之 decoder解码加速</title>
+    <url>/2022/05/23/faster-decoder/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
 
 <!-- toc -->
 <ul>
-<li><a href="#qian-yan">前言</a></li>
-<li><a href="#dui-bi-xue-xi-fan-shi">对比学习范式</a></li>
-<li><a href="#wu-jian-du-dui-bi-xue-xi">无监督对比学习</a></li>
-<li><a href="#you-jian-du-dui-bi-xue-xi">有监督对比学习</a></li>
-<li><a href="#zong-jie">总结</a></li>
+<li><a href="#1-bei-jing">1 背景</a></li>
+<li><a href="#2-attention-cache">2 attention cache</a><ul>
+<li><a href="#2-1-yuan-li">2.1 原理</a></li>
+<li><a href="#encoder-decoder-cross-attention">encoder-decoder cross-attention</a></li>
+<li><a href="#self-attention">self-attention</a></li>
+<li><a href="#2-2-shi-xian">2.2 实现</a><ul>
+<li><a href="#1-attention-ceng-xiu-gai">1. attention 层修改</a></li>
+<li><a href="#2-attention-mask-de-jiu-zheng">2. attention mask 的“纠正”</a></li>
+<li><a href="#3-position-bias-de-jiu-zheng">3. position bias 的“纠正”</a></li>
+<li><a href="#4-jie-ma-shi-xian">4. 解码实现</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#3-onnx">3 onnx</a></li>
+<li><a href="#4-demo">4 demo</a></li>
 <li><a href="#guan-yu-tou-tu">关于头图</a></li>
 </ul>
 <!-- tocstop -->
 </div>
 
-<h1><span id="qian-yan">前言</span><a href="#qian-yan" class="header-anchor"></a></h1><p>在之前的<a href="https://xv44586.github.io/2021/01/20/ccf-qa-2/">博客</a>里，笔者介绍了在有监督任务（文本匹配）上，增加对比学习来提高模型性能的实验，而当时尝试后却发现，在新增了对比学习的任务后，模型的性能并没有得到对应的提升，经过简单分析后，笔者也尝试给出了一些可能的问题与解决方案。虽然笔者的实验都失败了，但是笔者依然认为对比学习是一个非常好的方向，所以也在持续关注，这篇就算是后续的填坑与总结吧。</p>
-<h1><span id="dui-bi-xue-xi-fan-shi">对比学习范式</span><a href="#dui-bi-xue-xi-fan-shi" class="header-anchor"></a></h1><p>之前也提到过，这里在简单称述一下对比学习目前的主要范式。对比学习主要是通过对比，拉近相似样本之间的距离，推远不相似样本之间的距离。而相似样本的构造，又可以分为有监督与无监督两种：</p>
-<ul>
-<li>有监督对比学习：通过将监督样本中的相同label的样本作为正样本，不同label的样本作为负样本，来进行对比学习；</li>
-<li>无监督对比学习：由于没有监督信号（label），此时，我们对同一个样本构造两个view，让同一样本构造的两个view互为正样本，而其他样本构造的view则全部为负样本，以此来进行对比学习。而由同一个样本构造两个view，又是数据扩增的过程，所以也可以称作是数据扩展对比学习。而不管那种范式，通常对比学习都是在batch内进行。</li>
-</ul>
-<h1><span id="wu-jian-du-dui-bi-xue-xi">无监督对比学习</span><a href="#wu-jian-du-dui-bi-xue-xi" class="header-anchor"></a></h1><p>笔者曾经在实验中，通过对样本进行eda（随机替换、随机删除、随机重复和随机互换），来构造不同view，由此进行对比学习。实验失败后，笔者也提到失败的可能原因主要有两点：batch size太小且样本上直接进行操作，获得的新样本与原来的语义可能由较大的差别甚至是完全的反义。如：“我不会再爱你” –&gt; “我会再爱你”,而强行让这两个样本的语义距离相互靠近，效果自然不会好；而batch size太小的问题，一来是换大的GPU，二来可以尝试在算法层面进行优化，如将Adam 替换为AdaFactor，re-compute等，这不是本文的重点，所以就不再细说了。<br>而针对直接对样本进行修改会导致语义不一致的问题，其主要原因是NLP中，样本的输入是one-hot形式的，我们的相似样本应该是语义上相似，对应的修改后的语义距离应该尽可能“小”，而直接对one-hot形式进行修改，对应的距离恒定是$\sqrt{2}$ ，怎么看也不小。一种解决方法是借鉴对抗训练在NLP中的方式，将修改放在Embedding 层，由于one-hot与Embedding的对应关系，就能够获得“相似语义”的样本了。对应思路的论文有美团今年的<a href="http://arxiv.org/abs/2105.11741" target="_blank" rel="noopener">ConSERT: A Contrastive Framework for Self-Supervised Sentence Representation Transfer</a>,总的来说，这篇paper就是将EDA的思路放在embedding 层，然后构建不同view后进行对比学习，最后获得的语义表示超过了当前的sota，在多个数据集上获得了提升。不过值得吐槽的是，美团也学坏了，竟然学会了谷歌那套在更多数据上进行训练然后跟只有原始数据的结果进行对比，可能是论文本身没什么亮点，只能通过“大的提升”来吸引眼球了吧~<br>而做数据扩增时，最常用的两个方式随机删除与随机互换，而位置编码在transformer 中起到的作用不是关键性的，且直接互换位置也会带来语义变化较大的风险，那只使用随机删除策略做数据扩增，进行对比学习效果如何呢？答案是非常好！女神陈丹琦最近的论文<a href="https://arxiv.org/abs/2104.08821" target="_blank" rel="noopener">SimCSE: Simple Contrastive Learning of Sentence Embeddings</a>,只使用dropout ，对同一个样本构造两个不同的view，然后进行对比学习，最终的效果在非监督学习任务下8个点提升起步，在监督任务下4个点提升起步，此外，<a href="https://github.com/bojone/SimCSE" target="_blank" rel="noopener">苏神</a>在中文任务上也进行了实验，再次验证了该方法的有效性。</p>
-<p><img src="/2021/07/06/cl2rdrop/simcse.png" alt="效果对比"></p>
-<p>而simcse具体是如何工作的呢？其实做法相当简单，即将一个样本进入模型两次，然后通过dropout 两次，获得两个不同的view，互为正样本。而dropout 由于是在feature 维度进行随机mask，所以就得到了与在embedding层随机mask相同的效果，此外，由于在transformer 中，dropout 多次使用，也进一步的增加了两个view 的差异。读完论文，看着效果，直叹“大道至简”，而对比在embedding 做扰动与直接使用dropout，从效果上看dropout 也是一种更加有效的数据扩增手段。那这个思路是不是可以扩展到有监督任务呢？<br>其实读完SimCSE后，笔者就觉得dropout 是一种更加有效的数据扩增手段，自然可以扩展到有监督任务学习中。这里的有监督任务学习有别与有监督对比学习，请读者注意区分。而在有监督任务学习中的方案也是比较直观：将样本进入模型两遍，然后在做监督任务的同时，增加一个对比学习，不过笔者实验时被之前无监督任务的思路所束缚了，一直使用encoder output 的logits来表征语义，所以调来调去效果时好时坏，好的时候也没有超过0.5的提升，所以就放弃了。<br>而最近的论文<a href="http://arxiv.org/abs/2106.14448" target="_blank" rel="noopener">R-Drop: Regularized Dropout for Neural Networks</a>却成功的将这个思路延续了下来，在读完其<a href="https://github.com/dropreg/R-Drop" target="_blank" rel="noopener">代码</a>后，才发现原来是自己姿势不对~<br>R-Drop中的完整思路是这样的：首先，我们通过将样本重复的输入到模型，然后通过dropout，获取不同的view，而dropout的目的是为了将集成模型的思路延续到深度学习中，本质目的是增加模型的鲁棒性。所以，不同的view获得的最终的输出，我们也希望其尽可能的一致。而论文中的任务都是分类任务，所以模型最终的输出是一个概率分布，衡量两个概率分别的差异通常使用kl散度，所以最终的loss增加了一个对应view之间的kl-divergence。<br>对比笔者之前的思路与R-Drop 中的思路，首先R-Drop 中是直接作用在最终的probs上，而笔者是希望encoder output logits 之间能“同性相吸，异性排斥”，而由于在做分类任务时，在logits 后都会接一个dense层来压缩维度，这个dense 层就会大大抑制前面的对比学习的效果，即前面的logits可以差异很大，但通过最后的dense层，却能得到一样的预测结果（label相同），而直接作用在最终的输出层，才会得到想要的效果；其次在R-Drop 中，不再需要与其他样本做对比，即只要相同view 的输出足够“接近”即可，而不需要其与其他的view 尽可能的“远”，考虑到同一个batch 内，存在同样label的样本的概率是极大的，而要求同时预测对label又要其结果之间尽可能不同是不合理的，所以取消掉与其他view之间的对比也是合理与必要的；而由于不需要去其他view做对比，对比学习中大batch size的要求也就不再需要，即在小的batch size 下该方法依然有效，真可谓“方法简单效果好”，在所有的NLP任务中都值得尝试。<br>前面提到笔者之前的思路的最大问题是对比的不是最后一层的输出，而同一batch内，又不可避免的会出现相同label，让相同label的logits之间相互“远离”似乎不太合理，但从对抗训练或者模型的鲁棒性上考虑，让同一样本的不同view之间相互接近而与其他view之间相互远离，可以达到让样本在一个范围内的输出尽可能的保持一致，从而能使模型更加的鲁棒，自然会增加一些泛化能力。这个思路笔者也在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_tnews_contrastive_learning_dropout.py" target="_blank" rel="noopener">之前的实验</a>上进行了修改尝试，结果显示确实能提高一些性能，但是与只拉近相同view之间的kl-divergence相比，提升就不够看了。</p>
-<h1><span id="you-jian-du-dui-bi-xue-xi">有监督对比学习</span><a href="#you-jian-du-dui-bi-xue-xi" class="header-anchor"></a></h1><p>有监督对比学习是指相同label之间互为正样本，不同label间为负样本，与上文提到的有监督任务是不同的。而有监督任务中也可以使用无监督对比学习的思路，如上文提到的R-Drop，而有监督对比学习自从<a href="https://arxiv.org/abs/2011.01403" target="_blank" rel="noopener">Supervised Contrastive Learning for Pre-trained Language Model Fine-tuning</a>后，笔者还未关注到有什么新的进展，所以还是推荐在有监督任务上使用R-Drop思路。</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文主要总结了从笔者之前对比学习实验时留下的问题，到最近一些论文中提出的解决思路，虽然整个心路历程与原作者们的肯定不一样，但希望能给读者提供对比学习到目前为止的一些进展脉络。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>图片来自大佬刑无刀（陈开江）的朋友圈：据说人工智能中有80%的部分是人工😄</p>
+<h1><span id="1-bei-jing">1 背景</span><a href="#1-bei-jing" class="header-anchor"></a></h1><p>Transformer 模型舍弃了 step by step 的时序循环，依靠 self-attention 的并行结构获得了远超同量级 LSTM 网络的训练速度。即使做auto-regresisve 任务时，通过attention-mask 机制依然可以像encoder 一样并行计算。然而在解码时，却任然需要step by step 的进行，即需要知道上一个time step 的结果后才能进行下一个time step 的解码。此外，通常我们的解码策略是在获得模型结果后在内存中计算的，需要不停的将结果从GPU load 进 CPU 然后计算，这就进一步的拖慢了解码速度。而通常我们在部署时，首选的tf-serving 需要将结果通过网络传输，这将进一步的拖慢解码速度。而针对解码慢的问题，主要的加速方案有：</p>
+<ol>
+<li>将解码策略放在GPU 上计算，这样将避免结果在GPU/CPU 之间转换与等待；</li>
+<li>attention cache，根据attention 层的特点，对attention 中的 $K$ / $V$ 进行cache，避免对之前的time step 进行重复计算，将attention 层的计算由 $O(n^2)$  降低到 $O(n)$。</li>
+<li>transformer 计算最耗时的是attention 层中的softmax，尝试使用一些线性函数进行近似替换</li>
+</ol>
+<h1><span id="2-attention-cache">2 attention cache</span><a href="#2-attention-cache" class="header-anchor"></a></h1><p>三种方案中，GPU 上进行解码需要一些底层技术进行开发，暂时没能力，而替换softmax 方案则会或多或少的损失一些精度，本文都不做进一步讨论。本文聚焦在attention cache 方案上，加速的同时又“不会”损失精度。</p>
+<h2><span id="2-1-yuan-li">2.1 原理</span><a href="#2-1-yuan-li" class="header-anchor"></a></h2><p>attention 的计算公式：</p>
+<p>$$<br>A = Softmax(QK^{T})* V<br>$$</p>
+<p>在解码时，我们是step by step 进行的，所以，我们将时刻 t 的attention 写出来：</p>
+<p>$$<br>A = Softmax(Q_{t}K^{T})* V<br>$$</p>
+<p>即：对于时刻t 来说，attention 只需要当前的 $Q_{t}$ 时刻信息，$K$ / $V$ 的所有时刻信息进行计算。而 $Q_{t}$ 的计算只需要 $Token_{t-t}$ 即可，如何加速计算的关键就剩下如何更加高效的计算 $K$ / $V$.</p>
+<h2><span id="encoder-decoder-cross-attention">encoder-decoder cross-attention</span><a href="#encoder-decoder-cross-attention" class="header-anchor"></a></h2><p>对于encoder-decoder cross-attention 来说，对应的 $K$ / $V$ 都来自encoder 的outputs，所以直接将其整个进行cache 即可，而无需每步都重新计算。</p>
+<h2><span id="self-attention">self-attention</span><a href="#self-attention" class="header-anchor"></a></h2><p>而当attention 是self-attention 时，对于时刻 $t$ 来说，此时的 $K$ / $V$ 为 $K$ / $V$ 的前 $t$ 时刻信息，即 $K_{\leq t}$ / $V_{\leq t}$ .此时的 attention 计算为：</p>
+<p>$$<br>A = Softmax(Q_{t}K_{\leq t}^{T})* V_{\leq t}<br>$$</p>
+<p>而 $K_{t}$/$V_{t}$ 的计算只与 $Token_t$ 有关，与其他时刻的 $Token$ 无关，且不论是时刻 $t$ 还是时刻 $t+1$,对应的 $K_{t-1}$ / $V_{t-1}$ 的计算结果都是一样的。因此，每个时刻都对 $K_{\leq t}$ / $V_{\leq t}$ 全部计算是低效且浪费的。</p>
+<p>由于 $K_t$ / $V_t$ 有只需 $Token_t$ 计算且不同时刻结果“一致”的特点，我们将每个时刻的 $K_t$ / $V_t$ 进行cache，在进行attention 计算时使用cache 中的 $K_{\leq t}$ / $V_{\leq t}$<br>即可。<br>此外，由于使用了attention cache 后，每次解码输入只需要 $Token_t$ 而非 $Token_{\leq t}$ ，这样将其他层的计算量也会随之降低。<br>PS：由于decoder 中为了实现auto-regressive 而采用了下三角的attention mask，因此，不同时刻的attention mask 是不同的，这会导致不同时刻的 $K_t$ / $V_t$ 的结果略有不同（约e-10)，但是这并不影响最终端到端的结果。 </p>
+<h2><span id="2-2-shi-xian">2.2 实现</span><a href="#2-2-shi-xian" class="header-anchor"></a></h2><p>attention 层在实现时，除了进行attention 计算的同时，还会包含attention mask 和 position bias 两种信息，其中，attention mask 来实现auto regressive，即当前位置的attention 只能包含当前位置及之前的信息；position bias 则包括各种position 信息的实现，所以在使用attention cache 后，还需要对这两种信息进行“纠正”。</p>
+<h3><span id="1-attention-ceng-xiu-gai">1. attention 层修改</span><a href="#1-attention-ceng-xiu-gai" class="header-anchor"></a></h3><p>具体实现时，对于encoder-decoder cross-attention, 我们之间将encoder outputs 计算一次后进行cache，每次进行解码时作为inputs 送人decoder；</p>
+<p>对于self-attention ，我们在得到 $Q_{t}$/$K_{t}$/$V_{t}$ 后，将 $K_t$/$V_t$ 与之前的 $K_{\leq t-1}$/ $V_{\leq t-1}$ cache 进行拼接，构造出完整的$K_{\leq t}$ / $V_{\leq t}$, 然后将$Q_t$ / $K_{\leq t}$ / $V_{\leq t}$ 进入self-attention 层进行计算。</p>
+<h3><span id="2-attention-mask-de-jiu-zheng">2. attention mask 的“纠正”</span><a href="#2-attention-mask-de-jiu-zheng" class="header-anchor"></a></h3><p>由于attention mask 的作用是防止当前位置看到其后位置的信息，而在使用cache 后，当前位置即最后时刻的位置，所以此时的attention mask 已没有存在的必要，直接取消即可；PS: 由于这里直接取消了attention mask，而attention mask 的实现通常是通过加上一个 负无穷(-e12) 来实现的，所以加了cache 后的outputs 与没加之前会有一定的差异，大概在e-10 量级。</p>
+<h3><span id="3-position-bias-de-jiu-zheng">3. position bias 的“纠正”</span><a href="#3-position-bias-de-jiu-zheng" class="header-anchor"></a></h3><p>由于position bias 通常是通过inputs 的长度进行计算的，而加了attention cache 后，每次的inputs 的长度变为1 了（当前时刻的$Token_t$），所以此时的position bias 恒等于长度为1 的序列。为了还原他原始的position bias，我们使用拼接了cache 后的$K_{\leq t}$ 进行计算完整序列的position bias， 然后取出当前query 在完整序列中位置对应的position bias 即可。</p>
+<h3><span id="4-jie-ma-shi-xian">4. 解码实现</span><a href="#4-jie-ma-shi-xian" class="header-anchor"></a></h3><p>此外，在解码函数上，也需要进行相应的修改，以获得当前时刻的$K_t$/$V_t$ , 然后与之前时刻的所有 $K_{\leq t-1}$ / $V_{\leq t-1}$ cache 进行拼接，为下一个时刻计算做准备。</p>
+<h1><span id="3-onnx">3 onnx</span><a href="#3-onnx" class="header-anchor"></a></h1><p>由于tensorflow 会对当前显卡的显存全部占用，所以一个显卡只能启动一个tensorflow 进程，这样就导致当一个模型的显存不需要占用所有显存即可解码时，使用tensorflow 会浪费一部分显存，这里我们将其转为onnx ，这样只需要占用模型需要的显存即可，避免显存浪费。即一个显卡可以起多个解码进程。</p>
+<h1><span id="4-demo">4 demo</span><a href="#4-demo" class="header-anchor"></a></h1><p>在bert4keras 的基础上，对 T5/Roformer 进行了实现，具体代码参考：<a href="https://github.com/xv44586/faster-decoder" target="_blank" rel="noopener">faster-decoder</a></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>网上流传的某个可达鸭形象😄</p>
 ]]></content>
       <categories>
         <category>NLP</category>
       </categories>
       <tags>
-        <tag>SimCSE</tag>
-        <tag>R-Drop</tag>
+        <tag>faster decoder</tag>
+        <tag>T5</tag>
+        <tag>simbert</tag>
       </tags>
   </entry>
   <entry>
@@ -2968,70 +3032,6 @@
       <tags>
         <tag>speed-up</tag>
         <tag>horovod</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>faster-decoder之 decoder解码加速</title>
-    <url>/2022/05/23/faster-decoder/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#1-bei-jing">1 背景</a></li>
-<li><a href="#2-attention-cache">2 attention cache</a><ul>
-<li><a href="#2-1-yuan-li">2.1 原理</a></li>
-<li><a href="#encoder-decoder-cross-attention">encoder-decoder cross-attention</a></li>
-<li><a href="#self-attention">self-attention</a></li>
-<li><a href="#2-2-shi-xian">2.2 实现</a><ul>
-<li><a href="#1-attention-ceng-xiu-gai">1. attention 层修改</a></li>
-<li><a href="#2-attention-mask-de-jiu-zheng">2. attention mask 的“纠正”</a></li>
-<li><a href="#3-position-bias-de-jiu-zheng">3. position bias 的“纠正”</a></li>
-<li><a href="#4-jie-ma-shi-xian">4. 解码实现</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#3-onnx">3 onnx</a></li>
-<li><a href="#4-demo">4 demo</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="1-bei-jing">1 背景</span><a href="#1-bei-jing" class="header-anchor"></a></h1><p>Transformer 模型舍弃了 step by step 的时序循环，依靠 self-attention 的并行结构获得了远超同量级 LSTM 网络的训练速度。即使做auto-regresisve 任务时，通过attention-mask 机制依然可以像encoder 一样并行计算。然而在解码时，却任然需要step by step 的进行，即需要知道上一个time step 的结果后才能进行下一个time step 的解码。此外，通常我们的解码策略是在获得模型结果后在内存中计算的，需要不停的将结果从GPU load 进 CPU 然后计算，这就进一步的拖慢了解码速度。而通常我们在部署时，首选的tf-serving 需要将结果通过网络传输，这将进一步的拖慢解码速度。而针对解码慢的问题，主要的加速方案有：</p>
-<ol>
-<li>将解码策略放在GPU 上计算，这样将避免结果在GPU/CPU 之间转换与等待；</li>
-<li>attention cache，根据attention 层的特点，对attention 中的 $K$ / $V$ 进行cache，避免对之前的time step 进行重复计算，将attention 层的计算由 $O(n^2)$  降低到 $O(n)$。</li>
-<li>transformer 计算最耗时的是attention 层中的softmax，尝试使用一些线性函数进行近似替换</li>
-</ol>
-<h1><span id="2-attention-cache">2 attention cache</span><a href="#2-attention-cache" class="header-anchor"></a></h1><p>三种方案中，GPU 上进行解码需要一些底层技术进行开发，暂时没能力，而替换softmax 方案则会或多或少的损失一些精度，本文都不做进一步讨论。本文聚焦在attention cache 方案上，加速的同时又“不会”损失精度。</p>
-<h2><span id="2-1-yuan-li">2.1 原理</span><a href="#2-1-yuan-li" class="header-anchor"></a></h2><p>attention 的计算公式：</p>
-<p>$$<br>A = Softmax(QK^{T})* V<br>$$</p>
-<p>在解码时，我们是step by step 进行的，所以，我们将时刻 t 的attention 写出来：</p>
-<p>$$<br>A = Softmax(Q_{t}K^{T})* V<br>$$</p>
-<p>即：对于时刻t 来说，attention 只需要当前的 $Q_{t}$ 时刻信息，$K$ / $V$ 的所有时刻信息进行计算。而 $Q_{t}$ 的计算只需要 $Token_{t-t}$ 即可，如何加速计算的关键就剩下如何更加高效的计算 $K$ / $V$.</p>
-<h2><span id="encoder-decoder-cross-attention">encoder-decoder cross-attention</span><a href="#encoder-decoder-cross-attention" class="header-anchor"></a></h2><p>对于encoder-decoder cross-attention 来说，对应的 $K$ / $V$ 都来自encoder 的outputs，所以直接将其整个进行cache 即可，而无需每步都重新计算。</p>
-<h2><span id="self-attention">self-attention</span><a href="#self-attention" class="header-anchor"></a></h2><p>而当attention 是self-attention 时，对于时刻 $t$ 来说，此时的 $K$ / $V$ 为 $K$ / $V$ 的前 $t$ 时刻信息，即 $K_{\leq t}$ / $V_{\leq t}$ .此时的 attention 计算为：</p>
-<p>$$<br>A = Softmax(Q_{t}K_{\leq t}^{T})* V_{\leq t}<br>$$</p>
-<p>而 $K_{t}$/$V_{t}$ 的计算只与 $Token_t$ 有关，与其他时刻的 $Token$ 无关，且不论是时刻 $t$ 还是时刻 $t+1$,对应的 $K_{t-1}$ / $V_{t-1}$ 的计算结果都是一样的。因此，每个时刻都对 $K_{\leq t}$ / $V_{\leq t}$ 全部计算是低效且浪费的。</p>
-<p>由于 $K_t$ / $V_t$ 有只需 $Token_t$ 计算且不同时刻结果“一致”的特点，我们将每个时刻的 $K_t$ / $V_t$ 进行cache，在进行attention 计算时使用cache 中的 $K_{\leq t}$ / $V_{\leq t}$<br>即可。<br>此外，由于使用了attention cache 后，每次解码输入只需要 $Token_t$ 而非 $Token_{\leq t}$ ，这样将其他层的计算量也会随之降低。<br>PS：由于decoder 中为了实现auto-regressive 而采用了下三角的attention mask，因此，不同时刻的attention mask 是不同的，这会导致不同时刻的 $K_t$ / $V_t$ 的结果略有不同（约e-10)，但是这并不影响最终端到端的结果。 </p>
-<h2><span id="2-2-shi-xian">2.2 实现</span><a href="#2-2-shi-xian" class="header-anchor"></a></h2><p>attention 层在实现时，除了进行attention 计算的同时，还会包含attention mask 和 position bias 两种信息，其中，attention mask 来实现auto regressive，即当前位置的attention 只能包含当前位置及之前的信息；position bias 则包括各种position 信息的实现，所以在使用attention cache 后，还需要对这两种信息进行“纠正”。</p>
-<h3><span id="1-attention-ceng-xiu-gai">1. attention 层修改</span><a href="#1-attention-ceng-xiu-gai" class="header-anchor"></a></h3><p>具体实现时，对于encoder-decoder cross-attention, 我们之间将encoder outputs 计算一次后进行cache，每次进行解码时作为inputs 送人decoder；</p>
-<p>对于self-attention ，我们在得到 $Q_{t}$/$K_{t}$/$V_{t}$ 后，将 $K_t$/$V_t$ 与之前的 $K_{\leq t-1}$/ $V_{\leq t-1}$ cache 进行拼接，构造出完整的$K_{\leq t}$ / $V_{\leq t}$, 然后将$Q_t$ / $K_{\leq t}$ / $V_{\leq t}$ 进入self-attention 层进行计算。</p>
-<h3><span id="2-attention-mask-de-jiu-zheng">2. attention mask 的“纠正”</span><a href="#2-attention-mask-de-jiu-zheng" class="header-anchor"></a></h3><p>由于attention mask 的作用是防止当前位置看到其后位置的信息，而在使用cache 后，当前位置即最后时刻的位置，所以此时的attention mask 已没有存在的必要，直接取消即可；PS: 由于这里直接取消了attention mask，而attention mask 的实现通常是通过加上一个 负无穷(-e12) 来实现的，所以加了cache 后的outputs 与没加之前会有一定的差异，大概在e-10 量级。</p>
-<h3><span id="3-position-bias-de-jiu-zheng">3. position bias 的“纠正”</span><a href="#3-position-bias-de-jiu-zheng" class="header-anchor"></a></h3><p>由于position bias 通常是通过inputs 的长度进行计算的，而加了attention cache 后，每次的inputs 的长度变为1 了（当前时刻的$Token_t$），所以此时的position bias 恒等于长度为1 的序列。为了还原他原始的position bias，我们使用拼接了cache 后的$K_{\leq t}$ 进行计算完整序列的position bias， 然后取出当前query 在完整序列中位置对应的position bias 即可。</p>
-<h3><span id="4-jie-ma-shi-xian">4. 解码实现</span><a href="#4-jie-ma-shi-xian" class="header-anchor"></a></h3><p>此外，在解码函数上，也需要进行相应的修改，以获得当前时刻的$K_t$/$V_t$ , 然后与之前时刻的所有 $K_{\leq t-1}$ / $V_{\leq t-1}$ cache 进行拼接，为下一个时刻计算做准备。</p>
-<h1><span id="3-onnx">3 onnx</span><a href="#3-onnx" class="header-anchor"></a></h1><p>由于tensorflow 会对当前显卡的显存全部占用，所以一个显卡只能启动一个tensorflow 进程，这样就导致当一个模型的显存不需要占用所有显存即可解码时，使用tensorflow 会浪费一部分显存，这里我们将其转为onnx ，这样只需要占用模型需要的显存即可，避免显存浪费。即一个显卡可以起多个解码进程。</p>
-<h1><span id="4-demo">4 demo</span><a href="#4-demo" class="header-anchor"></a></h1><p>在bert4keras 的基础上，对 T5/Roformer 进行了实现，具体代码参考：<a href="https://github.com/xv44586/faster-decoder" target="_blank" rel="noopener">faster-decoder</a></p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>网上流传的某个可达鸭形象😄</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>faster decoder</tag>
-        <tag>T5</tag>
-        <tag>simbert</tag>
       </tags>
   </entry>
   <entry>
