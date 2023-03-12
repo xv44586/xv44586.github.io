@@ -228,6 +228,48 @@
       </tags>
   </entry>
   <entry>
+    <title>Bagging为什么能降低过拟合</title>
+    <url>/2019/10/16/bagging/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#pian-chai-yu-fang-chai">偏差与方差</a></li>
+<li><a href="#jiang-di-mo-xing-guo-ni-he">降低模型过拟合</a><ul>
+<li><a href="#ji-cheng-mo-xing">集成模型</a></li>
+<li><a href="#bagging">Bagging</a></li>
+<li><a href="#sui-ji-sen-lin">随机森林</a></li>
+</ul>
+</li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<h1><span id="pian-chai-yu-fang-chai">偏差与方差</span><a href="#pian-chai-yu-fang-chai" class="header-anchor"></a></h1><p><strong>偏差 (bias)</strong><br><img src="/2019/10/16/bagging/fx.png" alt><br>即模型的期望预测与真实值之间的差异。</p>
+<p><strong>方差 (variance)</strong><br><img src="/2019/10/156/bagging/var.png" alt><br>方差通常衡量模型对<strong>不同数据集</strong>的敏感程度，也可以认为是衡量模型的不稳定性。若方差大，则表示数据的微小变动就能导致学习出的模型产生较大差异，即对应的模型结构风险更高。</p>
+<p>有了偏差和方差的定义，我们就能推导出模型的期望泛化误差：</p>
+<p><img src="/2019/10/16/bagging/ed.png" alt><br>如果我们能在保持bias基本不变时，降低variance，则模型的期望泛化误差降低，从而降低模型过拟合风险。</p>
+<h1><span id="jiang-di-mo-xing-guo-ni-he">降低模型过拟合</span><a href="#jiang-di-mo-xing-guo-ni-he" class="header-anchor"></a></h1><h2><span id="ji-cheng-mo-xing">集成模型</span><a href="#ji-cheng-mo-xing" class="header-anchor"></a></h2><p>假设我们现在有一个集成模型，其过程为从整体样本中进行采样，得到n份独立且与整体同分布的样本集，然后选择同样的模型进行训练，最后取平均。由于单个模型对应数据同分布，模型相同，则对应的bias和variance相同，而</p>
+<p><img src="/2019/10/16/bagging/exi.png" alt></p>
+<p>所以最终模型的bias与单模型的bias相同；另一方面，由于各个子模型独立，则</p>
+<p><img src="/2019/10/16/bagging/varn.png" alt></p>
+<p>此时可以显著降低模型的variance，根据模型泛化误差期望公式，此时的集成模型的期望泛化误差将小于单模型的期望泛化误差，从而降低了模型的过拟合。</p>
+<h2><span id="bagging">Bagging</span><a href="#bagging" class="header-anchor"></a></h2><p>针对上述集成模型，当各个子模型相同时，</p>
+<p><img src="/2019/10/16/bagging/varxi.png" alt><br>此时不会降低variance。</p>
+<p>对应公式：设有n个随机变量，两两变量之间的相关性为𝜌，则方差为</p>
+<p><img src="/2019/10/16/bagging/p.png" alt><br>Bagging对样本重采样，对每一重采样得到的子样本集训练一个模型，最后取平均。由于子样本集有相似性，同时也使用同种模型，则各个子模型有相似的bias和variance，由上面结论可知，此时的bias与单模型近似相同，所以bagging不能显著降低bias。（因此在选择模型时，需要选择bias小的模型）子模型介于相同与独立两个极端情况之间，所以对应variance会处于var(x) 与 var(x)/n之间，即通过降低上述公式中的第二项降低整体方差。<br>而根据模型期望泛化误差公式，由于方差的降低，也能带来最终模型的期望泛化误差的降低，从而降低过拟合。</p>
+<h2><span id="sui-ji-sen-lin">随机森林</span><a href="#sui-ji-sen-lin" class="header-anchor"></a></h2><p>随机森林是一种常用的Bagging模型，其通过对样本进行有放回的采样，构造n个样本集，同时对特征列进行采样后进行模型训练，即同时降低上述公式中的两项，来降低方差，从而降低过拟合。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于杭州青芝坞</p>
+]]></content>
+      <categories>
+        <category>MachineLearning</category>
+      </categories>
+      <tags>
+        <tag>Bagging</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Word2Vec之skip-gram</title>
     <url>/2019/10/13/skipgram/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -375,45 +417,37 @@
       </tags>
   </entry>
   <entry>
-    <title>Bagging为什么能降低过拟合</title>
-    <url>/2019/10/16/bagging/</url>
+    <title>Dropout--深度神经网络中的Bagging</title>
+    <url>/2019/10/17/dropout/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
 
 <!-- toc -->
 <ul>
-<li><a href="#pian-chai-yu-fang-chai">偏差与方差</a></li>
-<li><a href="#jiang-di-mo-xing-guo-ni-he">降低模型过拟合</a><ul>
-<li><a href="#ji-cheng-mo-xing">集成模型</a></li>
-<li><a href="#bagging">Bagging</a></li>
-<li><a href="#sui-ji-sen-lin">随机森林</a></li>
-</ul>
-</li>
+<li><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</a></li>
+<li><a href="#dropout">Dropout</a></li>
+<li><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</a></li>
+<li><a href="#updating">updating…</a></li>
 <li><a href="#guan-yu-tou-tu">关于头图</a></li>
 </ul>
 <!-- tocstop -->
 </div>
 
-<h1><span id="pian-chai-yu-fang-chai">偏差与方差</span><a href="#pian-chai-yu-fang-chai" class="header-anchor"></a></h1><p><strong>偏差 (bias)</strong><br><img src="/2019/10/16/bagging/fx.png" alt><br>即模型的期望预测与真实值之间的差异。</p>
-<p><strong>方差 (variance)</strong><br><img src="/2019/10/156/bagging/var.png" alt><br>方差通常衡量模型对<strong>不同数据集</strong>的敏感程度，也可以认为是衡量模型的不稳定性。若方差大，则表示数据的微小变动就能导致学习出的模型产生较大差异，即对应的模型结构风险更高。</p>
-<p>有了偏差和方差的定义，我们就能推导出模型的期望泛化误差：</p>
-<p><img src="/2019/10/16/bagging/ed.png" alt><br>如果我们能在保持bias基本不变时，降低variance，则模型的期望泛化误差降低，从而降低模型过拟合风险。</p>
-<h1><span id="jiang-di-mo-xing-guo-ni-he">降低模型过拟合</span><a href="#jiang-di-mo-xing-guo-ni-he" class="header-anchor"></a></h1><h2><span id="ji-cheng-mo-xing">集成模型</span><a href="#ji-cheng-mo-xing" class="header-anchor"></a></h2><p>假设我们现在有一个集成模型，其过程为从整体样本中进行采样，得到n份独立且与整体同分布的样本集，然后选择同样的模型进行训练，最后取平均。由于单个模型对应数据同分布，模型相同，则对应的bias和variance相同，而</p>
-<p><img src="/2019/10/16/bagging/exi.png" alt></p>
-<p>所以最终模型的bias与单模型的bias相同；另一方面，由于各个子模型独立，则</p>
-<p><img src="/2019/10/16/bagging/varn.png" alt></p>
-<p>此时可以显著降低模型的variance，根据模型泛化误差期望公式，此时的集成模型的期望泛化误差将小于单模型的期望泛化误差，从而降低了模型的过拟合。</p>
-<h2><span id="bagging">Bagging</span><a href="#bagging" class="header-anchor"></a></h2><p>针对上述集成模型，当各个子模型相同时，</p>
-<p><img src="/2019/10/16/bagging/varxi.png" alt><br>此时不会降低variance。</p>
-<p>对应公式：设有n个随机变量，两两变量之间的相关性为𝜌，则方差为</p>
-<p><img src="/2019/10/16/bagging/p.png" alt><br>Bagging对样本重采样，对每一重采样得到的子样本集训练一个模型，最后取平均。由于子样本集有相似性，同时也使用同种模型，则各个子模型有相似的bias和variance，由上面结论可知，此时的bias与单模型近似相同，所以bagging不能显著降低bias。（因此在选择模型时，需要选择bias小的模型）子模型介于相同与独立两个极端情况之间，所以对应variance会处于var(x) 与 var(x)/n之间，即通过降低上述公式中的第二项降低整体方差。<br>而根据模型期望泛化误差公式，由于方差的降低，也能带来最终模型的期望泛化误差的降低，从而降低过拟合。</p>
-<h2><span id="sui-ji-sen-lin">随机森林</span><a href="#sui-ji-sen-lin" class="header-anchor"></a></h2><p>随机森林是一种常用的Bagging模型，其通过对样本进行有放回的采样，构造n个样本集，同时对特征列进行采样后进行模型训练，即同时降低上述公式中的两项，来降低方差，从而降低过拟合。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于杭州青芝坞</p>
+<h1><span id="shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</span><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti" class="header-anchor"></a></h1><p>深度神经网络由于其巨大的参数量，可以很方便的拟合非常复杂的非线性关系，同时，巨大的参数量也给模型带来了过拟合的问题。为了解决这个问题，也有人提出了早停和加入正则项等手段。而在传统机器学习中，除了这些手段，还有一种手段来解决这个问题，即bagging（参考我之前的文章<a href="https://xv44586.github.io/2019/10/16/bagging/">Bagging为什么能降低过拟合</a>），最典型的就是随机森林：对样本和特征进行抽样，训练多个模型，然后进行集成（投票/求平均）。那如何将这种思路引入到深度神经网络中呢？<br>首先,由于训练单个深度神经网络就已经非常耗时，通常样本量也不够多，不适合采样，所以像随机森林一样抽样训练多个模型的方案不可取。<br>剩下的思路就是用“一个”模型来模拟多个sub-model，那如何来模拟呢？</p>
+<h1><span id="dropout">Dropout</span><a href="#dropout" class="header-anchor"></a></h1><p>对于深度神经网络，其最重要的部分就是其隐藏单元（神经元），对于一个有n个神经元的层，我们可以通过设置神经元是否激活，来模拟$2^n$ 种结构，即sub-model，而在evaluate阶段，我们将这些所有的sub-mdoel的结果进行求平均。那对于现在的结构，不可能对 $2^n$中结构都去做计算然后再求平均，一种近似的做法是用当前这“一个”模型来近似模拟：设置所有神经元都处于激活状态，同时，对每个神经元的输出乘以其激活概率keep_prob.这就是Dropout的背后思想。<br><img src="/2019/10/17/dropout/dropout.png" alt="Dropout"><br>简单总结Dropout的具体做法：训练阶段，在前向传播的时候，让某个神经元的激活值以一定的概率p停止工作；预测阶段，对每个神经元的输出乘以1-p (keep_prob)。<br>接下来思考一下，为什么这么做work:首先，训练阶段部分神经元失活，对应的结果是部分features不参与计算，本质上是对features进行采样；其次，从整个训练过程中看，每次训练（batch-data),都对应不同的失活神经元（sub-model)，对应的每个sub-model在单个epoch内，都是在对样本进行无放回的抽样，本质上是在bagging。最后，在预测阶段，为什么可以用“一个”完整的模型来模拟sub-model的求平均过程呢？从sub-model的角度看，每个sub-model被training的概率为$(1-p)$, 而神经元对所有sub-model是共享的，唯一的区别是是否激活，所以归一到每个神经元上，单个神经元被training（激活）的概率为$(1-p)$,而sub-model的总数是$2^n$，每个神经元求平均的过程即$Out_i * (1-p) * 2^n/ 2^n = Out_i * (1 -p)$.<br>具体实现时，我们的目的是在训练阶段对神经元进行随机（概率p)失活,而在test和evaluate时，对神经元的输出乘以$(1-p)$,所以在实现时，可以采用一个trick：dropout时，对样本进行mask的同时，将其除以$(1-p)$,这样就可以一次计算完成所有逻辑，同时，把所有逻辑保留在整个层中。<br><strong>tf的实现：</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dropout</span><span class="params">(x, keep_prob, noise_shape=None, seed=None, name=None)</span>:</span>  <span class="comment"># pylint: disable=invalid-name</span></span><br><span class="line">  <span class="string">"""Computes dropout.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  With probability `keep_prob`, outputs the input element scaled up by</span></span><br><span class="line"><span class="string">  `1 / keep_prob`, otherwise outputs `0`.  The scaling is so that the expected</span></span><br><span class="line"><span class="string">  sum is unchanged.</span></span><br><span class="line"><span class="string">    ...</span></span><br><span class="line"><span class="string"> """</span></span><br><span class="line">  <span class="keyword">with</span> ops.name_scope(name, <span class="string">"dropout"</span>, [x]) <span class="keyword">as</span> name:</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment"># Do nothing if we know keep_prob == 1</span></span><br><span class="line">    <span class="keyword">if</span> tensor_util.constant_value(keep_prob) == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    noise_shape = noise_shape <span class="keyword">if</span> noise_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> array_ops.shape(x)</span><br><span class="line">    <span class="comment"># uniform [keep_prob, 1.0 + keep_prob)</span></span><br><span class="line">    random_tensor = keep_prob</span><br><span class="line">    random_tensor += random_ops.random_uniform(noise_shape,</span><br><span class="line">                                               seed=seed,</span><br><span class="line">                                               dtype=x.dtype)</span><br><span class="line">    <span class="comment"># 0. if [keep_prob, 1.0) and 1. if [1.0, 1.0 + keep_prob)</span></span><br><span class="line">    binary_tensor = math_ops.floor(random_tensor)</span><br><span class="line">    ret = math_ops.div(x, keep_prob) * binary_tensor</span><br><span class="line">    <span class="keyword">if</span> context.in_graph_mode():</span><br><span class="line">      ret.set_shape(x.get_shape())</span><br><span class="line">    <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure></p>
+<h1><span id="bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</span><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan" class="header-anchor"></a></h1><p>如果在非dropout阶段不进行scaled会如何？<br>scaled<br><img src="/2019/10/17/dropout/scaled.png" alt="scaled.png"><br>without_scaled<br><img src="/2019/10/17/dropout/without-scaled.png" alt="without_scaled.png"><br>实验也说明非dropout阶段如果没有进行scaled（求平均），对应的loss会比train阶段高，同时acc也会降低。</p>
+<p><strong>桥豆麻袋，到这里好像出现了一点问题：</strong><br>按照我们上面的思路，在test和evaluate阶段，我们从对sub-model求平均转化为对每个神经元的output进行scaled down，即 $activation(x * W ) * (1 - p)$， 而我们在实现时，只是对x进行scaled up操作，如果后面接的层的激活函数是线性的，这样处理没有什么问题，但是，后面的层不总是线性激活函数，那此时，$output = activation(x * (1-p) * W)  != activation(x*W) * (1 - p)$,即我们得到的输出与我们想要的并不一样，按照以上的理解，我们对output进行scaled-down，验证一下两者的区别。<br>scaled_input<br><img src="/2019/10/17/dropout/scaled-input.png" alt="scaled_input.png"><br>scaled_output<br><img src="/2019/10/17/dropout/scaled-output.png" alt="scaled_output.png"></p>
+<p>看上去对output进行scaled-down结果稍微好一点，但是并不显著，此时的激活函数是relu，而且是在倒数第二层，换个激活函数试试。<br>scaled_input_tanh<br><img src="/2019/10/17/dropout/scaled_input_tanh.png" alt="scaled_input_tanh.png"><br>scaled_output_tanh<br><img src="/2019/10/17/dropout/scaled_output_tanh.png" alt="scaled_output_tanh.png"><br>结果看上去对output进行scaled-down效果稍微差一些，但差距不大。<br>代码地址<a href="https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout" target="_blank" rel="noopener">https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout</a>，感兴趣的可以试试其他方式。<br>既然两种方式在结果上看，效果差不多，而对output进行scaled-down需要添加一个AfterDropLayer，逻辑会在不同的层中，而对inputs直接进行scaled-up，所有逻辑都保存在一个layer中，更清晰。<br><strong>But，Why？</strong>为什么两种方式的结果效果差异不大？真让人头秃啊！</p>
+<p><strong>论文地址</strong><br><a href="http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" target="_blank" rel="noopener">http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf</a></p>
+<p>================================</p>
+<h1><span id="updating">updating…</span><a href="#updating" class="header-anchor"></a></h1><p><img src="/2019/10/17/dropout/linear.png" alt="image.png"></p>
+<p>上图是sigmoid函数在[-8,8]区间的图像，其中linear是由[-8,-4,-2,2,4,8]截断的直线，看图可以看出，sigmoid在区间内都非常的接近”linear”，梯度变化较大的部分只在几个拐点周围，大部分都是近似”linear”,所以也就解释了为什么两种方式有差异，但是差异并不大。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>大四竞赛作品截图</p>
 ]]></content>
       <categories>
         <category>MachineLearning</category>
       </categories>
       <tags>
-        <tag>Bagging</tag>
+        <tag>Deep Learning</tag>
       </tags>
   </entry>
   <entry>
@@ -468,40 +502,6 @@
       </categories>
       <tags>
         <tag>Glove</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Dropout--深度神经网络中的Bagging</title>
-    <url>/2019/10/17/dropout/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</a></li>
-<li><a href="#dropout">Dropout</a></li>
-<li><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</a></li>
-<li><a href="#updating">updating…</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti">深度神经网络过拟合问题</span><a href="#shen-du-shen-jing-wang-luo-guo-ni-he-wen-ti" class="header-anchor"></a></h1><p>深度神经网络由于其巨大的参数量，可以很方便的拟合非常复杂的非线性关系，同时，巨大的参数量也给模型带来了过拟合的问题。为了解决这个问题，也有人提出了早停和加入正则项等手段。而在传统机器学习中，除了这些手段，还有一种手段来解决这个问题，即bagging（参考我之前的文章<a href="https://xv44586.github.io/2019/10/16/bagging/">Bagging为什么能降低过拟合</a>），最典型的就是随机森林：对样本和特征进行抽样，训练多个模型，然后进行集成（投票/求平均）。那如何将这种思路引入到深度神经网络中呢？<br>首先,由于训练单个深度神经网络就已经非常耗时，通常样本量也不够多，不适合采样，所以像随机森林一样抽样训练多个模型的方案不可取。<br>剩下的思路就是用“一个”模型来模拟多个sub-model，那如何来模拟呢？</p>
-<h1><span id="dropout">Dropout</span><a href="#dropout" class="header-anchor"></a></h1><p>对于深度神经网络，其最重要的部分就是其隐藏单元（神经元），对于一个有n个神经元的层，我们可以通过设置神经元是否激活，来模拟$2^n$ 种结构，即sub-model，而在evaluate阶段，我们将这些所有的sub-mdoel的结果进行求平均。那对于现在的结构，不可能对 $2^n$中结构都去做计算然后再求平均，一种近似的做法是用当前这“一个”模型来近似模拟：设置所有神经元都处于激活状态，同时，对每个神经元的输出乘以其激活概率keep_prob.这就是Dropout的背后思想。<br><img src="/2019/10/17/dropout/dropout.png" alt="Dropout"><br>简单总结Dropout的具体做法：训练阶段，在前向传播的时候，让某个神经元的激活值以一定的概率p停止工作；预测阶段，对每个神经元的输出乘以1-p (keep_prob)。<br>接下来思考一下，为什么这么做work:首先，训练阶段部分神经元失活，对应的结果是部分features不参与计算，本质上是对features进行采样；其次，从整个训练过程中看，每次训练（batch-data),都对应不同的失活神经元（sub-model)，对应的每个sub-model在单个epoch内，都是在对样本进行无放回的抽样，本质上是在bagging。最后，在预测阶段，为什么可以用“一个”完整的模型来模拟sub-model的求平均过程呢？从sub-model的角度看，每个sub-model被training的概率为$(1-p)$, 而神经元对所有sub-model是共享的，唯一的区别是是否激活，所以归一到每个神经元上，单个神经元被training（激活）的概率为$(1-p)$,而sub-model的总数是$2^n$，每个神经元求平均的过程即$Out_i * (1-p) * 2^n/ 2^n = Out_i * (1 -p)$.<br>具体实现时，我们的目的是在训练阶段对神经元进行随机（概率p)失活,而在test和evaluate时，对神经元的输出乘以$(1-p)$,所以在实现时，可以采用一个trick：dropout时，对样本进行mask的同时，将其除以$(1-p)$,这样就可以一次计算完成所有逻辑，同时，把所有逻辑保留在整个层中。<br><strong>tf的实现：</strong><br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">dropout</span><span class="params">(x, keep_prob, noise_shape=None, seed=None, name=None)</span>:</span>  <span class="comment"># pylint: disable=invalid-name</span></span><br><span class="line">  <span class="string">"""Computes dropout.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">  With probability `keep_prob`, outputs the input element scaled up by</span></span><br><span class="line"><span class="string">  `1 / keep_prob`, otherwise outputs `0`.  The scaling is so that the expected</span></span><br><span class="line"><span class="string">  sum is unchanged.</span></span><br><span class="line"><span class="string">    ...</span></span><br><span class="line"><span class="string"> """</span></span><br><span class="line">  <span class="keyword">with</span> ops.name_scope(name, <span class="string">"dropout"</span>, [x]) <span class="keyword">as</span> name:</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment"># Do nothing if we know keep_prob == 1</span></span><br><span class="line">    <span class="keyword">if</span> tensor_util.constant_value(keep_prob) == <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    noise_shape = noise_shape <span class="keyword">if</span> noise_shape <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> array_ops.shape(x)</span><br><span class="line">    <span class="comment"># uniform [keep_prob, 1.0 + keep_prob)</span></span><br><span class="line">    random_tensor = keep_prob</span><br><span class="line">    random_tensor += random_ops.random_uniform(noise_shape,</span><br><span class="line">                                               seed=seed,</span><br><span class="line">                                               dtype=x.dtype)</span><br><span class="line">    <span class="comment"># 0. if [keep_prob, 1.0) and 1. if [1.0, 1.0 + keep_prob)</span></span><br><span class="line">    binary_tensor = math_ops.floor(random_tensor)</span><br><span class="line">    ret = math_ops.div(x, keep_prob) * binary_tensor</span><br><span class="line">    <span class="keyword">if</span> context.in_graph_mode():</span><br><span class="line">      ret.set_shape(x.get_shape())</span><br><span class="line">    <span class="keyword">return</span> ret</span><br></pre></td></tr></table></figure></p>
-<h1><span id="bu-tong-dropout-fang-an-dui-bi-shi-yan">不同dropout方案对比实验</span><a href="#bu-tong-dropout-fang-an-dui-bi-shi-yan" class="header-anchor"></a></h1><p>如果在非dropout阶段不进行scaled会如何？<br>scaled<br><img src="/2019/10/17/dropout/scaled.png" alt="scaled.png"><br>without_scaled<br><img src="/2019/10/17/dropout/without-scaled.png" alt="without_scaled.png"><br>实验也说明非dropout阶段如果没有进行scaled（求平均），对应的loss会比train阶段高，同时acc也会降低。</p>
-<p><strong>桥豆麻袋，到这里好像出现了一点问题：</strong><br>按照我们上面的思路，在test和evaluate阶段，我们从对sub-model求平均转化为对每个神经元的output进行scaled down，即 $activation(x * W ) * (1 - p)$， 而我们在实现时，只是对x进行scaled up操作，如果后面接的层的激活函数是线性的，这样处理没有什么问题，但是，后面的层不总是线性激活函数，那此时，$output = activation(x * (1-p) * W)  != activation(x*W) * (1 - p)$,即我们得到的输出与我们想要的并不一样，按照以上的理解，我们对output进行scaled-down，验证一下两者的区别。<br>scaled_input<br><img src="/2019/10/17/dropout/scaled-input.png" alt="scaled_input.png"><br>scaled_output<br><img src="/2019/10/17/dropout/scaled-output.png" alt="scaled_output.png"></p>
-<p>看上去对output进行scaled-down结果稍微好一点，但是并不显著，此时的激活函数是relu，而且是在倒数第二层，换个激活函数试试。<br>scaled_input_tanh<br><img src="/2019/10/17/dropout/scaled_input_tanh.png" alt="scaled_input_tanh.png"><br>scaled_output_tanh<br><img src="/2019/10/17/dropout/scaled_output_tanh.png" alt="scaled_output_tanh.png"><br>结果看上去对output进行scaled-down效果稍微差一些，但差距不大。<br>代码地址<a href="https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout" target="_blank" rel="noopener">https://github.com/xv44586/Papers/tree/master/DeepLearning/Dropout</a>，感兴趣的可以试试其他方式。<br>既然两种方式在结果上看，效果差不多，而对output进行scaled-down需要添加一个AfterDropLayer，逻辑会在不同的层中，而对inputs直接进行scaled-up，所有逻辑都保存在一个layer中，更清晰。<br><strong>But，Why？</strong>为什么两种方式的结果效果差异不大？真让人头秃啊！</p>
-<p><strong>论文地址</strong><br><a href="http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf" target="_blank" rel="noopener">http://www.jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf</a></p>
-<p>================================</p>
-<h1><span id="updating">updating…</span><a href="#updating" class="header-anchor"></a></h1><p><img src="/2019/10/17/dropout/linear.png" alt="image.png"></p>
-<p>上图是sigmoid函数在[-8,8]区间的图像，其中linear是由[-8,-4,-2,2,4,8]截断的直线，看图可以看出，sigmoid在区间内都非常的接近”linear”，梯度变化较大的部分只在几个拐点周围，大部分都是近似”linear”,所以也就解释了为什么两种方式有差异，但是差异并不大。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>大四竞赛作品截图</p>
-]]></content>
-      <categories>
-        <category>MachineLearning</category>
-      </categories>
-      <tags>
-        <tag>Deep Learning</tag>
       </tags>
   </entry>
   <entry>
@@ -605,6 +605,67 @@
       </categories>
       <tags>
         <tag>word2vec</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>词向量总结</title>
+    <url>/2019/10/22/w2v-summary/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#yi-tong">异同</a><ul>
+<li><a href="#xiang-tong-dian">相同点</a></li>
+<li><a href="#bu-tong-dian">不同点</a></li>
+</ul>
+</li>
+<li><a href="#xing-zhi">性质</a><ul>
+<li><a href="#pmi-jiao-du">PMI角度</a></li>
+<li><a href="#ke-jia-xing">可加性</a></li>
+<li><a href="#mo-chang">模长</a></li>
+<li><a href="#xiang-guan-xing">相关性</a></li>
+</ul>
+</li>
+<li><a href="#ying-yong">应用</a><ul>
+<li><a href="#liang-ge-ju-zi-de-xiang-guan-xing">两个句子的相关性</a></li>
+<li><a href="#zhong-xin-ci-guan-jian-ci-ti-qu">中心词（关键词）提取</a></li>
+<li><a href="#ju-xiang-liang">句向量</a></li>
+</ul>
+</li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<h1><span id="yi-tong">异同</span><a href="#yi-tong" class="header-anchor"></a></h1><p>本文主要讨论<code>Glove</code>和<code>word2vec</code>两种模型对应词向量。</p>
+<h2><span id="xiang-tong-dian">相同点</span><a href="#xiang-tong-dian" class="header-anchor"></a></h2><ul>
+<li>两种模型都是在对词对的<code>PMI</code>做分解，所以他们具有相同的性质（向量可加性，点积，余弦距离，模长等）。</li>
+<li>模型的基本形式都是向量的点积，且都有两套词向量空间（单词向量空间与上下文词向量空间）。</li>
+</ul>
+<h2><span id="bu-tong-dian">不同点</span><a href="#bu-tong-dian" class="header-anchor"></a></h2><ul>
+<li>1.通常我们都是根据模型来推导其对应性质，而Glove是通过其性质来反推模型，这种方式还是给人眼前一亮的。</li>
+<li>2.除Glove以外的词向量模型都是对条件概率$P(w|context)$进行建模，如<code>word2vec</code>的<code>SkipGram</code>对$P(w_2|w_1)$进行建模，但是这个信息是有缺点的，首先，他不是一个严格对称的模型，即$P(w_2|w_1)$  与 $P(w_1|w_2)$ 并不一定相等，所以，在建模时需要把上下文与中心词向量区分开，不能放到同一个向量空间；其次，这个概率是有界的、归一化的量，所以在模型里需要用softmax等对结果进行归一化，这个也会造成优化上的困难。而<code>Glove</code>可以看作是对$PMI$进行建模，而$PMI$是比概率更对称也更重要的一个量。</li>
+<li>3.如Glove论文中所述，就整体目标函数而言，可以看作是两种模型采用了不同的损失函数，其基本形式是一致的。</li>
+<li>4.两种模型都是词袋模型（一元模型）。</li>
+<li>5.对应词向量内积含义不同：<br><img src="/2019/10/22/w2v-summary/dot.png" alt="内积含义"></li>
+</ul>
+<h1><span id="xing-zhi">性质</span><a href="#xing-zhi" class="header-anchor"></a></h1><h2><span id="pmi-jiao-du">PMI角度</span><a href="#pmi-jiao-du" class="header-anchor"></a></h2><p>上文说了两种模型都是对词对的PMI做分解，所以我们在解释其性质时直接从PMI的角度来解释。<br>首先来看一下PMI<br><img src="/2019/10/22/w2v-summary/pmi.png" alt="PMI"><br>对于任意两个词序列Q和A，其中$Q=(q1,q2…qk)$, $A = (a1, a2…al)$，我们模型都是采用的词袋模型，即满足朴素假设：每个特征之间相互独立。<br><img src="/2019/10/22/w2v-summary/pqa.png" alt><br>带入朴素假设<br><img src="/2019/10/22/w2v-summary/naive.png" alt><br>用贝叶斯公式变换<br><img src="/2019/10/22/w2v-summary/change.png" alt><br>再用一次朴素假设<br><img src="/2019/10/22/w2v-summary/naive-change.png" alt></p>
+<p>最后得到：<br><img src="/2019/10/22/w2v-summary/pmiqa.png" alt><br>即在朴素假设下，两个序列的互信息等于两个序列中各个项的互信息的总和。</p>
+<h2><span id="ke-jia-xing">可加性</span><a href="#ke-jia-xing" class="header-anchor"></a></h2><p>在Glove和word2vec中，两个词之间的相关性是通过对应词向量的内积来表达的，即对于词$W_i$, $W_j$, 其相关性等于$&lt;V_i ,V_j&gt;$, 带入上面，即：<br><img src="/2019/10/22/w2v-summary/pmiin.png" alt><br>即两个词序列的相关性可以通过将两个序列内的词向量求和后再进行点积计算。<br>如我们求两个句子的相关度时，可以先将句子内的词对应的词向量进行求和，然后再进行相似性计算。</p>
+<h2><span id="mo-chang">模长</span><a href="#mo-chang" class="header-anchor"></a></h2><p>词向量w的模长正比与其内积&lt;w,w&gt;，即正比PMI(w,w)，而在一个滑动窗口内，上下文中的词与中心词相等的概率极低，所以可以认为P(w,w) ~ P(w),推出<br><img src="/2019/10/22/w2v-summary/pww.png" alt><br>即，模长正比与词频的倒数，词频越高（停用词，虚词等），其对应的模长越短，这样就表面模长能在一定程度上代表词本身的重要性。<br>从模型学习的角度来看，词向量的内积等于其模长的乘积乘以余弦值，即<br><img src="/2019/10/22/w2v-summary/cos.png" alt><br>对于高频的几乎没有什么固定搭配的词，其所含语义也相对非常少，即这些词与其他任意词的互信息都非常低，约等于0，而为了让上式等于0，与其不停的调节两个向量的方向，不如让其中一个的模长像0靠近，这样经过多次迭代后，高频的语义少的词的模长就越来越短，逐渐接近0.<br>实验结果中，也能看到按模长排序后，前面的都是高频的语义含量极低的词。<br><img src="/2019/10/22/w2v-summary/sort.png" alt="模长排序结果"><br>可以看到，排在前面的都是高频的语义极少的词（’UNK’，’以及’,’三’，符号等)</p>
+<h2><span id="xiang-guan-xing">相关性</span><a href="#xiang-guan-xing" class="header-anchor"></a></h2><p>两个词的互信息正比于词对应向量的内积，即两个词互信息越大，两个词成对出现的几率越高，其对应词向量的内积也就越大，因此，可以通过内积来对词的相关性进行排序。而上面也说了，模长代表了词的重要程度，如果我们不考虑词本身的重要程度，只考虑其词义，可以用向量范数将其归一化后在进行内积计算，这样更稳定.<br><img src="/2019/10/22/w2v-summary/cosij.png" alt><br>即词的相关性可以用词向量之间的余弦距离来计算，这样比只使用内积更稳定。<br>在统计上，互信息为0，则表面这两个词无关，对应到模型，即两个词的词向量的内积为0，而根据向量的知识，两个向量的内积为0，则表明两个向量相互垂直，即两个向量无关。两个词在统计上的无关正好对应其在词向量空间上的几何无关！</p>
+<h1><span id="ying-yong">应用</span><a href="#ying-yong" class="header-anchor"></a></h1><h2><span id="liang-ge-ju-zi-de-xiang-guan-xing">两个句子的相关性</span><a href="#liang-ge-ju-zi-de-xiang-guan-xing" class="header-anchor"></a></h2><p>计算两个句子或短语之间的相关性时，我们可以借鉴上面PMI在朴素假设下的性质，将两个句子中的词向量进行求和，再计算两个结果向量之间的相关性，如点积或余弦。<br>而如果一个句子内的词向量的和与某一个词的词向量相关性非常高，可以认为这个句子与这个词表达了相同的语义，或者，在词向量空间内，词对应的向量在句子的聚类中心附近。</p>
+<h2><span id="zhong-xin-ci-guan-jian-ci-ti-qu">中心词（关键词）提取</span><a href="#zhong-xin-ci-guan-jian-ci-ti-qu" class="header-anchor"></a></h2><p>所谓中心词（关键词），即能概况句子的意思，通过这些词，我就能大概猜到整个句子的整体内容。即这些词（相对句子内其他词）对整个句子的相关性更高。这样就能将问题转化成词与句子相关性排序问题。<br>通过语言模型的角度来看，语言模型本身就是一个通过上（下）文来预测下一个词概率的模型，即最大化$P(w1,w2,w3..|W)$.而关键词的含义是什么呢？用数学的方式表达就是：<br>对于$S=(w1,w2, w3..wk)$,求解$P(S|wk)$值最高的$wk$,其中$wk$属于$S$。这其实与语言模型的含义是一致的。<br>最终，将问题转化成词与句子之间的相关性排序问题，而上面提到求解两个句子相关性时，可以将句子对应词向量先求和再计算相关性，最后关键词提取就变成：<br>先将句子对应词向量求和，得到sen_vec，然后计算单个词与sen_vec的相关性，然后排序即可。<br><img src="/2019/10/22/w2v-summary/keywords.png" alt><br>可以看到结果还是相当不错的。</p>
+<h2><span id="ju-xiang-liang">句向量</span><a href="#ju-xiang-liang" class="header-anchor"></a></h2><p>上面在做句子相关性时，都是为了将计算从$O(n^2)$降低到$O(n)$而将句子内的词向量进行求和，然后再计算。其实也就是用词向量的求和来得到句向量，来作为句子在相同词向量空间的语义。其实这是一种简单又快捷的得到句向量的方式，在很多任务中都可以尝试使用。</p>
+<p><strong>refer</strong><br><a href="https://papers.nips.cc/paper/5477-neural-word-embedding-as-implicit-matrix-factorization.pdf" target="_blank" rel="noopener">neural-word-embedding-as-implicit-matrix-factorization</a><br><a href="https://aclweb.org/anthology/P17-1007" target="_blank" rel="noopener">https://aclweb.org/anthology/P17-1007</a></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于秦皇岛</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>word2vec</tag>
+        <tag>Glove</tag>
       </tags>
   </entry>
   <entry>
@@ -725,67 +786,6 @@
       <tags>
         <tag>Segmentation</tag>
         <tag>Survey</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>词向量总结</title>
-    <url>/2019/10/22/w2v-summary/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#yi-tong">异同</a><ul>
-<li><a href="#xiang-tong-dian">相同点</a></li>
-<li><a href="#bu-tong-dian">不同点</a></li>
-</ul>
-</li>
-<li><a href="#xing-zhi">性质</a><ul>
-<li><a href="#pmi-jiao-du">PMI角度</a></li>
-<li><a href="#ke-jia-xing">可加性</a></li>
-<li><a href="#mo-chang">模长</a></li>
-<li><a href="#xiang-guan-xing">相关性</a></li>
-</ul>
-</li>
-<li><a href="#ying-yong">应用</a><ul>
-<li><a href="#liang-ge-ju-zi-de-xiang-guan-xing">两个句子的相关性</a></li>
-<li><a href="#zhong-xin-ci-guan-jian-ci-ti-qu">中心词（关键词）提取</a></li>
-<li><a href="#ju-xiang-liang">句向量</a></li>
-</ul>
-</li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="yi-tong">异同</span><a href="#yi-tong" class="header-anchor"></a></h1><p>本文主要讨论<code>Glove</code>和<code>word2vec</code>两种模型对应词向量。</p>
-<h2><span id="xiang-tong-dian">相同点</span><a href="#xiang-tong-dian" class="header-anchor"></a></h2><ul>
-<li>两种模型都是在对词对的<code>PMI</code>做分解，所以他们具有相同的性质（向量可加性，点积，余弦距离，模长等）。</li>
-<li>模型的基本形式都是向量的点积，且都有两套词向量空间（单词向量空间与上下文词向量空间）。</li>
-</ul>
-<h2><span id="bu-tong-dian">不同点</span><a href="#bu-tong-dian" class="header-anchor"></a></h2><ul>
-<li>1.通常我们都是根据模型来推导其对应性质，而Glove是通过其性质来反推模型，这种方式还是给人眼前一亮的。</li>
-<li>2.除Glove以外的词向量模型都是对条件概率$P(w|context)$进行建模，如<code>word2vec</code>的<code>SkipGram</code>对$P(w_2|w_1)$进行建模，但是这个信息是有缺点的，首先，他不是一个严格对称的模型，即$P(w_2|w_1)$  与 $P(w_1|w_2)$ 并不一定相等，所以，在建模时需要把上下文与中心词向量区分开，不能放到同一个向量空间；其次，这个概率是有界的、归一化的量，所以在模型里需要用softmax等对结果进行归一化，这个也会造成优化上的困难。而<code>Glove</code>可以看作是对$PMI$进行建模，而$PMI$是比概率更对称也更重要的一个量。</li>
-<li>3.如Glove论文中所述，就整体目标函数而言，可以看作是两种模型采用了不同的损失函数，其基本形式是一致的。</li>
-<li>4.两种模型都是词袋模型（一元模型）。</li>
-<li>5.对应词向量内积含义不同：<br><img src="/2019/10/22/w2v-summary/dot.png" alt="内积含义"></li>
-</ul>
-<h1><span id="xing-zhi">性质</span><a href="#xing-zhi" class="header-anchor"></a></h1><h2><span id="pmi-jiao-du">PMI角度</span><a href="#pmi-jiao-du" class="header-anchor"></a></h2><p>上文说了两种模型都是对词对的PMI做分解，所以我们在解释其性质时直接从PMI的角度来解释。<br>首先来看一下PMI<br><img src="/2019/10/22/w2v-summary/pmi.png" alt="PMI"><br>对于任意两个词序列Q和A，其中$Q=(q1,q2…qk)$, $A = (a1, a2…al)$，我们模型都是采用的词袋模型，即满足朴素假设：每个特征之间相互独立。<br><img src="/2019/10/22/w2v-summary/pqa.png" alt><br>带入朴素假设<br><img src="/2019/10/22/w2v-summary/naive.png" alt><br>用贝叶斯公式变换<br><img src="/2019/10/22/w2v-summary/change.png" alt><br>再用一次朴素假设<br><img src="/2019/10/22/w2v-summary/naive-change.png" alt></p>
-<p>最后得到：<br><img src="/2019/10/22/w2v-summary/pmiqa.png" alt><br>即在朴素假设下，两个序列的互信息等于两个序列中各个项的互信息的总和。</p>
-<h2><span id="ke-jia-xing">可加性</span><a href="#ke-jia-xing" class="header-anchor"></a></h2><p>在Glove和word2vec中，两个词之间的相关性是通过对应词向量的内积来表达的，即对于词$W_i$, $W_j$, 其相关性等于$&lt;V_i ,V_j&gt;$, 带入上面，即：<br><img src="/2019/10/22/w2v-summary/pmiin.png" alt><br>即两个词序列的相关性可以通过将两个序列内的词向量求和后再进行点积计算。<br>如我们求两个句子的相关度时，可以先将句子内的词对应的词向量进行求和，然后再进行相似性计算。</p>
-<h2><span id="mo-chang">模长</span><a href="#mo-chang" class="header-anchor"></a></h2><p>词向量w的模长正比与其内积&lt;w,w&gt;，即正比PMI(w,w)，而在一个滑动窗口内，上下文中的词与中心词相等的概率极低，所以可以认为P(w,w) ~ P(w),推出<br><img src="/2019/10/22/w2v-summary/pww.png" alt><br>即，模长正比与词频的倒数，词频越高（停用词，虚词等），其对应的模长越短，这样就表面模长能在一定程度上代表词本身的重要性。<br>从模型学习的角度来看，词向量的内积等于其模长的乘积乘以余弦值，即<br><img src="/2019/10/22/w2v-summary/cos.png" alt><br>对于高频的几乎没有什么固定搭配的词，其所含语义也相对非常少，即这些词与其他任意词的互信息都非常低，约等于0，而为了让上式等于0，与其不停的调节两个向量的方向，不如让其中一个的模长像0靠近，这样经过多次迭代后，高频的语义少的词的模长就越来越短，逐渐接近0.<br>实验结果中，也能看到按模长排序后，前面的都是高频的语义含量极低的词。<br><img src="/2019/10/22/w2v-summary/sort.png" alt="模长排序结果"><br>可以看到，排在前面的都是高频的语义极少的词（’UNK’，’以及’,’三’，符号等)</p>
-<h2><span id="xiang-guan-xing">相关性</span><a href="#xiang-guan-xing" class="header-anchor"></a></h2><p>两个词的互信息正比于词对应向量的内积，即两个词互信息越大，两个词成对出现的几率越高，其对应词向量的内积也就越大，因此，可以通过内积来对词的相关性进行排序。而上面也说了，模长代表了词的重要程度，如果我们不考虑词本身的重要程度，只考虑其词义，可以用向量范数将其归一化后在进行内积计算，这样更稳定.<br><img src="/2019/10/22/w2v-summary/cosij.png" alt><br>即词的相关性可以用词向量之间的余弦距离来计算，这样比只使用内积更稳定。<br>在统计上，互信息为0，则表面这两个词无关，对应到模型，即两个词的词向量的内积为0，而根据向量的知识，两个向量的内积为0，则表明两个向量相互垂直，即两个向量无关。两个词在统计上的无关正好对应其在词向量空间上的几何无关！</p>
-<h1><span id="ying-yong">应用</span><a href="#ying-yong" class="header-anchor"></a></h1><h2><span id="liang-ge-ju-zi-de-xiang-guan-xing">两个句子的相关性</span><a href="#liang-ge-ju-zi-de-xiang-guan-xing" class="header-anchor"></a></h2><p>计算两个句子或短语之间的相关性时，我们可以借鉴上面PMI在朴素假设下的性质，将两个句子中的词向量进行求和，再计算两个结果向量之间的相关性，如点积或余弦。<br>而如果一个句子内的词向量的和与某一个词的词向量相关性非常高，可以认为这个句子与这个词表达了相同的语义，或者，在词向量空间内，词对应的向量在句子的聚类中心附近。</p>
-<h2><span id="zhong-xin-ci-guan-jian-ci-ti-qu">中心词（关键词）提取</span><a href="#zhong-xin-ci-guan-jian-ci-ti-qu" class="header-anchor"></a></h2><p>所谓中心词（关键词），即能概况句子的意思，通过这些词，我就能大概猜到整个句子的整体内容。即这些词（相对句子内其他词）对整个句子的相关性更高。这样就能将问题转化成词与句子相关性排序问题。<br>通过语言模型的角度来看，语言模型本身就是一个通过上（下）文来预测下一个词概率的模型，即最大化$P(w1,w2,w3..|W)$.而关键词的含义是什么呢？用数学的方式表达就是：<br>对于$S=(w1,w2, w3..wk)$,求解$P(S|wk)$值最高的$wk$,其中$wk$属于$S$。这其实与语言模型的含义是一致的。<br>最终，将问题转化成词与句子之间的相关性排序问题，而上面提到求解两个句子相关性时，可以将句子对应词向量先求和再计算相关性，最后关键词提取就变成：<br>先将句子对应词向量求和，得到sen_vec，然后计算单个词与sen_vec的相关性，然后排序即可。<br><img src="/2019/10/22/w2v-summary/keywords.png" alt><br>可以看到结果还是相当不错的。</p>
-<h2><span id="ju-xiang-liang">句向量</span><a href="#ju-xiang-liang" class="header-anchor"></a></h2><p>上面在做句子相关性时，都是为了将计算从$O(n^2)$降低到$O(n)$而将句子内的词向量进行求和，然后再计算。其实也就是用词向量的求和来得到句向量，来作为句子在相同词向量空间的语义。其实这是一种简单又快捷的得到句向量的方式，在很多任务中都可以尝试使用。</p>
-<p><strong>refer</strong><br><a href="https://papers.nips.cc/paper/5477-neural-word-embedding-as-implicit-matrix-factorization.pdf" target="_blank" rel="noopener">neural-word-embedding-as-implicit-matrix-factorization</a><br><a href="https://aclweb.org/anthology/P17-1007" target="_blank" rel="noopener">https://aclweb.org/anthology/P17-1007</a></p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于秦皇岛</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>word2vec</tag>
-        <tag>Glove</tag>
       </tags>
   </entry>
   <entry>
@@ -930,6 +930,166 @@
       </tags>
   </entry>
   <entry>
+    <title>from softmax to crf</title>
+    <url>/2019/12/26/from-softmax-to-crf/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#xu-lie-biao-zhu">序列标注</a><ul>
+<li><a href="#mo-xing">模型</a></li>
+<li><a href="#shu-xue-xing-shi">数学形式</a></li>
+</ul>
+</li>
+<li><a href="#yan-shi-jian-zhou-softmax">沿时间轴Softmax</a></li>
+<li><a href="#crf">CRF</a></li>
+<li><a href="#xian-xing-lian-crf">线性链CRF</a></li>
+<li><a href="#qiu-jie">求解</a></li>
+<li><a href="#demo">demo</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>又做NER相关东西， 用到了CRF，所以想给组里人从头一步一步的将CRF讲一遍，希望大家看完能明白CRF的数学模型已经工程上的使用。<br>网上关于CRF大多数都是将他与HMM及概率图模型一起对比着讲，但是我觉得这需要一些背景知识，鉴于上次分享发现大家并没有什么背景知识，<br>所以这次希望能尽量减少背景知识就能让人搞懂CRF。</p>
+<h1><span id="xu-lie-biao-zhu">序列标注</span><a href="#xu-lie-biao-zhu" class="header-anchor"></a></h1><h2><span id="mo-xing">模型</span><a href="#mo-xing" class="header-anchor"></a></h2><p>通常CRF出现在序列标注任务中，所以我们先来看看序列标注主要是做什么的。<br>序列标注是NLP中一个重要的任务，它包括分词、词性标注、命名实体识等。下面用一个分词的例子来简单说明。（<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a>)<br>假设我们现在用$bmes$四标签来进行分词，其中b 代表begin即词的开头， m代表middle即词内，e代表end即词的结尾，s代表single即单独成词。<br>现在我们有一个字符串序列 “今天天气不错”，如果对应的分词结果为“今天/天气/不/错”，则其标签序列为“bebess”。由于在序列标注中，我们认为正确的标签序列是唯一的，<br>所以我们的目标就是在所有可能的标签序列中（如bbbbbb,ssssss)挑选出真实的标签序列（bebess), 即最大化概率$P(bebess|今天天气不错）$。<br><img src="/2019/12/26/from-softmax-to-crf/seg.png" alt="4tag分词网络示意图"><br>即在上图中，所有从左至右的连线中，选出黄色的那条。</p>
+<h2><span id="shu-xue-xing-shi">数学形式</span><a href="#shu-xue-xing-shi" class="header-anchor"></a></h2><p>我们假设输入序列是$X=[x_1, x_2, x_3, …, x_n]$,对应的输出序列是 $Y = [y_1, y_2, …, y_n]$,<br>label的集合为$L = [l_1, l_2, … , l_k]$. 任务目标是让真实的输出序列的概率最大，即：<br>$$<br>Max(P(y_1,y_2,..y_n|X))<br>$$</p>
+<h1><span id="yan-shi-jian-zhou-softmax">沿时间轴Softmax</span><a href="#yan-shi-jian-zhou-softmax" class="header-anchor"></a></h1><p>直接对上述模型进行求解比较困难，所以我们先将问题简化，然后在对简化后的问题进行求解。<br>首先，我们引入朴素假设：即标签之间独立不相关，对应的目标就简化为：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>$$<br>为了对$P(y_i|X)$进行建模，通常我们先通过RNNs（LSTM，BiLSTM, etc)来捕获输入X的全局信息，获得隐藏状态序列$\bar{x_1}, \bar{x_2}, …, \bar{x_n}$,<br>此时的$\bar{x_i}$可以看作是$x_i$ 通过X获取的特征，由于RNNs可以捕获全局信息，所以我们认为特征$\bar{x_i}$之间互不相关，对应的<br>$$P(y_i|X) = P(y_i|\bar{x_i})$$<br>我们的目标：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>= Max(P(y_1|\bar{x_1})P(y_2|\bar{x_2})..P(y_n|\bar{x_n}))<br>= Max(\prod(P(y_i|\bar{x_i})))<br>$$<br>此时只需要$Max(P(y_i|\bar{x_i}))$进行求解，即沿时间轴一步一步的对RNNs的隐藏输出通过softmax来最大化对应目标标签概率。<br><img src="/2019/12/26/from-softmax-to-crf/softmax.png" alt="沿时间轴softmax"></p>
+<h1><span id="crf">CRF</span><a href="#crf" class="header-anchor"></a></h1><p>因为在上一个方案中，我们做了朴素建设，将输出序列看作是相互独立的一元模型，这样会引入一些问题，如在分词中（bmes），m- 标签不能出现在s- 后面，<br>s- 标签不能出现在b- 和m-后面等，所以即使在上述方案中，至少也需要人为的设置一个“转移矩阵”，将不合理的转移方式得分置为0，来避免不合理方案的出现。<br>而上述方案出现错误的原因，本质上是因为我们的朴素假设：标签之间相互独立。为了解决上述方案的问题，我们至少需要在输出端显式考虑标签的关联性，即输出标签与上下文相关。<br><img src="/2019/12/26/from-softmax-to-crf/crf_example.png" alt="显式考虑输出端上下文"><br>显式考虑输出端上下文相关</p>
+<p>现在我们回到原始目标上来，原始目标是$Max(P(y_1,y_2,..y_n|X)) $, 上个方案中我们是因为直接对$P(y_1, y_2,…y_n|x_1, x_2, …,x_n)$直接建模很难，<br>所以才做出了假设，简化目标。现在让我们换个思路，为了求解上述概率，我们还可以穷举出输出序列所有的可能结果$Y_1, Y_2, …, Y_{k^n}$,<br>然后如果能计算出当前输入X对应每种可能的输出序列的“值”， 则我们可以通过Softmax计算出真实输出序列的概率，即得到$P(Y_{true}|X)$。<br><code>假设一：我们可以学习一个打分函数f，通过函数f可以得到输出序列关于输入的得分，即$score_i = f(Y_i, X)$</code><br>此时，我们的目标就转化为 $P(Y|X) = \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}$.<br>其中$Z(X) = \sum_{i=1}^{k^n}(exp(f(Y_i, X)))$。即此时的概率P是一个指数分布。<br>此时我们的方案是<code>1</code>个<code>$k^n$</code>多分类问题，即我们是对一个完整的输出序列为单位来计算概率（路径积分），而上一个方案中，是<code>n</code>个<code>k</code>分类问题，<br>这是两个方案的不同点之一。<br>在方案一中我们也说过，直接对完整序列建模比较困难，此时我们直接对$f(Y_i, X)$求解也会面临相同的困难，为了避免方案一的问题，我们不再使用一元模型，改为二元模型。<br><code>引入一阶马尔可夫假设，且其关联性是加性的。即当前输出标签只与前一个输出标签相关，其总得分是对所有得分求和。</code><br>此时的目标就转化为<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= P(y_1|X)P(y_2|y_1;X)…P(y_n|y_{n-1}|X)<br>= P(y_1|X)\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)} P(y_2|X) … \frac{P(y_{n-1}, y_n|X)}{P(y_{n-1}|X)P(y_n|X)} P(y_n|X)<br>$$<br>假设一中我们假设P是一个指数分布，所以此时我们引入两个函数e 和 t：e对$P(y_i|X)$建模, t 对$\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)}$建模，即：<br>$$<br>P(y_i|X) = exp(e(y_i, X))<br>\frac{P(y_{i-1},y_1|X)}{P(y_{i-1}|X)P(y_i|X)} = P(y_i|X)exp(t(y_{i-i}, y_i; X))<br>$$</p>
+<p>此时的目标就化简为：<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}<br>= \frac{1}{Z(X)} exp(e(y_i,X) + t(y_1, y_2; X) + e(y_2, X) + … + t(y_{n-1}, y_n; X) + e(y_n, X))<br>$$<br>此时我们只需要对每个标签和相邻标签打分，然后将所有打分求和，即可得到总得分，然后对目标进行求解。</p>
+<h1><span id="xian-xing-lian-crf">线性链CRF</span><a href="#xian-xing-lian-crf" class="header-anchor"></a></h1><p>虽然上面已经做了大量简化，但是求解时依然比较困难，主要是在求解t中，因为需要同时对输入X与标签$y_i$, $y_{i-1}$同时考虑，而在e中，<br>已经将输入与输出的关联进行了建模，此时我们引入线性链假设：假设t与输入X无关，则此时$ t(y_{i-1}, y_i;X) = t(y_{i-1}, y_i)$，那打分函数f简化为：<br>$$<br>f(y_1, y_2, …, y_n;X)<br>= e(y_1,X) + t(y_1, y_2) + e(y_2, X) + … + t(y_{n-1},y_n;X) + e(y_n,X)<br>$$<br>此时t就是一个待训练的参数矩阵，而e则可以通过RNNs来建模，概率分布也变为：</p>
+<p>$$<br>P(y_1, y_2,…,y_n|x_1, x_2,…,x_n)<br>= exp(e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e(y_{i+1}, X)])) \frac{1}{Z(X)}<br>$$</p>
+<h1><span id="qiu-jie">求解</span><a href="#qiu-jie" class="header-anchor"></a></h1><p>为了求解模型，我们用最大似然法， 即：</p>
+<p>$$loss = -logP(y_1, y_2, …, y_n|x_1, x_2, …, x_n)$$<br>将上式代入：</p>
+<p>$$loss = logZ(X) - (e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e( y_{i+1} , X)]) $$</p>
+<p>减号后面的项通过添加一个待训练的参数矩阵循环计算即可得到结果，难算的前面的归一化因子Z(X)。前面我们也说了，我们此时是以路径为单位，<br>则此时Z(X) 需要我们穷举所有可能的路径比对其打分求和，而此时的路径有 $k^n$条，是指数级的，直接算效率太低，几乎不可能。<br>在假设二中，我们引入了一阶马尔可夫假设，当前标签只与前一个标签有联系，因此我们可以递归的计算归一化因子，这使得原来是指数级的计算量降低为线性级别。<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a><br>（这点是求解归一化因子的关键，最初我在推导时一直卡在这点上）<br>具体的: 将计算到时刻t的归一化因子记为Zt，并将它安装标签分为k个部分，即：</p>
+<p>$$Zt = Zt^1 + Zt^2 + … + Zt^k$$<br>其中$Zt^i$表示以标签i为终点的所有路径的得分指数和，此时，我们写出递归公式：</p>
+<p>$$Z_{t+1}^1 = (Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X)$$</p>
+<p>$$…  $$</p>
+<p>$$Z_{t+1}^k = (Zt^1 T_{1k} + Zt^2 T{2k} + … + Zt^k T_{kk})E_{t+1}(k|X)$$</p>
+<p>其中T是矩阵t的各个元素取指数形式，即$T_{ij} = exp(t_{ij})$, E是e的指数形式，即$E_{ij} = exp(e_{ij})$, 而$e_{ij}$是指时刻i时RNNs对label j的打分。<br><img src="/2019/12/26/from-softmax-to-crf/logz.png" alt="logz"></p>
+<p>上式带有指数形式，我们取对数来简化计算过程。<br>$$<br>log(Z_{t+1}^1) = log((Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X) )  \\<br>=log(exp(log(Zt^1) + t_{11}) + exp(log(Zt^2) + t_{21}) + … + exp(log(Zt^k) + t_{k1}) exp(e_{t+1}(1|X)))  \\<br>= log(exp(log(Zt^1) + t_{11} + e_{t+1}(1|X)) + exp(log(Zt^2) + t_{21} + e_{t+1}(1|X)) + … + exp(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))\\<br>= log(\sum_k(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))<br>$$</p>
+<p>上面的过程比较曲折，对有些同学可能不太好理解，我们用一个简单的例子来帮助理解。<br>我们假设我们现在有一个输入$X=[w_0,w_1, w_2]$, 标签集合为$L=[l_1, l_2]$. RNNs对e完成了建模，即：</p>
+<table>
+<thead>
+<tr>
+<th>&nbsp;</th>
+<th>l1</th>
+<th>l2     </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>w0</td>
+<td>$e_{01}$</td>
+<td>$e_{02}$ </td>
+</tr>
+<tr>
+<td>w1</td>
+<td>$e_{11}$</td>
+<td>$e_{12}$ </td>
+</tr>
+<tr>
+<td>w2</td>
+<td>$e_{21}$</td>
+<td>$e_{22}$ </td>
+</tr>
+</tbody>
+</table>
+<p>其中$e_{ij}$代表第i个字是第j个标签的得分。<br>转移矩阵t:</p>
+<table>
+<thead>
+<tr>
+<th>&nbsp;</th>
+<th>l1</th>
+<th>l2 </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>l1</td>
+<td>t11</td>
+<td>t12  </td>
+</tr>
+<tr>
+<td>l2</td>
+<td>t21</td>
+<td>t22  </td>
+</tr>
+</tbody>
+</table>
+<p>其中$t_{ij}$代表第i个标签转换为第j个标签的得分。<br>接下来我们按从$w_0$到$w_2$的方向一步一步来进行计算。首先，我们引入两个变量: states, cur，其中:  </p>
+<ul>
+<li>states代表上一个时刻计算的最终结果，即对应$log(Z_t^i)$</li>
+<li><p>cur代表当前时刻各个标签的得分，即对应$e_t^i$</p>
+</li>
+<li><p><code>$w_0$:</code></p>
+</li>
+<li>states = None</li>
+<li>$cur = [e_{01}, e_{02}]$<br>此时:<br>$$log(Z) = exp(e_{01}) + exp(e_{02})$$</li>
+</ul>
+<ul>
+<li><code>$w_0$ –&gt; $w_1$:</code></li>
+<li>states = $[e_{01}, e_{02}]$</li>
+<li>cur = $[e_{11}, e{12}]$</li>
+</ul>
+<ol>
+<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="2">
+<li>扩展cur:<br>$<br>cur = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="3">
+<li>将cur, states 与转移矩阵t 求和:</li>
+</ol>
+<p>$<br>score = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>t_{11}&amp;t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix}$$<br>$=$ $$\begin{pmatrix}<br>e_{01} + e_{11} + t_{11} &amp; e_{01} + e_{12} + t_{12}\\<br>e_{02} + e_{11} + t_{21} &amp; e_{02} + e_{12} + t_{22}\\<br>\end{pmatrix}$$<br>$</p>
+<ol start="4">
+<li>对score取指数形式然后求和，得到新的states:<br>$$<br>states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))]<br>$$<br>其中，states中的每个元素即对应着式中$logZ_{t}^i$, 此时的$log(Z)= \sum_k(exp(log(Z^k)))$:</li>
+</ol>
+<p>$$<br>log(Z_{0,1}) = log(exp(log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))) + exp(log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22})))) \\<br>= log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}) + exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))<br>$$</p>
+<p>当序列长度为2，标签有两个时，所有可能的标签序列为$(label_1-&gt;label_1, label_2-&gt;label_1, label_1-&gt;label_2, label_2-&gt;label_2)$,而对应的序列得分，即对应上式中的项，即：</p>
+<ul>
+<li>$ S_1: label_1-&gt;label_1:$<br>$ S_1 = e_{01} + e_{11} + t_{11} $</li>
+<li>$S_2: label_2-&gt;label_1:$<br>$ S_2 = e_{02} + e_{11} + t_{21}$</li>
+<li>$S_3 = label_1-&gt;label_2:$<br>$ S_3 = e_{01} + e_{12} + t_{12}$</li>
+<li>$S_4 = label_2-&gt;label_2:$<br>$ S_4 = e_{02} + e_{12} + t_{22}$</li>
+</ul>
+<ul>
+<li><code>$w_0$ -&gt; $w_1$ -&gt; $w_2$:</code></li>
+<li>$states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))] $</li>
+<li>$cur = [e_{21}, e_{22}]$</li>
+</ul>
+<p>与上面的做法一样，也分为4步：</p>
+<ol>
+<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))&amp;log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))\\<br>log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))&amp;log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="2">
+<li>cur：<br>$<br>cur = $$\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix}$$<br>$</li>
+</ol>
+<ol start="3">
+<li>将states，cur与转义矩阵t求和：</li>
+</ol>
+<p>$$<br>scores = \begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) &amp; log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) \\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) &amp; log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>t_{11}&amp; t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix} \\=<br>\begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11} &amp;log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12}\\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21} &amp;log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22}\\<br>\end{pmatrix}<br>$$</p>
+<ol start="4">
+<li>对score取指数形式然后求和，得到新的states:</li>
+</ol>
+<p>$$ states = [\\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11})+exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21})), \\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12})+ exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22})))] \\<br> = [log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})),\\<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22}))]<br>$$</p>
+<p>现在，我们用states计算一下$(Z_2)$:</p>
+<p>$$<br>log(Z_{(0-&gt;1-&gt;2)}) = log(exp(states[0]) + exp(states[1])) \\<br>=log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})) \\+<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22})) \\<br>= log(exp(e_{01}+e_{11}+t_{11}+e_{21}+t_{11}) + exp(e_{02}+e_{11}+t_{21}+e_{21}+t_{11}) \\ +<br>exp(e_{01}+e_{12}+t_{12} +e_{21}+t_{21}) + exp(e_{02}+e_{12}+t_{22}+e_{21}+t_{21}) \\+<br>exp(e_{01}+e_{11}+t_{11} +e_{22}+t_{12}) + exp(e_{01}+e_{11}+t_{11}+e_{22}+t_{12}) \\+<br>exp(e_{01}+e_{12}+t_{12} +e_{22}+t_{22}) + exp(e_{01}+e_{12}+t_{12}+e_{22}+t_{21}))<br>$$</p>
+<p>上式也就是我们要求的最终结果$log(Z)$,其中指数内对应着所有路径的得分。<br>到此，上例中的整个归一化因子的计算过程也就完成了，而CRF中最难的部分也就解决了。</p>
+<h1><span id="demo">demo</span><a href="#demo" class="header-anchor"></a></h1><p>搞懂了理论部分，下面写一个demo来验证一下。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CRF</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mask_label=False, **kwargs)</span>:</span></span><br><span class="line">        self.mask_label = <span class="number">1</span> <span class="keyword">if</span> mask_label <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        super(CRF, self).__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">build</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        self.num_label = input_shape[<span class="number">-1</span>] - self.mask_label</span><br><span class="line">        self.trans = self.add_weight(name=<span class="string">'crf_trans'</span>,</span><br><span class="line">                                     shape=(self.num_label, self.num_label),</span><br><span class="line">                                     trainable=<span class="literal">True</span>,</span><br><span class="line">                                     initializer=<span class="string">'glorot_uniform'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">path_score</span><span class="params">(self, inputs, labels)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label), obtained from rnn(lstm, bilstm. etc.)</span></span><br><span class="line"><span class="string">        :param labels: one-hot, (batch_size, timesteps, num_label) , real target series</span></span><br><span class="line"><span class="string">        :return:  path score</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        point_score = K.sum(K.sum(inputs * labels, <span class="number">2</span>), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        label_pre = K.expand_dims(labels[:, :<span class="number">-1</span>], <span class="number">3</span>)</span><br><span class="line">        label_next = K.expand_dims(labels[:, <span class="number">1</span>:], <span class="number">2</span>)</span><br><span class="line">        label_trans = label_pre * label_next</span><br><span class="line">        trans = K.expand_dims(K.expand_dims(self.trans, <span class="number">0</span>), <span class="number">0</span>)</span><br><span class="line">        trans_score = K.sum(K.sum(label_trans * trans, [<span class="number">2</span>, <span class="number">3</span>]), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> point_score + trans_score</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">log_norm_pre</span><span class="params">(self, inputs, states)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        expand previous states and inputs, sum with trans</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, num_label), current word emission scores</span></span><br><span class="line"><span class="string">        :param states: (batch_size, num_label), all paths  score of previous word</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        states = K.expand_dims(states[<span class="number">0</span>], <span class="number">2</span>)</span><br><span class="line">        inputs = K.expand_dims(inputs, <span class="number">1</span>)</span><br><span class="line">        trans = K.expand_dims(self.trans, <span class="number">0</span>)</span><br><span class="line">        scores = states + trans + inputs</span><br><span class="line">        output = K.logsumexp(scores, <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> output, [output]</span><br><span class="line">        <span class="comment"># states = K.expand_dims(states[0], 2)  # (batch_size, output_dim, 1)</span></span><br><span class="line">        <span class="comment"># trans = K.expand_dims(self.trans, 0)  # (1, output_dim, output_dim)</span></span><br><span class="line">        <span class="comment"># output = K.logsumexp(states + trans, 1)  # (batch_size, output_dim)</span></span><br><span class="line">        <span class="comment"># return output + inputs, [output + inputs]</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">loss</span><span class="params">(self, y_true, y_pre)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label)</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># mask = 1 - y_true[:, 1: -1] if self.mask_label else None</span></span><br><span class="line">        <span class="comment"># # y_true, y_pred = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span></span><br><span class="line">        <span class="comment"># real_path_score = self.path_score(y_pre, y_true)</span></span><br><span class="line">        <span class="comment"># init_states = [y_pre[:, 0]]</span></span><br><span class="line">        <span class="comment"># log_norm, _ = K.rnn(self.log_norm_pre, initial_states=init_states, inputs=y_pre[:, 1:], mask=mask)  # log(Z)</span></span><br><span class="line">        <span class="comment"># log_norm_score = K.logsumexp(log_norm, 1, keepdims=True)</span></span><br><span class="line">        <span class="comment"># return log_norm_score - real_path_score</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, <span class="number">1</span>:, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pre = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span><br><span class="line">        init_states = [y_pre[:, <span class="number">0</span>]]  <span class="comment"># 初始状态</span></span><br><span class="line">        log_norm, _, _ = K.rnn(self.log_norm_pre, y_pre[:, <span class="number">1</span>:], init_states, mask=mask)  <span class="comment"># 计算Z向量（对数）</span></span><br><span class="line">        log_norm = K.logsumexp(log_norm, <span class="number">1</span>, keepdims=<span class="literal">True</span>)  <span class="comment"># 计算Z（对数）</span></span><br><span class="line">        path_score = self.path_score(y_pre, y_true)  <span class="comment"># 计算分子（对数）</span></span><br><span class="line">        <span class="keyword">return</span> log_norm - path_score  <span class="comment"># 即log(分子/分母)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span>  <span class="comment"># crf 只是loss，不改变inputs</span></span><br><span class="line">        <span class="keyword">return</span> inputs</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accuracy</span><span class="params">(self, y_true, y_pred)</span>:</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, :, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pred = y_true[:, :, :self.num_label], y_pred[:, :, :self.num_label]</span><br><span class="line">        isequal = K.equal(K.argmax(y_true, <span class="number">2</span>), K.argmax(y_pred, <span class="number">2</span>))</span><br><span class="line">        isequal = K.cast(isequal, <span class="string">'float32'</span>)</span><br><span class="line">        <span class="keyword">if</span> mask == <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> K.mean(isequal)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> K.sum(isequal * mask) / K.sum(mask)</span><br></pre></td></tr></table></figure></p>
+<p>结果：<br><img src="/2019/12/26/from-softmax-to-crf/result.png" alt="result"></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>初雪下的红果果</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>CRF</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>有趣的概率统计题</title>
     <url>/2019/11/30/statistics/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -954,6 +1114,160 @@
       </categories>
       <tags>
         <tag>Statistics</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>记一次npm环境问题</title>
+    <url>/2020/01/11/npm-environment/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#qi-yin">起因</a></li>
+<li><a href="#ddbug">Ddbug</a></li>
+<li><a href="#jie-lun">结论</a></li>
+<li><a href="#guan-yu-tou">关于头</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+
+<h1><span id="qi-yin">起因</span><a href="#qi-yin" class="header-anchor"></a></h1><p>上周写完博客，本地预览时，突然报错，看了一下是 sharp.js 的问题，以为是个小场面，然后就开始了一周的痛苦修环境经历，哭了😭</p>
+<h1><span id="ddbug">Ddbug</span><a href="#ddbug" class="header-anchor"></a></h1><ol>
+<li>首先根据提示，重新安装  <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">rm -rf node_modules/sharp</span><br><span class="line">npm i sharp</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>此时报错：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">c++: error: unrecognized command line option <span class="string">'-stdlib=libc++'</span></span><br><span class="line">make: *** [Release/.node] Error <span class="number">1</span></span><br><span class="line">gyp ERR! build error</span><br><span class="line">gyp ERR! stack Error: `make` failed <span class="keyword">with</span> exit code: <span class="number">2</span></span><br><span class="line">gyp ERR! stack     at ChildProcess.onExit (/usr/local/Cellar/node@<span class="number">8</span>/<span class="number">8.16</span><span class="number">.2</span>/lib/node_modules/npm/node_modules/node-gyp/lib/build.js:<span class="number">262</span>:<span class="number">23</span>)</span><br><span class="line">gyp ERR! stack     at emitTwo (events.js:<span class="number">126</span>:<span class="number">13</span>)</span><br><span class="line">gyp ERR! stack     at ChildProcess.emit (events.js:<span class="number">214</span>:<span class="number">7</span>)</span><br><span class="line">gyp ERR! stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:<span class="number">198</span>:<span class="number">12</span>)</span><br></pre></td></tr></table></figure></p>
+<p>这个问题的本质是当前的包需要通过源码编译，而当前用的是gcc（macOS），而gcc不支持当前命令，之前装环境没有遇到过这个问题，可能是我最近跟新了gcc？<br>查了一下解决这个问题最简单的方式是指定c++:<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">CXX=clang++ npm i xxx</span><br></pre></td></tr></table></figure></p>
+<p>这次确实装成功了，走起！<br>此时又报新错：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">can <span class="keyword">not</span> find sharp xxx</span><br><span class="line">rm node_modules/sharp <span class="keyword">and</span> rebuild</span><br></pre></td></tr></table></figure></p>
+<p>阿嘞？装上了又找不到？why？<br>又尝试了全局安装，依然找不到，此时，有点上头，我干脆把node_modules全部删掉，重新装吧。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">rm -rf node_modules</span><br><span class="line">CXX=clang++ npm i</span><br></pre></td></tr></table></figure></p>
+<p>阿嘞？这次装也失败了，错误大致原因是node-gyp rebuild nodejieba失败。<br>开始以为是node-gyp的问题，后来查了一下，node-gyp是用来帮助丛源码编译的工具，所以本质上不是他的问题，还是别的问题。<br>又查了一下nodejieba, 有人说是在lunr.js中用的nodejieba在node高版本中会存在编译失败，建议用 node8.x ,python版本最好是2.7，那我上次没失败？先将node降级到node8, python切到2.7。<br>再装一次，依然失败。但是错误信息不够定位，查一下怎么看更全的日志。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">CXX=clang++ npm i --verbose</span><br><span class="line">```  </span><br><span class="line">发现两条重要信息，大概是无法找到lib下某个库，可能是本级的环境出了问题，整理一下吧。</span><br><span class="line"> ```python</span><br><span class="line">brew update</span><br><span class="line">brew cleanup</span><br><span class="line">brew doctor</span><br><span class="line">```  </span><br><span class="line">环境的一堆issue解决掉（主要是link无效），然后把之前无法找到的两个lib重新装了一次（很慢）。</span><br><span class="line">此时还是同样问题，这次又查看了一下当前环境问题，两个包没link，一个是python(其实是python3，之前link的python2)， 一个是swig，后来一想，可能是swig这个工具在源码编译是缺失导致的，</span><br><span class="line">```python</span><br><span class="line">brew link swig</span><br></pre></td></tr></table></figure></p>
+<p>此时在装，搞定！走起，又报新错：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">FATAL Something<span class="string">'s wrong. Maybe you can find the solution here: https://hexo.io/docs/troubleshooting.html</span></span><br><span class="line"><span class="string">Error: spawn /Users/xuming/Project/blog/node_modules/optipng-bin/vendor/optipng ENOENT</span></span><br><span class="line"><span class="string">    at Process.ChildProcess._handle.onexit (internal/child_process.js:190:19)</span></span><br><span class="line"><span class="string">    at onErrorNT (internal/child_process.js:362:16)</span></span><br><span class="line"><span class="string">    at _combinedTickCallback (internal/process/next_tick.js:139:11)</span></span><br><span class="line"><span class="string">    at process._tickCallback (internal/process/next_tick.js:181:9)</span></span><br></pre></td></tr></table></figure></p>
+<p>这是缺module，但是我是npm i，为什么还缺？此时可能只是当前node_modules的问题，为了验证本机其他环境已经ok了，新建了一个博客，验证后发现本机确实OK了。<br>额，那就缺什么装什么吧。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">npm i optipng-bin</span><br></pre></td></tr></table></figure></p>
+<p>走起！一切正常！此时我的心情就好比火箭发射成功一样。折磨了一周的环境问题，终于搞定了，中间还有许多其他方向的试探，但都记不得了。- -！</p>
+<h1><span id="jie-lun">结论</span><a href="#jie-lun" class="header-anchor"></a></h1><ol>
+<li>npm 失败后，可以加 –verbose 参数查看详细日志，定位问题。</li>
+<li>编译源码可能你还需要装xcode-select --install</li>
+<li>对于 Error: spawn .../node_modules/xxx/vendor/.. ENOENT,单独安装一下对应缺失module即可。</li>
+<li>node-gyp 和 libvips可能也会影响，建议重装一次</li>
+<li>MacOS中，可能会gcc与clang并存，加上系统升级，可能导致相应版本不兼容问题。指定clang ：<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">CXX=clang++ npm i</span><br></pre></td></tr></table></figure>
+6. 本机环境问题，可以通过<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">brew doctor</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1><span id="guan-yu-tou">关于头</span><a href="#guan-yu-tou" class="header-anchor"></a></h1><p>雪中奥森</p>
+]]></content>
+      <categories>
+        <category>Life</category>
+      </categories>
+      <tags>
+        <tag>npm</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>装机指北</title>
+    <url>/2020/05/05/make-a-computer/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#ying-jian-pian">硬件篇</a><ul>
+<li><a href="#xian-qia">显卡</a></li>
+<li><a href="#cpu">CPU</a></li>
+<li><a href="#zhu-ban">主板</a></li>
+<li><a href="#san-re">散热</a></li>
+<li><a href="#cun-chu">存储</a></li>
+<li><a href="#dian-yuan-yu-ji-xiang">电源与机箱</a></li>
+</ul>
+</li>
+<li><a href="#an-zhuang">安装</a></li>
+<li><a href="#ruan-jian-an-zhuang">软件安装</a><ul>
+<li><a href="#xi-tong-an-zhuang">系统安装</a></li>
+<li><a href="#an-zhuang-nvidia-qu-dong">安装Nvidia驱动</a></li>
+<li><a href="#cuda-de-an-zhuang-yu-xie-zai">CUDA的安装与卸载</a><ul>
+<li><a href="#xie-zai-cuda">卸载cuda</a></li>
+<li><a href="#an-zhuang-cuda">安装cuda</a></li>
+</ul>
+</li>
+<li><a href="#an-zhuang-cudnn">安装cudnn</a></li>
+<li><a href="#python-huan-jing">Python环境</a><ul>
+<li><a href="#conda-pei-zhi">conda配置</a></li>
+<li><a href="#an-zhuang-jupyter">安装jupyter</a></li>
+</ul>
+</li>
+<li><a href="#an-zhuang-tensorflow-gpu">安装tensorflow-gpu</a></li>
+</ul>
+</li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>  今年回来，第一件事就是要打造一个自己的实验环境，而这也是我第一次自己从硬件开始，所以前前后后差不多折腾了大半个月，总算是搞定了。为了纪念这次从0开始打造自己的深度学习实验环境，所以写了这篇指北。</p>
+<h1><span id="ying-jian-pian">硬件篇</span><a href="#ying-jian-pian" class="header-anchor"></a></h1><p>  关于硬件，最主要的就是显卡、CPU、主板和散热了，接下来一个一个介绍经验。</p>
+<h2><span id="xian-qia">显卡</span><a href="#xian-qia" class="header-anchor"></a></h2><p>  显卡的选择主要参考两个维度：1.显存大小；2.浮点计算能力。<br>  显卡主要分AMD与Nvidia系列。因为Nvidia有CUDA加持，加速计算，自然是Nvidia系列了，Nvidia显卡目前针对PC有三个系列：Quadro、GeForce和Tesla。其中Quadro系列是专业绘图，GeoForce是专业游戏显卡（可绘图可计算），而Tesla是专业计算卡。综合考虑价格与 state-of-the-art 的模型对硬件的最低要求，最终选择了2080Ti。关于GPU的选型，可以参考<a href="https://zhuanlan.zhihu.com/p/61411536" target="_blank" rel="noopener">深度学习GPU对比</a><br>  确定了型号，就是出品厂家选择了，主要区别就是公版非公版。公版就是Nvidia自己设计自己出的，而非公就是第三方厂商出的，包括evga，技嘉，微星等等。有一篇2080ti进行深度学习时的显卡性能测评的文章，找不到地址了，结论是evga &gt; Nvidia &gt; others 。evga与Nvidia的主要区别有两个：1.价格上evga略高 10% 左右；2. Nvidia 采用双风扇风冷，evga 采用单风扇风冷-水冷混合。最终选择了公版。</p>
+<h2><span id="cpu">CPU</span><a href="#cpu" class="header-anchor"></a></h2><p>  CPU主要有两个系列：Intel 和 AMD 。也是因为主要用来做计算，所以肯定首选 AMD。目前ADM系列顶配是 3990X，但是价格大概在三万左右，太感人了。第二的是 3700X ，京东上一千三上下，那就是他了。</p>
+<h2><span id="zhu-ban">主板</span><a href="#zhu-ban" class="header-anchor"></a></h2><p>  CPU确定了，主板型号基本就定了。 主要参考如下图：<br>  <img src="/2020/05/05/make-a-computer/board.png" alt="cpu-主板对应型号参考"><br>  看了一些测评，最终选择了微星<a href="https://item.jd.com/8259910.html" target="_blank" rel="noopener">B450</a></p>
+<h2><span id="san-re">散热</span><a href="#san-re" class="header-anchor"></a></h2><p>  散热目前两个方式：风冷和水冷。两者的区别主要参考<a href="https://www.zhihu.com/question/57695465/answer/440467918" target="_blank" rel="noopener">风冷与水冷区别</a><br>  水冷在散热上还是要强一些的（240以上），所以打算试水一款水冷。主要推荐两款：<a href="https://item.m.jd.com/product/100003859323.html?wxa_abtest=o&amp;utm_user=plusmember&amp;ad_od=share&amp;utm_source=androidapp&amp;utm_medium=appshare&amp;utm_campaign=t_335139774&amp;utm_term=Wxfriends&amp;from=singlemessage&amp;isappinstalled=0" target="_blank" rel="noopener">乔思伯光影240</a> <a href="https://item.m.jd.com/product/6454809.html?wxa_abtest=o&amp;utm_user=plusmember&amp;ad_od=share&amp;utm_source=androidapp&amp;utm_medium=appshare&amp;utm_campaign=t_335139774&amp;utm_term=Wxfriends&amp;from=singlemessage&amp;isappinstalled=0" target="_blank" rel="noopener">九州风神水元素240T</a>。最后选择了九州风神水元素，因为买那天乔思伯涨价了～</p>
+<h2><span id="cun-chu">存储</span><a href="#cun-chu" class="header-anchor"></a></h2><p>  存储上打算采用 32G + 1T ssd。内存自然上<a href="https://item.jd.com/8391349.html" target="_blank" rel="noopener">金士顿骇客神条</a>, ssd主要参考性价比，最终选择<a href="https://item.jd.com/100002580230.html" target="_blank" rel="noopener">三星1T SSD</a></p>
+<h2><span id="dian-yuan-yu-ji-xiang">电源与机箱</span><a href="#dian-yuan-yu-ji-xiang" class="header-anchor"></a></h2><p>  由于目前暂时只插一张显卡，所以电源在 600W 以上即可。选一个品牌比较好的，那就是<a href="https://item.jd.com/6828141.html" target="_blank" rel="noopener">安钛克750</a> 了<br>  至于机箱，主要参考能不能够合理安放显卡、主板以及后续可能的散热。对于我当前的配置，只要是中塔的基本都够插显卡。买个安静低调的，那就他了：<a href="https://item.jd.com/100004999668.html" target="_blank" rel="noopener">爱国者M2</a><br>  最终的配置清单如下：<br>  <img src="/2020/05/05/make-a-computer/list.png" alt="list"></p>
+<h1><span id="an-zhuang">安装</span><a href="#an-zhuang" class="header-anchor"></a></h1><p>  安装前，强烈建议多看几期安装教程视频，我主要看的是 B站 的<a href="https://www.bilibili.com/video/BV1vx41187cm" target="_blank" rel="noopener">跟装机猿搞装机</a> 系列。最困难的可能是水冷散热的安装了。由于平台不同，安装方式不同，推荐看对应水冷厂商给的安装视频。我主要参考<a href="https://www.bilibili.com/video/BV1EE411h7R1" target="_blank" rel="noopener">水元素安装教程</a><br>  安装过程大致总结一下：</p>
+<ol>
+<li>拿出主板和CPU，按照说明书将CPU装到主板上。</li>
+<li>将水冷拿出，拿出硅脂，涂抹在CPU上，将冷头上的塑料膜撕掉，安装好支撑后，将水冷头贴在CPU上，安装固定。</li>
+<li>拆开机箱侧板，将主板装上，并将水冷的风扇固定在机箱上。注意：风扇上没有挡板的是出风口，一般原则是从机箱内往外吹，注意风向。</li>
+<li>插入内存条，固定固态硬盘</li>
+<li>将线按说明一个一个插上</li>
+<li>寻找机箱上显卡位置，可能需要扣掉挡板铁片。将显卡插入主板，同时固定在机箱上</li>
+<li>放入电源，插好对应线<br>主要注意的主要是：1、水冷头上的膜一定要撕去，否则CPU上的热不能很好的传导出来。2、装之前大概看一下机箱各个位置，有些时候因为安装顺序会导致没地方下手，需要卸了重组。</li>
+</ol>
+<h1><span id="ruan-jian-an-zhuang">软件安装</span><a href="#ruan-jian-an-zhuang" class="header-anchor"></a></h1><h2><span id="xi-tong-an-zhuang">系统安装</span><a href="#xi-tong-an-zhuang" class="header-anchor"></a></h2><p>  系统选Linux的稳定版，所以装了CentOS 7。<br>  1.首先下载centos的镜像文件，外网可能会慢，选择<a href="http://mirrors.aliyun.com/centos/7/isos/x86_64/" target="_blank" rel="noopener">阿里源</a><br>  2.下载相应的刻录工具，插入u盘，将镜像刻录进u盘（刻录时会先格式化u盘，如果是windows系统，u盘默认是FAT32,这种格式下是没法放大于4G的单文件，所以需要进行格式转换：cmd下执行 convert e: /fs:ntfs)<br>  3.插入u盘，开机，引导开机进入u盘（大部分是自动进来），选择 test &amp; install<br>  4.一般安装时，对应的命令行中的目录是错误的，执行会报错：<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ERROR，could not insert <span class="string">'floppy'</span></span><br></pre></td></tr></table></figure></p>
+<p>  而无法进入安装界面<br>  此时需要查找u盘对应名字，修改命令：<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">cd</span>:/dev &amp; ls</span><br></pre></td></tr></table></figure></p>
+<p>  找到一个 <code>s##数字 </code>的串，我的是sdb4 ,然后重启，进入后先按 e 进入编辑模式，修改命令行<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">linuxefi/images/pxeboot/vmlinuz inst.stage2=hd:LABEL=CentOS\x207\x20x86_64 xdriver=vesa nomodeset quiet</span><br><span class="line">linuxefi/images/pxeboot/vmlinuz inst.stage2=hd:/dev/sdb4 xdriver=vesa nomodeset quiet</span><br></pre></td></tr></table></figure></p>
+<p>  由于我的显卡是2080Ti,系统自带的nouveau驱动不匹配，需要禁用暂时，所以在后面加上 <code> nouveau.modeset=0 </code><br>  最终修改后完整的命令行为：<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">linuxefi/images/pxeboot/vmlinuz inst.stage2=hd:/dev/sdb4 xdriver=vesa nomodeset quiet nouveau.modeset=0</span><br></pre></td></tr></table></figure></p>
+<p>  此时保存后退出，选择test &amp; install 即可进入安装界面<br>  进入后安装，安装时，注意软件选择中选择带网络的，剩下的就是按提示一步一步来即可。</p>
+<h2><span id="an-zhuang-nvidia-qu-dong">安装Nvidia驱动</span><a href="#an-zhuang-nvidia-qu-dong" class="header-anchor"></a></h2><p>  1.检查显卡是否正常<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ lspci | grep -i nvidia</span><br></pre></td></tr></table></figure></p>
+<p>  2.检查驱动版本<br>  添加EIRepo源<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org</span><br><span class="line">$ rpm -Uvh http://www.elrepo.org/elrepo-release-7.6-5.el7.elrepo.noarch.rpm</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">3.安装显卡驱动检查包</span><br><span class="line">```bash</span><br><span class="line">$ yum install nvidia-detect</span><br></pre></td></tr></table></figure></p>
+<p>  检查驱动版本<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ nvidia-detect -v</span><br></pre></td></tr></table></figure></p>
+<p>  此时会得到对应的版本信息，注意那个数字<br>  4.安装编译环境<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) dkms</span><br><span class="line">$ yum -y update //注意这是升级系统</span><br><span class="line">$ yum -y install gcc kernel-devel kernel-headers dkms</span><br></pre></td></tr></table></figure></p>
+<p>  5.禁用vouveau<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ vim /etc/modprobe.d/blacklist-nouveau.conf</span><br><span class="line">    blacklist nouveau</span><br><span class="line">    options nouveau modeset=0</span><br></pre></td></tr></table></figure></p>
+<p>  6.重新建立initramfs image文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).img.bak</span><br><span class="line">$ dracut /boot/initramfs-$(uname -r).img $(uname -r)</span><br></pre></td></tr></table></figure></p>
+<p>  7.reboot</p>
+<h2><span id="cuda-de-an-zhuang-yu-xie-zai">CUDA的安装与卸载</span><a href="#cuda-de-an-zhuang-yu-xie-zai" class="header-anchor"></a></h2><h3><span id="xie-zai-cuda">卸载cuda</span><a href="#xie-zai-cuda" class="header-anchor"></a></h3>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sudo yum remove <span class="string">"*cublas*"</span> <span class="string">"cuda*"</span></span><br></pre></td></tr></table></figure>
+<p>参考：<a href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#removing-cuda-tk-and-driver" target="_blank" rel="noopener">removing-cuda</a></p>
+<h3><span id="an-zhuang-cuda">安装cuda</span><a href="#an-zhuang-cuda" class="header-anchor"></a></h3>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget path/to/your-version/install.rpm</span><br><span class="line">sudo rpm -i cuda-repo-rhel7-10-1-local-10.1.105-418.39-1.0-1.x86_64.rpm</span><br><span class="line">sudo yum clean all</span><br><span class="line">sudo yum install cuda</span><br></pre></td></tr></table></figure>
+<p>参考：<a href="https://developer.nvidia.com/cuda-10.1-download-archive-base?target_os=Linux&amp;target_arch=x86_64&amp;target_distro=CentOS&amp;target_version=7&amp;target_type=rpmlocal" target="_blank" rel="noopener">cuda-download</a><br>注意：一定不要通过浏览器去下载，因为会非常非常非常慢，但是wget大概几分钟就搞定了</p>
+<h2><span id="an-zhuang-cudnn">安装cudnn</span><a href="#an-zhuang-cudnn" class="header-anchor"></a></h2><p>  1.下载相应的包 libcudnn*.rpm</p>
+<ol start="2">
+<li><p>安装包</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rpm -ivh libcudnn7-*.x86_64.rpm</span><br><span class="line">rpm -ivh libcudnn7-devel-*.x86_64.rpm</span><br><span class="line">rpm -ivh libcudnn7-doc-*.x86_64.rpm</span><br></pre></td></tr></table></figure>
+<p>3.验证</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span>  <span class="variable">$HOME</span>/cudnn_samples_v7/mnistCUDNN</span><br><span class="line"><span class="variable">$make</span> clean &amp;&amp; make</span><br><span class="line">$ ./mnistCUDNN</span><br></pre></td></tr></table></figure>
+<p>if: Test passed! 则验证通过<br>参考：<a href="https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#install-linux" target="_blank" rel="noopener">cudnn-install</a></p>
+<h2><span id="python-huan-jing">Python环境</span><a href="#python-huan-jing" class="header-anchor"></a></h2><p>python环境采用Anaconda + jupyter notebook</p>
+<h3><span id="conda-pei-zhi">conda配置</span><a href="#conda-pei-zhi" class="header-anchor"></a></h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda create -n py3 python=3</span><br><span class="line">activate py3</span><br><span class="line">conda install ipykernel -n py3</span><br><span class="line">python -m ipykernel install --user --name py3 --display-name <span class="string">'py3'</span></span><br></pre></td></tr></table></figure>
+<p>删除环境</p>
+<figure class="highlight bash"><figcaption><span>jupyter kernelspec remove py3 ```</span></figcaption><table><tr><td class="code"><pre><span class="line">  pip 安装 与修改源</span><br><span class="line">```bash </span><br><span class="line">  conda install pip -n py3</span><br><span class="line">  vim ~/.pip/pip.conf</span><br><span class="line"></span><br><span class="line">  [global]</span><br><span class="line">  index-url=https://pypi.tuna.tsinghua.edu.cn/simple</span><br></pre></td></tr></table></figure>
+<h3><span id="an-zhuang-jupyter">安装jupyter</span><a href="#an-zhuang-jupyter" class="header-anchor"></a></h3><figure class="highlight bash"><figcaption><span>pip install jupyter```</span></figcaption><table><tr><td class="code"><pre><span class="line">  jupyter 作为后台服务器</span><br><span class="line">  1. 添加密码</span><br><span class="line">```bash </span><br><span class="line">  ipython</span><br><span class="line">  from jupyter.auth import passwd</span><br><span class="line">  passwd()</span><br></pre></td></tr></table></figure>
+<p>此时会让你输入两次密码，输入后得到一串hash码，保存下来， 回到bash, 添加配置文件</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ jupyter notebook --generate-config</span><br><span class="line">$ vim ~/.jupyter/jupyter-notebook-config.py</span><br><span class="line"></span><br><span class="line"><span class="comment"># edit</span></span><br><span class="line"></span><br><span class="line">c.NotebookApp.ip=<span class="string">'*'</span>                                  <span class="comment"># * 代表所有iP都能访问 ，也可以指定ip</span></span><br><span class="line">c.NotebookApp.password = u<span class="string">'sha1:ce...'</span>       <span class="comment"># 刚才复制的那个密文</span></span><br><span class="line">c.NotebookApp.open_browser = False       <span class="comment"># 禁止自动打开浏览器</span></span><br><span class="line">c.NotebookApp.port =8888                         <span class="comment">#指定一个端口</span></span><br><span class="line">   </span><br><span class="line">c.NotebookApp.notebook_dir = <span class="string">'/home/user/user1'</span>  <span class="comment">#指定工作空间</span></span><br><span class="line">c.PAMAuthenticator.encoding = <span class="string">'utf8'</span>         <span class="comment">#指定utf-8编码，解决读取中文路径或者文件乱码问题</span></span><br></pre></td></tr></table></figure>
+<p>后台运行</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ nohup jupyter notebook --allow-root &gt; jupyter.log 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>  关闭后台运行<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"> <span class="comment"># ps -axu | grep jupyter</span></span><br><span class="line"><span class="comment"># kill -9 pid</span></span><br></pre></td></tr></table></figure></p>
+<h2><span id="an-zhuang-tensorflow-gpu">安装tensorflow-gpu</span><a href="#an-zhuang-tensorflow-gpu" class="header-anchor"></a></h2><p>  tensorflow-gpu对cuda有版本要求，所以在安装cuda前需要提前查看，确定自己版本。参考官网<a href="https://www.tensorflow.org/install/source" target="_blank" rel="noopener">install</a><br>  <img src="/2020/05/05/make-a-computer/gpu.png" alt="tensorflow-gpu vs cuda"><br>  还记得cuda安装时，给出的卸载方法吗？就是因为装tensorflow-gpu后发现gpu不带动的，后来才发现是cuda版本太高了～<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ pip install tensorflow-gpu==2.1</span><br></pre></td></tr></table></figure></p>
+<p>  验证<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ ipython</span><br><span class="line">  import tensorflow as tf</span><br><span class="line">  tf.config.list_physical_devices(<span class="string">'GPU'</span>)</span><br></pre></td></tr></table></figure></p>
+<p>  没有报错则正常</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>  以上就是从零开始搭建搭建一套自己的深度学习实验平台的个人经验，整个过程从硬件到最终的软件适配都走了很多坑，希望能给你一些借鉴。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>  部分硬件盒子</p>
+]]></content>
+      <categories>
+        <category>Life</category>
+      </categories>
+      <tags>
+        <tag>tensorflow-gpu</tag>
+        <tag>装机</tag>
+        <tag>CUDA</tag>
       </tags>
   </entry>
   <entry>
@@ -1130,320 +1444,6 @@
       </tags>
   </entry>
   <entry>
-    <title>from softmax to crf</title>
-    <url>/2019/12/26/from-softmax-to-crf/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#xu-lie-biao-zhu">序列标注</a><ul>
-<li><a href="#mo-xing">模型</a></li>
-<li><a href="#shu-xue-xing-shi">数学形式</a></li>
-</ul>
-</li>
-<li><a href="#yan-shi-jian-zhou-softmax">沿时间轴Softmax</a></li>
-<li><a href="#crf">CRF</a></li>
-<li><a href="#xian-xing-lian-crf">线性链CRF</a></li>
-<li><a href="#qiu-jie">求解</a></li>
-<li><a href="#demo">demo</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>又做NER相关东西， 用到了CRF，所以想给组里人从头一步一步的将CRF讲一遍，希望大家看完能明白CRF的数学模型已经工程上的使用。<br>网上关于CRF大多数都是将他与HMM及概率图模型一起对比着讲，但是我觉得这需要一些背景知识，鉴于上次分享发现大家并没有什么背景知识，<br>所以这次希望能尽量减少背景知识就能让人搞懂CRF。</p>
-<h1><span id="xu-lie-biao-zhu">序列标注</span><a href="#xu-lie-biao-zhu" class="header-anchor"></a></h1><h2><span id="mo-xing">模型</span><a href="#mo-xing" class="header-anchor"></a></h2><p>通常CRF出现在序列标注任务中，所以我们先来看看序列标注主要是做什么的。<br>序列标注是NLP中一个重要的任务，它包括分词、词性标注、命名实体识等。下面用一个分词的例子来简单说明。（<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a>)<br>假设我们现在用$bmes$四标签来进行分词，其中b 代表begin即词的开头， m代表middle即词内，e代表end即词的结尾，s代表single即单独成词。<br>现在我们有一个字符串序列 “今天天气不错”，如果对应的分词结果为“今天/天气/不/错”，则其标签序列为“bebess”。由于在序列标注中，我们认为正确的标签序列是唯一的，<br>所以我们的目标就是在所有可能的标签序列中（如bbbbbb,ssssss)挑选出真实的标签序列（bebess), 即最大化概率$P(bebess|今天天气不错）$。<br><img src="/2019/12/26/from-softmax-to-crf/seg.png" alt="4tag分词网络示意图"><br>即在上图中，所有从左至右的连线中，选出黄色的那条。</p>
-<h2><span id="shu-xue-xing-shi">数学形式</span><a href="#shu-xue-xing-shi" class="header-anchor"></a></h2><p>我们假设输入序列是$X=[x_1, x_2, x_3, …, x_n]$,对应的输出序列是 $Y = [y_1, y_2, …, y_n]$,<br>label的集合为$L = [l_1, l_2, … , l_k]$. 任务目标是让真实的输出序列的概率最大，即：<br>$$<br>Max(P(y_1,y_2,..y_n|X))<br>$$</p>
-<h1><span id="yan-shi-jian-zhou-softmax">沿时间轴Softmax</span><a href="#yan-shi-jian-zhou-softmax" class="header-anchor"></a></h1><p>直接对上述模型进行求解比较困难，所以我们先将问题简化，然后在对简化后的问题进行求解。<br>首先，我们引入朴素假设：即标签之间独立不相关，对应的目标就简化为：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>$$<br>为了对$P(y_i|X)$进行建模，通常我们先通过RNNs（LSTM，BiLSTM, etc)来捕获输入X的全局信息，获得隐藏状态序列$\bar{x_1}, \bar{x_2}, …, \bar{x_n}$,<br>此时的$\bar{x_i}$可以看作是$x_i$ 通过X获取的特征，由于RNNs可以捕获全局信息，所以我们认为特征$\bar{x_i}$之间互不相关，对应的<br>$$P(y_i|X) = P(y_i|\bar{x_i})$$<br>我们的目标：<br>$$<br>Max(P(y_1|X)P(y_2|X)…P(y_n|X))<br>= Max(P(y_1|\bar{x_1})P(y_2|\bar{x_2})..P(y_n|\bar{x_n}))<br>= Max(\prod(P(y_i|\bar{x_i})))<br>$$<br>此时只需要$Max(P(y_i|\bar{x_i}))$进行求解，即沿时间轴一步一步的对RNNs的隐藏输出通过softmax来最大化对应目标标签概率。<br><img src="/2019/12/26/from-softmax-to-crf/softmax.png" alt="沿时间轴softmax"></p>
-<h1><span id="crf">CRF</span><a href="#crf" class="header-anchor"></a></h1><p>因为在上一个方案中，我们做了朴素建设，将输出序列看作是相互独立的一元模型，这样会引入一些问题，如在分词中（bmes），m- 标签不能出现在s- 后面，<br>s- 标签不能出现在b- 和m-后面等，所以即使在上述方案中，至少也需要人为的设置一个“转移矩阵”，将不合理的转移方式得分置为0，来避免不合理方案的出现。<br>而上述方案出现错误的原因，本质上是因为我们的朴素假设：标签之间相互独立。为了解决上述方案的问题，我们至少需要在输出端显式考虑标签的关联性，即输出标签与上下文相关。<br><img src="/2019/12/26/from-softmax-to-crf/crf_example.png" alt="显式考虑输出端上下文"><br>显式考虑输出端上下文相关</p>
-<p>现在我们回到原始目标上来，原始目标是$Max(P(y_1,y_2,..y_n|X)) $, 上个方案中我们是因为直接对$P(y_1, y_2,…y_n|x_1, x_2, …,x_n)$直接建模很难，<br>所以才做出了假设，简化目标。现在让我们换个思路，为了求解上述概率，我们还可以穷举出输出序列所有的可能结果$Y_1, Y_2, …, Y_{k^n}$,<br>然后如果能计算出当前输入X对应每种可能的输出序列的“值”， 则我们可以通过Softmax计算出真实输出序列的概率，即得到$P(Y_{true}|X)$。<br><code>假设一：我们可以学习一个打分函数f，通过函数f可以得到输出序列关于输入的得分，即$score_i = f(Y_i, X)$</code><br>此时，我们的目标就转化为 $P(Y|X) = \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}$.<br>其中$Z(X) = \sum_{i=1}^{k^n}(exp(f(Y_i, X)))$。即此时的概率P是一个指数分布。<br>此时我们的方案是<code>1</code>个<code>$k^n$</code>多分类问题，即我们是对一个完整的输出序列为单位来计算概率（路径积分），而上一个方案中，是<code>n</code>个<code>k</code>分类问题，<br>这是两个方案的不同点之一。<br>在方案一中我们也说过，直接对完整序列建模比较困难，此时我们直接对$f(Y_i, X)$求解也会面临相同的困难，为了避免方案一的问题，我们不再使用一元模型，改为二元模型。<br><code>引入一阶马尔可夫假设，且其关联性是加性的。即当前输出标签只与前一个输出标签相关，其总得分是对所有得分求和。</code><br>此时的目标就转化为<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= P(y_1|X)P(y_2|y_1;X)…P(y_n|y_{n-1}|X)<br>= P(y_1|X)\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)} P(y_2|X) … \frac{P(y_{n-1}, y_n|X)}{P(y_{n-1}|X)P(y_n|X)} P(y_n|X)<br>$$<br>假设一中我们假设P是一个指数分布，所以此时我们引入两个函数e 和 t：e对$P(y_i|X)$建模, t 对$\frac{P(y_1,y_2|X)}{P(y_1|X)P(y_2|X)}$建模，即：<br>$$<br>P(y_i|X) = exp(e(y_i, X))<br>\frac{P(y_{i-1},y_1|X)}{P(y_{i-1}|X)P(y_i|X)} = P(y_i|X)exp(t(y_{i-i}, y_i; X))<br>$$</p>
-<p>此时的目标就化简为：<br>$$<br>P(y_1, y_2, …, y_n|X)<br>= \frac{exp(f(y_1, y_2,…y_n; X))}{Z(X)}<br>= \frac{1}{Z(X)} exp(e(y_i,X) + t(y_1, y_2; X) + e(y_2, X) + … + t(y_{n-1}, y_n; X) + e(y_n, X))<br>$$<br>此时我们只需要对每个标签和相邻标签打分，然后将所有打分求和，即可得到总得分，然后对目标进行求解。</p>
-<h1><span id="xian-xing-lian-crf">线性链CRF</span><a href="#xian-xing-lian-crf" class="header-anchor"></a></h1><p>虽然上面已经做了大量简化，但是求解时依然比较困难，主要是在求解t中，因为需要同时对输入X与标签$y_i$, $y_{i-1}$同时考虑，而在e中，<br>已经将输入与输出的关联进行了建模，此时我们引入线性链假设：假设t与输入X无关，则此时$ t(y_{i-1}, y_i;X) = t(y_{i-1}, y_i)$，那打分函数f简化为：<br>$$<br>f(y_1, y_2, …, y_n;X)<br>= e(y_1,X) + t(y_1, y_2) + e(y_2, X) + … + t(y_{n-1},y_n;X) + e(y_n,X)<br>$$<br>此时t就是一个待训练的参数矩阵，而e则可以通过RNNs来建模，概率分布也变为：</p>
-<p>$$<br>P(y_1, y_2,…,y_n|x_1, x_2,…,x_n)<br>= exp(e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e(y_{i+1}, X)])) \frac{1}{Z(X)}<br>$$</p>
-<h1><span id="qiu-jie">求解</span><a href="#qiu-jie" class="header-anchor"></a></h1><p>为了求解模型，我们用最大似然法， 即：</p>
-<p>$$loss = -logP(y_1, y_2, …, y_n|x_1, x_2, …, x_n)$$<br>将上式代入：</p>
-<p>$$loss = logZ(X) - (e(y_1, X) + \sum_{i=1}^{n-1}[t(y_i, y_{i+1}) + e( y_{i+1} , X)]) $$</p>
-<p>减号后面的项通过添加一个待训练的参数矩阵循环计算即可得到结果，难算的前面的归一化因子Z(X)。前面我们也说了，我们此时是以路径为单位，<br>则此时Z(X) 需要我们穷举所有可能的路径比对其打分求和，而此时的路径有 $k^n$条，是指数级的，直接算效率太低，几乎不可能。<br>在假设二中，我们引入了一阶马尔可夫假设，当前标签只与前一个标签有联系，因此我们可以递归的计算归一化因子，这使得原来是指数级的计算量降低为线性级别。<a href="https://spaces.ac.cn/archives/5542/comment-page-1#comments" target="_blank" rel="noopener">原文</a><br>（这点是求解归一化因子的关键，最初我在推导时一直卡在这点上）<br>具体的: 将计算到时刻t的归一化因子记为Zt，并将它安装标签分为k个部分，即：</p>
-<p>$$Zt = Zt^1 + Zt^2 + … + Zt^k$$<br>其中$Zt^i$表示以标签i为终点的所有路径的得分指数和，此时，我们写出递归公式：</p>
-<p>$$Z_{t+1}^1 = (Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X)$$</p>
-<p>$$…  $$</p>
-<p>$$Z_{t+1}^k = (Zt^1 T_{1k} + Zt^2 T{2k} + … + Zt^k T_{kk})E_{t+1}(k|X)$$</p>
-<p>其中T是矩阵t的各个元素取指数形式，即$T_{ij} = exp(t_{ij})$, E是e的指数形式，即$E_{ij} = exp(e_{ij})$, 而$e_{ij}$是指时刻i时RNNs对label j的打分。<br><img src="/2019/12/26/from-softmax-to-crf/logz.png" alt="logz"></p>
-<p>上式带有指数形式，我们取对数来简化计算过程。<br>$$<br>log(Z_{t+1}^1) = log((Zt^1 T_{11} + Zt^2 T_{21} + … + Zt^k T_{k1})E_{t+1}(1|X) )  \\<br>=log(exp(log(Zt^1) + t_{11}) + exp(log(Zt^2) + t_{21}) + … + exp(log(Zt^k) + t_{k1}) exp(e_{t+1}(1|X)))  \\<br>= log(exp(log(Zt^1) + t_{11} + e_{t+1}(1|X)) + exp(log(Zt^2) + t_{21} + e_{t+1}(1|X)) + … + exp(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))\\<br>= log(\sum_k(log(Zt^k) + t_{k1} + e_{t+1}(1|X)))<br>$$</p>
-<p>上面的过程比较曲折，对有些同学可能不太好理解，我们用一个简单的例子来帮助理解。<br>我们假设我们现在有一个输入$X=[w_0,w_1, w_2]$, 标签集合为$L=[l_1, l_2]$. RNNs对e完成了建模，即：</p>
-<table>
-<thead>
-<tr>
-<th>&nbsp;</th>
-<th>l1</th>
-<th>l2     </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>w0</td>
-<td>$e_{01}$</td>
-<td>$e_{02}$ </td>
-</tr>
-<tr>
-<td>w1</td>
-<td>$e_{11}$</td>
-<td>$e_{12}$ </td>
-</tr>
-<tr>
-<td>w2</td>
-<td>$e_{21}$</td>
-<td>$e_{22}$ </td>
-</tr>
-</tbody>
-</table>
-<p>其中$e_{ij}$代表第i个字是第j个标签的得分。<br>转移矩阵t:</p>
-<table>
-<thead>
-<tr>
-<th>&nbsp;</th>
-<th>l1</th>
-<th>l2 </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>l1</td>
-<td>t11</td>
-<td>t12  </td>
-</tr>
-<tr>
-<td>l2</td>
-<td>t21</td>
-<td>t22  </td>
-</tr>
-</tbody>
-</table>
-<p>其中$t_{ij}$代表第i个标签转换为第j个标签的得分。<br>接下来我们按从$w_0$到$w_2$的方向一步一步来进行计算。首先，我们引入两个变量: states, cur，其中:  </p>
-<ul>
-<li>states代表上一个时刻计算的最终结果，即对应$log(Z_t^i)$</li>
-<li><p>cur代表当前时刻各个标签的得分，即对应$e_t^i$</p>
-</li>
-<li><p><code>$w_0$:</code></p>
-</li>
-<li>states = None</li>
-<li>$cur = [e_{01}, e_{02}]$<br>此时:<br>$$log(Z) = exp(e_{01}) + exp(e_{02})$$</li>
-</ul>
-<ul>
-<li><code>$w_0$ –&gt; $w_1$:</code></li>
-<li>states = $[e_{01}, e_{02}]$</li>
-<li>cur = $[e_{11}, e{12}]$</li>
-</ul>
-<ol>
-<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="2">
-<li>扩展cur:<br>$<br>cur = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="3">
-<li>将cur, states 与转移矩阵t 求和:</li>
-</ol>
-<p>$<br>score = $$\begin{pmatrix}<br>e_{11}&amp;e_{12}\\<br>e_{11}&amp;e_{12}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>e_{01}&amp;e_{01}\\<br>e_{02}&amp;e_{02}\\<br>\end{pmatrix}$$<br>$+$ $$\begin{pmatrix}<br>t_{11}&amp;t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix}$$<br>$=$ $$\begin{pmatrix}<br>e_{01} + e_{11} + t_{11} &amp; e_{01} + e_{12} + t_{12}\\<br>e_{02} + e_{11} + t_{21} &amp; e_{02} + e_{12} + t_{22}\\<br>\end{pmatrix}$$<br>$</p>
-<ol start="4">
-<li>对score取指数形式然后求和，得到新的states:<br>$$<br>states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))]<br>$$<br>其中，states中的每个元素即对应着式中$logZ_{t}^i$, 此时的$log(Z)= \sum_k(exp(log(Z^k)))$:</li>
-</ol>
-<p>$$<br>log(Z_{0,1}) = log(exp(log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))) + exp(log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22})))) \\<br>= log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}) + exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))<br>$$</p>
-<p>当序列长度为2，标签有两个时，所有可能的标签序列为$(label_1-&gt;label_1, label_2-&gt;label_1, label_1-&gt;label_2, label_2-&gt;label_2)$,而对应的序列得分，即对应上式中的项，即：</p>
-<ul>
-<li>$ S_1: label_1-&gt;label_1:$<br>$ S_1 = e_{01} + e_{11} + t_{11} $</li>
-<li>$S_2: label_2-&gt;label_1:$<br>$ S_2 = e_{02} + e_{11} + t_{21}$</li>
-<li>$S_3 = label_1-&gt;label_2:$<br>$ S_3 = e_{01} + e_{12} + t_{12}$</li>
-<li>$S_4 = label_2-&gt;label_2:$<br>$ S_4 = e_{02} + e_{12} + t_{22}$</li>
-</ul>
-<ul>
-<li><code>$w_0$ -&gt; $w_1$ -&gt; $w_2$:</code></li>
-<li>$states = [log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21})), log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))] $</li>
-<li>$cur = [e_{21}, e_{22}]$</li>
-</ul>
-<p>与上面的做法一样，也分为4步：</p>
-<ol>
-<li>扩展states:<br>$<br>states = $$\begin{pmatrix}<br>log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))&amp;log(exp(e_{01} + e_{11} + t_{11}) + exp(e_{02} + e_{11} + t_{21}))\\<br>log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))&amp;log(exp(e_{01} + e_{12} + t_{12}) + exp(e_{02} + e_{12} + t_{22}))\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="2">
-<li>cur：<br>$<br>cur = $$\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix}$$<br>$</li>
-</ol>
-<ol start="3">
-<li>将states，cur与转义矩阵t求和：</li>
-</ol>
-<p>$$<br>scores = \begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) &amp; log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) \\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) &amp; log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>e_{21} &amp;e_{22}\\<br>e_{21} &amp;e_{22}\\<br>\end{pmatrix} \\+<br>\begin{pmatrix}<br>t_{11}&amp; t_{12}\\<br>t_{21}&amp;t_{22}\\<br>\end{pmatrix} \\=<br>\begin{pmatrix}<br>log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11} &amp;log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12}\\<br>log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21} &amp;log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22}\\<br>\end{pmatrix}<br>$$</p>
-<ol start="4">
-<li>对score取指数形式然后求和，得到新的states:</li>
-</ol>
-<p>$$ states = [\\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{21} + t_{11})+exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22})) + e_{21} + t_{21})), \\<br>log(exp(log(exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21})) + e_{22} + t_{12})+ exp(log(exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+x_{12}+t_{22})) + e_{22} + t_{22})))] \\<br> = [log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})),\\<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22}))]<br>$$</p>
-<p>现在，我们用states计算一下$(Z_2)$:</p>
-<p>$$<br>log(Z_{(0-&gt;1-&gt;2)}) = log(exp(states[0]) + exp(states[1])) \\<br>=log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{21} + t_{11}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{21}+t_{21})) \\+<br>log((exp(e_{01}+e_{11}+t_{11}) + exp(e_{02}+e_{11}+t_{21}))exp(e_{22} + t_{12}) + (exp(e_{01}+e_{12}+t_{12}) + exp(e_{02}+e_{12}+t_{22}))exp(e_{22}+t_{22})) \\<br>= log(exp(e_{01}+e_{11}+t_{11}+e_{21}+t_{11}) + exp(e_{02}+e_{11}+t_{21}+e_{21}+t_{11}) \\ +<br>exp(e_{01}+e_{12}+t_{12} +e_{21}+t_{21}) + exp(e_{02}+e_{12}+t_{22}+e_{21}+t_{21}) \\+<br>exp(e_{01}+e_{11}+t_{11} +e_{22}+t_{12}) + exp(e_{01}+e_{11}+t_{11}+e_{22}+t_{12}) \\+<br>exp(e_{01}+e_{12}+t_{12} +e_{22}+t_{22}) + exp(e_{01}+e_{12}+t_{12}+e_{22}+t_{21}))<br>$$</p>
-<p>上式也就是我们要求的最终结果$log(Z)$,其中指数内对应着所有路径的得分。<br>到此，上例中的整个归一化因子的计算过程也就完成了，而CRF中最难的部分也就解决了。</p>
-<h1><span id="demo">demo</span><a href="#demo" class="header-anchor"></a></h1><p>搞懂了理论部分，下面写一个demo来验证一下。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CRF</span><span class="params">(Layer)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mask_label=False, **kwargs)</span>:</span></span><br><span class="line">        self.mask_label = <span class="number">1</span> <span class="keyword">if</span> mask_label <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        super(CRF, self).__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">build</span><span class="params">(self, input_shape)</span>:</span></span><br><span class="line">        self.num_label = input_shape[<span class="number">-1</span>] - self.mask_label</span><br><span class="line">        self.trans = self.add_weight(name=<span class="string">'crf_trans'</span>,</span><br><span class="line">                                     shape=(self.num_label, self.num_label),</span><br><span class="line">                                     trainable=<span class="literal">True</span>,</span><br><span class="line">                                     initializer=<span class="string">'glorot_uniform'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">path_score</span><span class="params">(self, inputs, labels)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label), obtained from rnn(lstm, bilstm. etc.)</span></span><br><span class="line"><span class="string">        :param labels: one-hot, (batch_size, timesteps, num_label) , real target series</span></span><br><span class="line"><span class="string">        :return:  path score</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        point_score = K.sum(K.sum(inputs * labels, <span class="number">2</span>), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        label_pre = K.expand_dims(labels[:, :<span class="number">-1</span>], <span class="number">3</span>)</span><br><span class="line">        label_next = K.expand_dims(labels[:, <span class="number">1</span>:], <span class="number">2</span>)</span><br><span class="line">        label_trans = label_pre * label_next</span><br><span class="line">        trans = K.expand_dims(K.expand_dims(self.trans, <span class="number">0</span>), <span class="number">0</span>)</span><br><span class="line">        trans_score = K.sum(K.sum(label_trans * trans, [<span class="number">2</span>, <span class="number">3</span>]), <span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        <span class="keyword">return</span> point_score + trans_score</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">log_norm_pre</span><span class="params">(self, inputs, states)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        expand previous states and inputs, sum with trans</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, num_label), current word emission scores</span></span><br><span class="line"><span class="string">        :param states: (batch_size, num_label), all paths  score of previous word</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        states = K.expand_dims(states[<span class="number">0</span>], <span class="number">2</span>)</span><br><span class="line">        inputs = K.expand_dims(inputs, <span class="number">1</span>)</span><br><span class="line">        trans = K.expand_dims(self.trans, <span class="number">0</span>)</span><br><span class="line">        scores = states + trans + inputs</span><br><span class="line">        output = K.logsumexp(scores, <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> output, [output]</span><br><span class="line">        <span class="comment"># states = K.expand_dims(states[0], 2)  # (batch_size, output_dim, 1)</span></span><br><span class="line">        <span class="comment"># trans = K.expand_dims(self.trans, 0)  # (1, output_dim, output_dim)</span></span><br><span class="line">        <span class="comment"># output = K.logsumexp(states + trans, 1)  # (batch_size, output_dim)</span></span><br><span class="line">        <span class="comment"># return output + inputs, [output + inputs]</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">loss</span><span class="params">(self, y_true, y_pre)</span>:</span></span><br><span class="line">        <span class="string">'''</span></span><br><span class="line"><span class="string">        :param inputs: (batch_size, timesteps, num_label)</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line">        <span class="comment"># mask = 1 - y_true[:, 1: -1] if self.mask_label else None</span></span><br><span class="line">        <span class="comment"># # y_true, y_pred = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span></span><br><span class="line">        <span class="comment"># real_path_score = self.path_score(y_pre, y_true)</span></span><br><span class="line">        <span class="comment"># init_states = [y_pre[:, 0]]</span></span><br><span class="line">        <span class="comment"># log_norm, _ = K.rnn(self.log_norm_pre, initial_states=init_states, inputs=y_pre[:, 1:], mask=mask)  # log(Z)</span></span><br><span class="line">        <span class="comment"># log_norm_score = K.logsumexp(log_norm, 1, keepdims=True)</span></span><br><span class="line">        <span class="comment"># return log_norm_score - real_path_score</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, <span class="number">1</span>:, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pre = y_true[:, :, :self.num_label], y_pre[:, :, :self.num_label]</span><br><span class="line">        init_states = [y_pre[:, <span class="number">0</span>]]  <span class="comment"># 初始状态</span></span><br><span class="line">        log_norm, _, _ = K.rnn(self.log_norm_pre, y_pre[:, <span class="number">1</span>:], init_states, mask=mask)  <span class="comment"># 计算Z向量（对数）</span></span><br><span class="line">        log_norm = K.logsumexp(log_norm, <span class="number">1</span>, keepdims=<span class="literal">True</span>)  <span class="comment"># 计算Z（对数）</span></span><br><span class="line">        path_score = self.path_score(y_pre, y_true)  <span class="comment"># 计算分子（对数）</span></span><br><span class="line">        <span class="keyword">return</span> log_norm - path_score  <span class="comment"># 即log(分子/分母)</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call</span><span class="params">(self, inputs)</span>:</span>  <span class="comment"># crf 只是loss，不改变inputs</span></span><br><span class="line">        <span class="keyword">return</span> inputs</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">accuracy</span><span class="params">(self, y_true, y_pred)</span>:</span></span><br><span class="line">        mask = <span class="number">1</span> - y_true[:, :, <span class="number">-1</span>] <span class="keyword">if</span> self.mask_label <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">        y_true, y_pred = y_true[:, :, :self.num_label], y_pred[:, :, :self.num_label]</span><br><span class="line">        isequal = K.equal(K.argmax(y_true, <span class="number">2</span>), K.argmax(y_pred, <span class="number">2</span>))</span><br><span class="line">        isequal = K.cast(isequal, <span class="string">'float32'</span>)</span><br><span class="line">        <span class="keyword">if</span> mask == <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> K.mean(isequal)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">return</span> K.sum(isequal * mask) / K.sum(mask)</span><br></pre></td></tr></table></figure></p>
-<p>结果：<br><img src="/2019/12/26/from-softmax-to-crf/result.png" alt="result"></p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>初雪下的红果果</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>CRF</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>记一次npm环境问题</title>
-    <url>/2020/01/11/npm-environment/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#qi-yin">起因</a></li>
-<li><a href="#ddbug">Ddbug</a></li>
-<li><a href="#jie-lun">结论</a></li>
-<li><a href="#guan-yu-tou">关于头</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-
-<h1><span id="qi-yin">起因</span><a href="#qi-yin" class="header-anchor"></a></h1><p>上周写完博客，本地预览时，突然报错，看了一下是 sharp.js 的问题，以为是个小场面，然后就开始了一周的痛苦修环境经历，哭了😭</p>
-<h1><span id="ddbug">Ddbug</span><a href="#ddbug" class="header-anchor"></a></h1><ol>
-<li>首先根据提示，重新安装  <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">rm -rf node_modules/sharp</span><br><span class="line">npm i sharp</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>此时报错：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">c++: error: unrecognized command line option <span class="string">'-stdlib=libc++'</span></span><br><span class="line">make: *** [Release/.node] Error <span class="number">1</span></span><br><span class="line">gyp ERR! build error</span><br><span class="line">gyp ERR! stack Error: `make` failed <span class="keyword">with</span> exit code: <span class="number">2</span></span><br><span class="line">gyp ERR! stack     at ChildProcess.onExit (/usr/local/Cellar/node@<span class="number">8</span>/<span class="number">8.16</span><span class="number">.2</span>/lib/node_modules/npm/node_modules/node-gyp/lib/build.js:<span class="number">262</span>:<span class="number">23</span>)</span><br><span class="line">gyp ERR! stack     at emitTwo (events.js:<span class="number">126</span>:<span class="number">13</span>)</span><br><span class="line">gyp ERR! stack     at ChildProcess.emit (events.js:<span class="number">214</span>:<span class="number">7</span>)</span><br><span class="line">gyp ERR! stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:<span class="number">198</span>:<span class="number">12</span>)</span><br></pre></td></tr></table></figure></p>
-<p>这个问题的本质是当前的包需要通过源码编译，而当前用的是gcc（macOS），而gcc不支持当前命令，之前装环境没有遇到过这个问题，可能是我最近跟新了gcc？<br>查了一下解决这个问题最简单的方式是指定c++:<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">CXX=clang++ npm i xxx</span><br></pre></td></tr></table></figure></p>
-<p>这次确实装成功了，走起！<br>此时又报新错：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">can <span class="keyword">not</span> find sharp xxx</span><br><span class="line">rm node_modules/sharp <span class="keyword">and</span> rebuild</span><br></pre></td></tr></table></figure></p>
-<p>阿嘞？装上了又找不到？why？<br>又尝试了全局安装，依然找不到，此时，有点上头，我干脆把node_modules全部删掉，重新装吧。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">rm -rf node_modules</span><br><span class="line">CXX=clang++ npm i</span><br></pre></td></tr></table></figure></p>
-<p>阿嘞？这次装也失败了，错误大致原因是node-gyp rebuild nodejieba失败。<br>开始以为是node-gyp的问题，后来查了一下，node-gyp是用来帮助丛源码编译的工具，所以本质上不是他的问题，还是别的问题。<br>又查了一下nodejieba, 有人说是在lunr.js中用的nodejieba在node高版本中会存在编译失败，建议用 node8.x ,python版本最好是2.7，那我上次没失败？先将node降级到node8, python切到2.7。<br>再装一次，依然失败。但是错误信息不够定位，查一下怎么看更全的日志。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">CXX=clang++ npm i --verbose</span><br><span class="line">```  </span><br><span class="line">发现两条重要信息，大概是无法找到lib下某个库，可能是本级的环境出了问题，整理一下吧。</span><br><span class="line"> ```python</span><br><span class="line">brew update</span><br><span class="line">brew cleanup</span><br><span class="line">brew doctor</span><br><span class="line">```  </span><br><span class="line">环境的一堆issue解决掉（主要是link无效），然后把之前无法找到的两个lib重新装了一次（很慢）。</span><br><span class="line">此时还是同样问题，这次又查看了一下当前环境问题，两个包没link，一个是python(其实是python3，之前link的python2)， 一个是swig，后来一想，可能是swig这个工具在源码编译是缺失导致的，</span><br><span class="line">```python</span><br><span class="line">brew link swig</span><br></pre></td></tr></table></figure></p>
-<p>此时在装，搞定！走起，又报新错：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">FATAL Something<span class="string">'s wrong. Maybe you can find the solution here: https://hexo.io/docs/troubleshooting.html</span></span><br><span class="line"><span class="string">Error: spawn /Users/xuming/Project/blog/node_modules/optipng-bin/vendor/optipng ENOENT</span></span><br><span class="line"><span class="string">    at Process.ChildProcess._handle.onexit (internal/child_process.js:190:19)</span></span><br><span class="line"><span class="string">    at onErrorNT (internal/child_process.js:362:16)</span></span><br><span class="line"><span class="string">    at _combinedTickCallback (internal/process/next_tick.js:139:11)</span></span><br><span class="line"><span class="string">    at process._tickCallback (internal/process/next_tick.js:181:9)</span></span><br></pre></td></tr></table></figure></p>
-<p>这是缺module，但是我是npm i，为什么还缺？此时可能只是当前node_modules的问题，为了验证本机其他环境已经ok了，新建了一个博客，验证后发现本机确实OK了。<br>额，那就缺什么装什么吧。<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">npm i optipng-bin</span><br></pre></td></tr></table></figure></p>
-<p>走起！一切正常！此时我的心情就好比火箭发射成功一样。折磨了一周的环境问题，终于搞定了，中间还有许多其他方向的试探，但都记不得了。- -！</p>
-<h1><span id="jie-lun">结论</span><a href="#jie-lun" class="header-anchor"></a></h1><ol>
-<li>npm 失败后，可以加 –verbose 参数查看详细日志，定位问题。</li>
-<li>编译源码可能你还需要装xcode-select --install</li>
-<li>对于 Error: spawn .../node_modules/xxx/vendor/.. ENOENT,单独安装一下对应缺失module即可。</li>
-<li>node-gyp 和 libvips可能也会影响，建议重装一次</li>
-<li>MacOS中，可能会gcc与clang并存，加上系统升级，可能导致相应版本不兼容问题。指定clang ：<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">CXX=clang++ npm i</span><br></pre></td></tr></table></figure>
-6. 本机环境问题，可以通过<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">brew doctor</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h1><span id="guan-yu-tou">关于头</span><a href="#guan-yu-tou" class="header-anchor"></a></h1><p>雪中奥森</p>
-]]></content>
-      <categories>
-        <category>Life</category>
-      </categories>
-      <tags>
-        <tag>npm</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>装机指北</title>
-    <url>/2020/05/05/make-a-computer/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#ying-jian-pian">硬件篇</a><ul>
-<li><a href="#xian-qia">显卡</a></li>
-<li><a href="#cpu">CPU</a></li>
-<li><a href="#zhu-ban">主板</a></li>
-<li><a href="#san-re">散热</a></li>
-<li><a href="#cun-chu">存储</a></li>
-<li><a href="#dian-yuan-yu-ji-xiang">电源与机箱</a></li>
-</ul>
-</li>
-<li><a href="#an-zhuang">安装</a></li>
-<li><a href="#ruan-jian-an-zhuang">软件安装</a><ul>
-<li><a href="#xi-tong-an-zhuang">系统安装</a></li>
-<li><a href="#an-zhuang-nvidia-qu-dong">安装Nvidia驱动</a></li>
-<li><a href="#cuda-de-an-zhuang-yu-xie-zai">CUDA的安装与卸载</a><ul>
-<li><a href="#xie-zai-cuda">卸载cuda</a></li>
-<li><a href="#an-zhuang-cuda">安装cuda</a></li>
-</ul>
-</li>
-<li><a href="#an-zhuang-cudnn">安装cudnn</a></li>
-<li><a href="#python-huan-jing">Python环境</a><ul>
-<li><a href="#conda-pei-zhi">conda配置</a></li>
-<li><a href="#an-zhuang-jupyter">安装jupyter</a></li>
-</ul>
-</li>
-<li><a href="#an-zhuang-tensorflow-gpu">安装tensorflow-gpu</a></li>
-</ul>
-</li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>  今年回来，第一件事就是要打造一个自己的实验环境，而这也是我第一次自己从硬件开始，所以前前后后差不多折腾了大半个月，总算是搞定了。为了纪念这次从0开始打造自己的深度学习实验环境，所以写了这篇指北。</p>
-<h1><span id="ying-jian-pian">硬件篇</span><a href="#ying-jian-pian" class="header-anchor"></a></h1><p>  关于硬件，最主要的就是显卡、CPU、主板和散热了，接下来一个一个介绍经验。</p>
-<h2><span id="xian-qia">显卡</span><a href="#xian-qia" class="header-anchor"></a></h2><p>  显卡的选择主要参考两个维度：1.显存大小；2.浮点计算能力。<br>  显卡主要分AMD与Nvidia系列。因为Nvidia有CUDA加持，加速计算，自然是Nvidia系列了，Nvidia显卡目前针对PC有三个系列：Quadro、GeForce和Tesla。其中Quadro系列是专业绘图，GeoForce是专业游戏显卡（可绘图可计算），而Tesla是专业计算卡。综合考虑价格与 state-of-the-art 的模型对硬件的最低要求，最终选择了2080Ti。关于GPU的选型，可以参考<a href="https://zhuanlan.zhihu.com/p/61411536" target="_blank" rel="noopener">深度学习GPU对比</a><br>  确定了型号，就是出品厂家选择了，主要区别就是公版非公版。公版就是Nvidia自己设计自己出的，而非公就是第三方厂商出的，包括evga，技嘉，微星等等。有一篇2080ti进行深度学习时的显卡性能测评的文章，找不到地址了，结论是evga &gt; Nvidia &gt; others 。evga与Nvidia的主要区别有两个：1.价格上evga略高 10% 左右；2. Nvidia 采用双风扇风冷，evga 采用单风扇风冷-水冷混合。最终选择了公版。</p>
-<h2><span id="cpu">CPU</span><a href="#cpu" class="header-anchor"></a></h2><p>  CPU主要有两个系列：Intel 和 AMD 。也是因为主要用来做计算，所以肯定首选 AMD。目前ADM系列顶配是 3990X，但是价格大概在三万左右，太感人了。第二的是 3700X ，京东上一千三上下，那就是他了。</p>
-<h2><span id="zhu-ban">主板</span><a href="#zhu-ban" class="header-anchor"></a></h2><p>  CPU确定了，主板型号基本就定了。 主要参考如下图：<br>  <img src="/2020/05/05/make-a-computer/board.png" alt="cpu-主板对应型号参考"><br>  看了一些测评，最终选择了微星<a href="https://item.jd.com/8259910.html" target="_blank" rel="noopener">B450</a></p>
-<h2><span id="san-re">散热</span><a href="#san-re" class="header-anchor"></a></h2><p>  散热目前两个方式：风冷和水冷。两者的区别主要参考<a href="https://www.zhihu.com/question/57695465/answer/440467918" target="_blank" rel="noopener">风冷与水冷区别</a><br>  水冷在散热上还是要强一些的（240以上），所以打算试水一款水冷。主要推荐两款：<a href="https://item.m.jd.com/product/100003859323.html?wxa_abtest=o&amp;utm_user=plusmember&amp;ad_od=share&amp;utm_source=androidapp&amp;utm_medium=appshare&amp;utm_campaign=t_335139774&amp;utm_term=Wxfriends&amp;from=singlemessage&amp;isappinstalled=0" target="_blank" rel="noopener">乔思伯光影240</a> <a href="https://item.m.jd.com/product/6454809.html?wxa_abtest=o&amp;utm_user=plusmember&amp;ad_od=share&amp;utm_source=androidapp&amp;utm_medium=appshare&amp;utm_campaign=t_335139774&amp;utm_term=Wxfriends&amp;from=singlemessage&amp;isappinstalled=0" target="_blank" rel="noopener">九州风神水元素240T</a>。最后选择了九州风神水元素，因为买那天乔思伯涨价了～</p>
-<h2><span id="cun-chu">存储</span><a href="#cun-chu" class="header-anchor"></a></h2><p>  存储上打算采用 32G + 1T ssd。内存自然上<a href="https://item.jd.com/8391349.html" target="_blank" rel="noopener">金士顿骇客神条</a>, ssd主要参考性价比，最终选择<a href="https://item.jd.com/100002580230.html" target="_blank" rel="noopener">三星1T SSD</a></p>
-<h2><span id="dian-yuan-yu-ji-xiang">电源与机箱</span><a href="#dian-yuan-yu-ji-xiang" class="header-anchor"></a></h2><p>  由于目前暂时只插一张显卡，所以电源在 600W 以上即可。选一个品牌比较好的，那就是<a href="https://item.jd.com/6828141.html" target="_blank" rel="noopener">安钛克750</a> 了<br>  至于机箱，主要参考能不能够合理安放显卡、主板以及后续可能的散热。对于我当前的配置，只要是中塔的基本都够插显卡。买个安静低调的，那就他了：<a href="https://item.jd.com/100004999668.html" target="_blank" rel="noopener">爱国者M2</a><br>  最终的配置清单如下：<br>  <img src="/2020/05/05/make-a-computer/list.png" alt="list"></p>
-<h1><span id="an-zhuang">安装</span><a href="#an-zhuang" class="header-anchor"></a></h1><p>  安装前，强烈建议多看几期安装教程视频，我主要看的是 B站 的<a href="https://www.bilibili.com/video/BV1vx41187cm" target="_blank" rel="noopener">跟装机猿搞装机</a> 系列。最困难的可能是水冷散热的安装了。由于平台不同，安装方式不同，推荐看对应水冷厂商给的安装视频。我主要参考<a href="https://www.bilibili.com/video/BV1EE411h7R1" target="_blank" rel="noopener">水元素安装教程</a><br>  安装过程大致总结一下：</p>
-<ol>
-<li>拿出主板和CPU，按照说明书将CPU装到主板上。</li>
-<li>将水冷拿出，拿出硅脂，涂抹在CPU上，将冷头上的塑料膜撕掉，安装好支撑后，将水冷头贴在CPU上，安装固定。</li>
-<li>拆开机箱侧板，将主板装上，并将水冷的风扇固定在机箱上。注意：风扇上没有挡板的是出风口，一般原则是从机箱内往外吹，注意风向。</li>
-<li>插入内存条，固定固态硬盘</li>
-<li>将线按说明一个一个插上</li>
-<li>寻找机箱上显卡位置，可能需要扣掉挡板铁片。将显卡插入主板，同时固定在机箱上</li>
-<li>放入电源，插好对应线<br>主要注意的主要是：1、水冷头上的膜一定要撕去，否则CPU上的热不能很好的传导出来。2、装之前大概看一下机箱各个位置，有些时候因为安装顺序会导致没地方下手，需要卸了重组。</li>
-</ol>
-<h1><span id="ruan-jian-an-zhuang">软件安装</span><a href="#ruan-jian-an-zhuang" class="header-anchor"></a></h1><h2><span id="xi-tong-an-zhuang">系统安装</span><a href="#xi-tong-an-zhuang" class="header-anchor"></a></h2><p>  系统选Linux的稳定版，所以装了CentOS 7。<br>  1.首先下载centos的镜像文件，外网可能会慢，选择<a href="http://mirrors.aliyun.com/centos/7/isos/x86_64/" target="_blank" rel="noopener">阿里源</a><br>  2.下载相应的刻录工具，插入u盘，将镜像刻录进u盘（刻录时会先格式化u盘，如果是windows系统，u盘默认是FAT32,这种格式下是没法放大于4G的单文件，所以需要进行格式转换：cmd下执行 convert e: /fs:ntfs)<br>  3.插入u盘，开机，引导开机进入u盘（大部分是自动进来），选择 test &amp; install<br>  4.一般安装时，对应的命令行中的目录是错误的，执行会报错：<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ERROR，could not insert <span class="string">'floppy'</span></span><br></pre></td></tr></table></figure></p>
-<p>  而无法进入安装界面<br>  此时需要查找u盘对应名字，修改命令：<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">cd</span>:/dev &amp; ls</span><br></pre></td></tr></table></figure></p>
-<p>  找到一个 <code>s##数字 </code>的串，我的是sdb4 ,然后重启，进入后先按 e 进入编辑模式，修改命令行<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">linuxefi/images/pxeboot/vmlinuz inst.stage2=hd:LABEL=CentOS\x207\x20x86_64 xdriver=vesa nomodeset quiet</span><br><span class="line">linuxefi/images/pxeboot/vmlinuz inst.stage2=hd:/dev/sdb4 xdriver=vesa nomodeset quiet</span><br></pre></td></tr></table></figure></p>
-<p>  由于我的显卡是2080Ti,系统自带的nouveau驱动不匹配，需要禁用暂时，所以在后面加上 <code> nouveau.modeset=0 </code><br>  最终修改后完整的命令行为：<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">linuxefi/images/pxeboot/vmlinuz inst.stage2=hd:/dev/sdb4 xdriver=vesa nomodeset quiet nouveau.modeset=0</span><br></pre></td></tr></table></figure></p>
-<p>  此时保存后退出，选择test &amp; install 即可进入安装界面<br>  进入后安装，安装时，注意软件选择中选择带网络的，剩下的就是按提示一步一步来即可。</p>
-<h2><span id="an-zhuang-nvidia-qu-dong">安装Nvidia驱动</span><a href="#an-zhuang-nvidia-qu-dong" class="header-anchor"></a></h2><p>  1.检查显卡是否正常<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ lspci | grep -i nvidia</span><br></pre></td></tr></table></figure></p>
-<p>  2.检查驱动版本<br>  添加EIRepo源<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org</span><br><span class="line">$ rpm -Uvh http://www.elrepo.org/elrepo-release-7.6-5.el7.elrepo.noarch.rpm</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">3.安装显卡驱动检查包</span><br><span class="line">```bash</span><br><span class="line">$ yum install nvidia-detect</span><br></pre></td></tr></table></figure></p>
-<p>  检查驱动版本<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ nvidia-detect -v</span><br></pre></td></tr></table></figure></p>
-<p>  此时会得到对应的版本信息，注意那个数字<br>  4.安装编译环境<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ yum install kernel-devel-$(uname -r) kernel-headers-$(uname -r) dkms</span><br><span class="line">$ yum -y update //注意这是升级系统</span><br><span class="line">$ yum -y install gcc kernel-devel kernel-headers dkms</span><br></pre></td></tr></table></figure></p>
-<p>  5.禁用vouveau<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ vim /etc/modprobe.d/blacklist-nouveau.conf</span><br><span class="line">    blacklist nouveau</span><br><span class="line">    options nouveau modeset=0</span><br></pre></td></tr></table></figure></p>
-<p>  6.重新建立initramfs image文件<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r).img.bak</span><br><span class="line">$ dracut /boot/initramfs-$(uname -r).img $(uname -r)</span><br></pre></td></tr></table></figure></p>
-<p>  7.reboot</p>
-<h2><span id="cuda-de-an-zhuang-yu-xie-zai">CUDA的安装与卸载</span><a href="#cuda-de-an-zhuang-yu-xie-zai" class="header-anchor"></a></h2><h3><span id="xie-zai-cuda">卸载cuda</span><a href="#xie-zai-cuda" class="header-anchor"></a></h3>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sudo yum remove <span class="string">"*cublas*"</span> <span class="string">"cuda*"</span></span><br></pre></td></tr></table></figure>
-<p>参考：<a href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#removing-cuda-tk-and-driver" target="_blank" rel="noopener">removing-cuda</a></p>
-<h3><span id="an-zhuang-cuda">安装cuda</span><a href="#an-zhuang-cuda" class="header-anchor"></a></h3>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget path/to/your-version/install.rpm</span><br><span class="line">sudo rpm -i cuda-repo-rhel7-10-1-local-10.1.105-418.39-1.0-1.x86_64.rpm</span><br><span class="line">sudo yum clean all</span><br><span class="line">sudo yum install cuda</span><br></pre></td></tr></table></figure>
-<p>参考：<a href="https://developer.nvidia.com/cuda-10.1-download-archive-base?target_os=Linux&amp;target_arch=x86_64&amp;target_distro=CentOS&amp;target_version=7&amp;target_type=rpmlocal" target="_blank" rel="noopener">cuda-download</a><br>注意：一定不要通过浏览器去下载，因为会非常非常非常慢，但是wget大概几分钟就搞定了</p>
-<h2><span id="an-zhuang-cudnn">安装cudnn</span><a href="#an-zhuang-cudnn" class="header-anchor"></a></h2><p>  1.下载相应的包 libcudnn*.rpm</p>
-<ol start="2">
-<li><p>安装包</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rpm -ivh libcudnn7-*.x86_64.rpm</span><br><span class="line">rpm -ivh libcudnn7-devel-*.x86_64.rpm</span><br><span class="line">rpm -ivh libcudnn7-doc-*.x86_64.rpm</span><br></pre></td></tr></table></figure>
-<p>3.验证</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span>  <span class="variable">$HOME</span>/cudnn_samples_v7/mnistCUDNN</span><br><span class="line"><span class="variable">$make</span> clean &amp;&amp; make</span><br><span class="line">$ ./mnistCUDNN</span><br></pre></td></tr></table></figure>
-<p>if: Test passed! 则验证通过<br>参考：<a href="https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html#install-linux" target="_blank" rel="noopener">cudnn-install</a></p>
-<h2><span id="python-huan-jing">Python环境</span><a href="#python-huan-jing" class="header-anchor"></a></h2><p>python环境采用Anaconda + jupyter notebook</p>
-<h3><span id="conda-pei-zhi">conda配置</span><a href="#conda-pei-zhi" class="header-anchor"></a></h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">conda create -n py3 python=3</span><br><span class="line">activate py3</span><br><span class="line">conda install ipykernel -n py3</span><br><span class="line">python -m ipykernel install --user --name py3 --display-name <span class="string">'py3'</span></span><br></pre></td></tr></table></figure>
-<p>删除环境</p>
-<figure class="highlight bash"><figcaption><span>jupyter kernelspec remove py3 ```</span></figcaption><table><tr><td class="code"><pre><span class="line">  pip 安装 与修改源</span><br><span class="line">```bash </span><br><span class="line">  conda install pip -n py3</span><br><span class="line">  vim ~/.pip/pip.conf</span><br><span class="line"></span><br><span class="line">  [global]</span><br><span class="line">  index-url=https://pypi.tuna.tsinghua.edu.cn/simple</span><br></pre></td></tr></table></figure>
-<h3><span id="an-zhuang-jupyter">安装jupyter</span><a href="#an-zhuang-jupyter" class="header-anchor"></a></h3><figure class="highlight bash"><figcaption><span>pip install jupyter```</span></figcaption><table><tr><td class="code"><pre><span class="line">  jupyter 作为后台服务器</span><br><span class="line">  1. 添加密码</span><br><span class="line">```bash </span><br><span class="line">  ipython</span><br><span class="line">  from jupyter.auth import passwd</span><br><span class="line">  passwd()</span><br></pre></td></tr></table></figure>
-<p>此时会让你输入两次密码，输入后得到一串hash码，保存下来， 回到bash, 添加配置文件</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ jupyter notebook --generate-config</span><br><span class="line">$ vim ~/.jupyter/jupyter-notebook-config.py</span><br><span class="line"></span><br><span class="line"><span class="comment"># edit</span></span><br><span class="line"></span><br><span class="line">c.NotebookApp.ip=<span class="string">'*'</span>                                  <span class="comment"># * 代表所有iP都能访问 ，也可以指定ip</span></span><br><span class="line">c.NotebookApp.password = u<span class="string">'sha1:ce...'</span>       <span class="comment"># 刚才复制的那个密文</span></span><br><span class="line">c.NotebookApp.open_browser = False       <span class="comment"># 禁止自动打开浏览器</span></span><br><span class="line">c.NotebookApp.port =8888                         <span class="comment">#指定一个端口</span></span><br><span class="line">   </span><br><span class="line">c.NotebookApp.notebook_dir = <span class="string">'/home/user/user1'</span>  <span class="comment">#指定工作空间</span></span><br><span class="line">c.PAMAuthenticator.encoding = <span class="string">'utf8'</span>         <span class="comment">#指定utf-8编码，解决读取中文路径或者文件乱码问题</span></span><br></pre></td></tr></table></figure>
-<p>后台运行</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ nohup jupyter notebook --allow-root &gt; jupyter.log 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p>  关闭后台运行<br>  <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"> <span class="comment"># ps -axu | grep jupyter</span></span><br><span class="line"><span class="comment"># kill -9 pid</span></span><br></pre></td></tr></table></figure></p>
-<h2><span id="an-zhuang-tensorflow-gpu">安装tensorflow-gpu</span><a href="#an-zhuang-tensorflow-gpu" class="header-anchor"></a></h2><p>  tensorflow-gpu对cuda有版本要求，所以在安装cuda前需要提前查看，确定自己版本。参考官网<a href="https://www.tensorflow.org/install/source" target="_blank" rel="noopener">install</a><br>  <img src="/2020/05/05/make-a-computer/gpu.png" alt="tensorflow-gpu vs cuda"><br>  还记得cuda安装时，给出的卸载方法吗？就是因为装tensorflow-gpu后发现gpu不带动的，后来才发现是cuda版本太高了～<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ pip install tensorflow-gpu==2.1</span><br></pre></td></tr></table></figure></p>
-<p>  验证<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ ipython</span><br><span class="line">  import tensorflow as tf</span><br><span class="line">  tf.config.list_physical_devices(<span class="string">'GPU'</span>)</span><br></pre></td></tr></table></figure></p>
-<p>  没有报错则正常</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>  以上就是从零开始搭建搭建一套自己的深度学习实验平台的个人经验，整个过程从硬件到最终的软件适配都走了很多坑，希望能给你一些借鉴。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>  部分硬件盒子</p>
-]]></content>
-      <categories>
-        <category>Life</category>
-      </categories>
-      <tags>
-        <tag>tensorflow-gpu</tag>
-        <tag>装机</tag>
-        <tag>CUDA</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>optimizer of bert</title>
     <url>/2020/08/01/optimizer-in-bert/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -1598,6 +1598,42 @@
         <tag>BERT</tag>
         <tag>Distillation</tag>
         <tag>speed-up</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>模型增强（2）&amp;#58; 从label下手</title>
+    <url>/2020/09/13/classification-label-augment/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#gou-zao-xin-label">构造新label</a><ul>
+<li><a href="#zi-jian-du">自监督</a></li>
+<li><a href="#xiang-si-xing">相似性</a></li>
+</ul>
+</li>
+<li><a href="#shi-yan-jie-guo">实验结果</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>上篇<a href="https://xv44586.github.io/2020/08/31/bert-01/">Knowledge Distillation (2): distilling knowledge of bert</a>中我们提到，模型压缩时一个很重要的知识是soft labels，<br>并且提出了一种简单的方式：自蒸馏（self-distillation），而从label 的角度来看，可以看作是一种label augmentation，即构造了一个新的label，为模型新增了一个任务，通过新任务的学习，来提高模型对原来任务的性能。本文就label augmentation 继续脑洞。</p>
+<h1><span id="gou-zao-xin-label">构造新label</span><a href="#gou-zao-xin-label" class="header-anchor"></a></h1><p>构造新label，其实本质上是构造一个与当前任务相关的新的任务，而对应的label则是通过当前样本通过某种方式获得，获得的label至少要比随机好，否则只会帮倒忙。</p>
+<h2><span id="zi-jian-du">自监督</span><a href="#zi-jian-du" class="header-anchor"></a></h2><p>构造新label，我们可以借鉴自监督的方式，如Mask Language Model，AutoRegressive，而BERT中已使用来MLM，UniLM中也告诉我们增加Seq2Seq的AR 任务对NLU任务提高不显著，不过今年的论文<a href="http://arxiv.org/abs/2004.10964" target="_blank" rel="noopener">Don’t Stop Pretraining: Adapt Language Models to Domains and Tasks</a> 实验证明了进一步预训练是能进一步提升下游任务的性能。而当前任务是文本分类，MLM也许不是很合适，所以Seq2Seq 的方式可以尝试。<br>具体的，我们让模型学习目标类别的同时，希望模型能同时生成样本的描述字段（或者人为给定的某种相关性短语），即利用类别对应描述字段构造一个seq2seq任务。</p>
+<h2><span id="xiang-si-xing">相似性</span><a href="#xiang-si-xing" class="header-anchor"></a></h2><p>对于同一个类别的样本，他们必然有某种相似性，至少比与其他类别的样本更相似。而何如构造样本呢？<br>一种简单的方式是对每个样本都从类当中抽取一个样本与他组成一对，然后让每个<code>i</code>样本与<code>i+1</code>样本相似。这种方式由于每次样本都是shuffle 的，只要让batch size 小于label number，一个batch 内同时出现多个同一类别的样本概率就会很小。<br>既然在构造seq2seq任务时，我们使用来label对应的描述，此时我们也可以继续尝试使用：每个样本构造一个新的样本，新样本由label对应描述与label id组成。</p>
+<h1><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h1><p>两组实验结果如下：</p>
+<p>$$<br>\begin{array}{c|c|c}<br>\hline \\<br>\text{seq2seq} &amp; \text{similarity} \\<br>\hline \\<br>59.91\% &amp; 56.9\%<br>\end{array}<br>$$</p>
+<p>可以看到，对于构造seq2seq 任务，其结果与直接fine-tuning 结果基本一致，这也符合预期。而构造相似性任务，其结果直接fine-tuning 结果相比反而更差了。原因可能是样本不均衡，所以同一batch 内有较高概率出现同一类别的样本，同时通过让样本与同一样本相似来间接相似，这种方式可能有些曲折了，不过最根本的原因应该还是batch 内同一类别样本的出现干扰了学习。<br>具体实验代码可以查阅<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_auxiliary_seq2seq_task.py" target="_blank" rel="noopener">classification_ifytek_auxiliary_seq2seq_task</a> 和<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_with_similarity.py" target="_blank" rel="noopener">classification_ifytek_with_similarity</a></p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文只是由于之前实验想到的尝试对label 做增强来实现模型增强的尝试，最后两组实验都没取得什么好的结果。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于翠湖湿地</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>Classification</tag>
       </tags>
   </entry>
   <entry>
@@ -1762,42 +1798,6 @@
       <tags>
         <tag>BERT</tag>
         <tag>Distillation</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>模型增强（2）&amp;#58; 从label下手</title>
-    <url>/2020/09/13/classification-label-augment/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#gou-zao-xin-label">构造新label</a><ul>
-<li><a href="#zi-jian-du">自监督</a></li>
-<li><a href="#xiang-si-xing">相似性</a></li>
-</ul>
-</li>
-<li><a href="#shi-yan-jie-guo">实验结果</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>上篇<a href="https://xv44586.github.io/2020/08/31/bert-01/">Knowledge Distillation (2): distilling knowledge of bert</a>中我们提到，模型压缩时一个很重要的知识是soft labels，<br>并且提出了一种简单的方式：自蒸馏（self-distillation），而从label 的角度来看，可以看作是一种label augmentation，即构造了一个新的label，为模型新增了一个任务，通过新任务的学习，来提高模型对原来任务的性能。本文就label augmentation 继续脑洞。</p>
-<h1><span id="gou-zao-xin-label">构造新label</span><a href="#gou-zao-xin-label" class="header-anchor"></a></h1><p>构造新label，其实本质上是构造一个与当前任务相关的新的任务，而对应的label则是通过当前样本通过某种方式获得，获得的label至少要比随机好，否则只会帮倒忙。</p>
-<h2><span id="zi-jian-du">自监督</span><a href="#zi-jian-du" class="header-anchor"></a></h2><p>构造新label，我们可以借鉴自监督的方式，如Mask Language Model，AutoRegressive，而BERT中已使用来MLM，UniLM中也告诉我们增加Seq2Seq的AR 任务对NLU任务提高不显著，不过今年的论文<a href="http://arxiv.org/abs/2004.10964" target="_blank" rel="noopener">Don’t Stop Pretraining: Adapt Language Models to Domains and Tasks</a> 实验证明了进一步预训练是能进一步提升下游任务的性能。而当前任务是文本分类，MLM也许不是很合适，所以Seq2Seq 的方式可以尝试。<br>具体的，我们让模型学习目标类别的同时，希望模型能同时生成样本的描述字段（或者人为给定的某种相关性短语），即利用类别对应描述字段构造一个seq2seq任务。</p>
-<h2><span id="xiang-si-xing">相似性</span><a href="#xiang-si-xing" class="header-anchor"></a></h2><p>对于同一个类别的样本，他们必然有某种相似性，至少比与其他类别的样本更相似。而何如构造样本呢？<br>一种简单的方式是对每个样本都从类当中抽取一个样本与他组成一对，然后让每个<code>i</code>样本与<code>i+1</code>样本相似。这种方式由于每次样本都是shuffle 的，只要让batch size 小于label number，一个batch 内同时出现多个同一类别的样本概率就会很小。<br>既然在构造seq2seq任务时，我们使用来label对应的描述，此时我们也可以继续尝试使用：每个样本构造一个新的样本，新样本由label对应描述与label id组成。</p>
-<h1><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h1><p>两组实验结果如下：</p>
-<p>$$<br>\begin{array}{c|c|c}<br>\hline \\<br>\text{seq2seq} &amp; \text{similarity} \\<br>\hline \\<br>59.91\% &amp; 56.9\%<br>\end{array}<br>$$</p>
-<p>可以看到，对于构造seq2seq 任务，其结果与直接fine-tuning 结果基本一致，这也符合预期。而构造相似性任务，其结果直接fine-tuning 结果相比反而更差了。原因可能是样本不均衡，所以同一batch 内有较高概率出现同一类别的样本，同时通过让样本与同一样本相似来间接相似，这种方式可能有些曲折了，不过最根本的原因应该还是batch 内同一类别样本的出现干扰了学习。<br>具体实验代码可以查阅<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_auxiliary_seq2seq_task.py" target="_blank" rel="noopener">classification_ifytek_auxiliary_seq2seq_task</a> 和<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_with_similarity.py" target="_blank" rel="noopener">classification_ifytek_with_similarity</a></p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文只是由于之前实验想到的尝试对label 做增强来实现模型增强的尝试，最后两组实验都没取得什么好的结果。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于翠湖湿地</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>Classification</tag>
       </tags>
   </entry>
   <entry>
@@ -1999,55 +1999,6 @@
       </tags>
   </entry>
   <entry>
-    <title>PET-文本分类的又一种妙解</title>
-    <url>/2020/10/25/pet/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#classification-to-nlg">Classification to NLG</a></li>
-<li><a href="#mlm">MLM</a></li>
-<li><a href="#ren-wu-zhuan-huan">任务转换</a></li>
-<li><a href="#pattern-exploiting-training">Pattern-Exploiting Training</a></li>
-<li><a href="#yu-nlg-chai-yi">与NLG差异</a></li>
-<li><a href="#shi-yan">实验</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-<p></div><br>之前的一篇<a href="https://xv44586.github.io/2020/09/13/classification-label-augment/">《模型增强-从label下手》</a>中，我们提到了通过转换label，将分类转换为NLG的方法，而由于性能没有得到增加，所以就没有继续往下做。今天看到两篇文章，思路略微相似，也让我眼前一亮，发现原来我与顶会思路这么近（误），所以总结对比一下。</p>
-<h1><span id="classification-to-nlg">Classification to NLG</span><a href="#classification-to-nlg" class="header-anchor"></a></h1><p>对于分类任务，我们可以将其转换为一个生成任务。比如此时我们有一个样本：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"context：'「天天特价房」华庭仁和国际 3室2厅2卫仅售65万', label: '房产', label_id: 0"</span></span><br></pre></td></tr></table></figure></p>
-<p>通常我们直接预测对应的label id，而由于其也有label，所以我们可以将其转换为一个NLG任务，即：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"context：['「天天特价房」华庭仁和国际 3室2厅2卫仅售65万', '房产']"</span></span><br></pre></td></tr></table></figure></p>
-<p>即通过样本生成label对应的token。借助UniLM同时具有NLU与NLG的能力，只需要很小的改动就可以利用BERT做该任务了，对应的示意图如下：<br><img src="/2020/10/25/pet/unilm.png" alt></p>
-<p>不过当时考虑到UniLM中提到seq2seq的训练<code>不能</code>提高NLU的能力，所以当时并没有选择使用MLM来尝试，最后得到的结论是：</p>
-<p>1.<em> 将分类转为生成后，性能基本一致；</em><br>2.<em> 将分类与生成联合起来训练，性能与单个任务性能基本一致。</em></p>
-<h1><span id="mlm">MLM</span><a href="#mlm" class="header-anchor"></a></h1><p>MLM,即Masked Language Model,中文翻译又叫“掩码语言模型”，即以自监督的方式，mask 掉一部分，然后通过剩余的部分来还原被mask 掉的部分，示意图如下：<br><img src="/2020/10/25/pet/mlm.png" alt></p>
-<p>而mask的方式也有多种，如随机选择token进行mask；将token所在的整个词都mask（whole word mask）；或者将某个span内的token都mask掉（span mask）。<br>虽然mlm在预训练任务上已经被证明十分有效，但是通常认为mlm部分的参数是与mlm任务相关的，而通常在下游任务中我们是别的任务，所以会舍弃掉这部分参数，而只使用encoder部分。<br>但是论文<a href="http://arxiv.org/abs/2009.07118" target="_blank" rel="noopener">It’s Not Just Size That Matters: Small Language Models Are Also Few-Shot Learners</a>与<a href="http://arxiv.org/abs/2001.07676" target="_blank" rel="noopener">Exploiting Cloze Questions for Few Shot Text Classification and Natural Language Inference</a>却告诉我们，mlm不仅有用，在few-shot场景下，通过一下简单的融合手段，性能能超过当前的明星GPT-3.</p>
-<h1><span id="ren-wu-zhuan-huan">任务转换</span><a href="#ren-wu-zhuan-huan" class="header-anchor"></a></h1><p>与之前的思路类似，我们针对分类任务，不再直接对label进行预测，而是预测其label description，即将其转换为完形填空形式的任务，来预测不同label description的概率。<br>而如何转换成完形填空呢？也很简单，我们添加一个简单的语义通顺的描述，然后将其中与分类有关的内容mask掉即可。举个例子：<br>假如我们现在的任务是短文本分类，一个样本为“context：’「天天特价房」华庭仁和国际 3室2厅2卫仅售65万’, label: ‘房产’”，我们添加一个统一的描述句，将其变为：<br>“下面是一则__相关新闻标题: 「天天特价房」华庭仁和国际 3室2厅2卫仅售65万”,其中的空格可选的内容是所有的label description，对应的真实值是”房产”两个字，这样，我们就将分类任务转换为一个完形填空的形式。<br>而添加的方式也可以分为前缀、后缀两种，完整的方式：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"以下是一则__相关新闻标题: 「天天特价房」华庭仁和国际 3室2厅2卫仅售65万"</span></span><br><span class="line"><span class="string">"「天天特价房」华庭仁和国际 3室2厅2卫仅售65万，以上是一则__相关新闻标题"</span></span><br></pre></td></tr></table></figure></p>
-<h1><span id="pattern-exploiting-training">Pattern-Exploiting Training</span><a href="#pattern-exploiting-training" class="header-anchor"></a></h1><p>上面我们添加的前缀/后缀句子称为<code>Pattern</code>, 而label description可以有多种方式，比如，对于“房产”这个label，我们也可以用“地产”来表达，对于“娱乐”label，也可以用“八卦”来表达，所以需要一个token到label的映射，这个映射可以是多对一的，这个被称为<code>Verbalizer</code>,所以在预测时可以将多个token的概率结合起来判断其对应的label。<br>由于是few-shot，为了提高性能，作者采用了与Knowledge Distillation类似的思路，具体方案如下：</p>
-<p>1.<em> 对每个Pattern利用多个pre-train model 进行fine-tuning，得到多个模型.其中$loss=L_{ce} + L_{mlm}$;</em><br>2.<em> 将多个模型的结果进行融合，得到一个融合模型Teacher Model；</em><br>3.<em> 利用Teacher Model在大量unlabed数据上进行预测，得到对应的soft labels；</em><br>4.<em> 利用soft labels数据，训练一个常规的分类模型（非MLM模型）。</em></p>
-<p>以上就是论文<a href="http://arxiv.org/abs/2001.07676" target="_blank" rel="noopener">Exploiting Cloze Questions for Few Shot Text Classification and Natural Language Inference</a>中提到的PET。<br>此外，该论文中还提到了一个改进：iPET。其中的区别是：在ipet中，得到mlm的多个model后，增加一个迭代：每次会从训练mlm的model中抽取一个$m_i$，然后从剩余的model中选取一部分对unlabeled data进行预测，将其中预测结果确定（不是准确，此时意味着结果的熵很小）的部分打上一个fake label，让$m_i$进行训练。重复多次后，融合模型对unlabeled data进行预测，得到一个soft labels data，在此基础上训练一个常规分类器。</p>
-<p>可以看到，PET的方式主要适用label description为有限空间，即选择题，此外，每个样本的label description需要长度相同，而且由于mask之间相互独立，所以长度也不能太长。</p>
-<h1><span id="yu-nlg-chai-yi">与NLG差异</span><a href="#yu-nlg-chai-yi" class="header-anchor"></a></h1><p>在之前的脑洞中，我们将分类任务转变为NLG任务，即利用样本来生成对应的label description，而他与PET中的主要差别主要有几点：</p>
-<p>1.<em> NLG中我们并没有没有限制label description的长度，且不同label对应description也可能是不同长度；</em><br>2.<em> NLG中我们每个token的生成是有依赖关系的，即后面的token会依赖之前的token，所以token长度可以比PET中稍微长一些；</em><br>3.<em> PET中对应的解码空间大大减小，只需要得到label对应token的概率即可;</em><br>4.<em> PET中的pattern可以放在前缀也可以放在后缀，NLG可以看作是后缀PET.</em><br>5.<em> PET 中由于pre-train是mlm任务，所以zero-show性能更好。</em></p>
-<h1><span id="shi-yan">实验</span><a href="#shi-yan" class="header-anchor"></a></h1><p>针对这些差异尝试做了几组实验，验证一下想法。</p>
-<ol>
-<li>NLG中label长度同一且解码时利用PET的方式解码，在few-shot下准确率从$52.4%$上升到$52.9%$，所以生成的label越短，解码空间越小越准确；</li>
-<li>PET前缀pattern下准确率为%53.7%$,所以前缀pattern比后缀性能更好，这也与苏剑林<a href="https://spaces.ac.cn/archives/7764" target="_blank" rel="noopener">《必须要GPT3吗？不，BERT的MLM模型也能小样本学习》</a>的结论一致。</li>
-<li>zero-shot情况下，PET的准确率为$47.2%$, 而NLG只有$17.9%$，考虑到数据集全量下目前最好成绩才$60.7%$,说明PET的方式在zero-shot下效果相当惊人。</li>
-</ol>
-<p>主要实验代码在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_pet_seq2seq.py" target="_blank" rel="noopener">classification_pet_seq2seq</a> 与 <a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_tnews_pet.py" target="_blank" rel="noopener">classification_tnews_pet</a></p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文介绍了一种新的转变分类任务获得更好性能的方法：即将分类任务转化为mlm模型进行完形填空，同时与之前脑洞的将分类转变为生成任务进行对比，通过实验验证了两者的差异与有效性。同时也提醒自己，多想几步，也许就能有新的发现。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>Classification</tag>
-        <tag>Few-shot</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>ccf问答匹配比赛</title>
     <url>/2020/11/08/ccf-qa/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -2135,6 +2086,95 @@
       </tags>
   </entry>
   <entry>
+    <title>PET-文本分类的又一种妙解</title>
+    <url>/2020/10/25/pet/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#classification-to-nlg">Classification to NLG</a></li>
+<li><a href="#mlm">MLM</a></li>
+<li><a href="#ren-wu-zhuan-huan">任务转换</a></li>
+<li><a href="#pattern-exploiting-training">Pattern-Exploiting Training</a></li>
+<li><a href="#yu-nlg-chai-yi">与NLG差异</a></li>
+<li><a href="#shi-yan">实验</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div><br>之前的一篇<a href="https://xv44586.github.io/2020/09/13/classification-label-augment/">《模型增强-从label下手》</a>中，我们提到了通过转换label，将分类转换为NLG的方法，而由于性能没有得到增加，所以就没有继续往下做。今天看到两篇文章，思路略微相似，也让我眼前一亮，发现原来我与顶会思路这么近（误），所以总结对比一下。</p>
+<h1><span id="classification-to-nlg">Classification to NLG</span><a href="#classification-to-nlg" class="header-anchor"></a></h1><p>对于分类任务，我们可以将其转换为一个生成任务。比如此时我们有一个样本：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"context：'「天天特价房」华庭仁和国际 3室2厅2卫仅售65万', label: '房产', label_id: 0"</span></span><br></pre></td></tr></table></figure></p>
+<p>通常我们直接预测对应的label id，而由于其也有label，所以我们可以将其转换为一个NLG任务，即：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"context：['「天天特价房」华庭仁和国际 3室2厅2卫仅售65万', '房产']"</span></span><br></pre></td></tr></table></figure></p>
+<p>即通过样本生成label对应的token。借助UniLM同时具有NLU与NLG的能力，只需要很小的改动就可以利用BERT做该任务了，对应的示意图如下：<br><img src="/2020/10/25/pet/unilm.png" alt></p>
+<p>不过当时考虑到UniLM中提到seq2seq的训练<code>不能</code>提高NLU的能力，所以当时并没有选择使用MLM来尝试，最后得到的结论是：</p>
+<p>1.<em> 将分类转为生成后，性能基本一致；</em><br>2.<em> 将分类与生成联合起来训练，性能与单个任务性能基本一致。</em></p>
+<h1><span id="mlm">MLM</span><a href="#mlm" class="header-anchor"></a></h1><p>MLM,即Masked Language Model,中文翻译又叫“掩码语言模型”，即以自监督的方式，mask 掉一部分，然后通过剩余的部分来还原被mask 掉的部分，示意图如下：<br><img src="/2020/10/25/pet/mlm.png" alt></p>
+<p>而mask的方式也有多种，如随机选择token进行mask；将token所在的整个词都mask（whole word mask）；或者将某个span内的token都mask掉（span mask）。<br>虽然mlm在预训练任务上已经被证明十分有效，但是通常认为mlm部分的参数是与mlm任务相关的，而通常在下游任务中我们是别的任务，所以会舍弃掉这部分参数，而只使用encoder部分。<br>但是论文<a href="http://arxiv.org/abs/2009.07118" target="_blank" rel="noopener">It’s Not Just Size That Matters: Small Language Models Are Also Few-Shot Learners</a>与<a href="http://arxiv.org/abs/2001.07676" target="_blank" rel="noopener">Exploiting Cloze Questions for Few Shot Text Classification and Natural Language Inference</a>却告诉我们，mlm不仅有用，在few-shot场景下，通过一下简单的融合手段，性能能超过当前的明星GPT-3.</p>
+<h1><span id="ren-wu-zhuan-huan">任务转换</span><a href="#ren-wu-zhuan-huan" class="header-anchor"></a></h1><p>与之前的思路类似，我们针对分类任务，不再直接对label进行预测，而是预测其label description，即将其转换为完形填空形式的任务，来预测不同label description的概率。<br>而如何转换成完形填空呢？也很简单，我们添加一个简单的语义通顺的描述，然后将其中与分类有关的内容mask掉即可。举个例子：<br>假如我们现在的任务是短文本分类，一个样本为“context：’「天天特价房」华庭仁和国际 3室2厅2卫仅售65万’, label: ‘房产’”，我们添加一个统一的描述句，将其变为：<br>“下面是一则__相关新闻标题: 「天天特价房」华庭仁和国际 3室2厅2卫仅售65万”,其中的空格可选的内容是所有的label description，对应的真实值是”房产”两个字，这样，我们就将分类任务转换为一个完形填空的形式。<br>而添加的方式也可以分为前缀、后缀两种，完整的方式：<br><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">"以下是一则__相关新闻标题: 「天天特价房」华庭仁和国际 3室2厅2卫仅售65万"</span></span><br><span class="line"><span class="string">"「天天特价房」华庭仁和国际 3室2厅2卫仅售65万，以上是一则__相关新闻标题"</span></span><br></pre></td></tr></table></figure></p>
+<h1><span id="pattern-exploiting-training">Pattern-Exploiting Training</span><a href="#pattern-exploiting-training" class="header-anchor"></a></h1><p>上面我们添加的前缀/后缀句子称为<code>Pattern</code>, 而label description可以有多种方式，比如，对于“房产”这个label，我们也可以用“地产”来表达，对于“娱乐”label，也可以用“八卦”来表达，所以需要一个token到label的映射，这个映射可以是多对一的，这个被称为<code>Verbalizer</code>,所以在预测时可以将多个token的概率结合起来判断其对应的label。<br>由于是few-shot，为了提高性能，作者采用了与Knowledge Distillation类似的思路，具体方案如下：</p>
+<p>1.<em> 对每个Pattern利用多个pre-train model 进行fine-tuning，得到多个模型.其中$loss=L_{ce} + L_{mlm}$;</em><br>2.<em> 将多个模型的结果进行融合，得到一个融合模型Teacher Model；</em><br>3.<em> 利用Teacher Model在大量unlabed数据上进行预测，得到对应的soft labels；</em><br>4.<em> 利用soft labels数据，训练一个常规的分类模型（非MLM模型）。</em></p>
+<p>以上就是论文<a href="http://arxiv.org/abs/2001.07676" target="_blank" rel="noopener">Exploiting Cloze Questions for Few Shot Text Classification and Natural Language Inference</a>中提到的PET。<br>此外，该论文中还提到了一个改进：iPET。其中的区别是：在ipet中，得到mlm的多个model后，增加一个迭代：每次会从训练mlm的model中抽取一个$m_i$，然后从剩余的model中选取一部分对unlabeled data进行预测，将其中预测结果确定（不是准确，此时意味着结果的熵很小）的部分打上一个fake label，让$m_i$进行训练。重复多次后，融合模型对unlabeled data进行预测，得到一个soft labels data，在此基础上训练一个常规分类器。</p>
+<p>可以看到，PET的方式主要适用label description为有限空间，即选择题，此外，每个样本的label description需要长度相同，而且由于mask之间相互独立，所以长度也不能太长。</p>
+<h1><span id="yu-nlg-chai-yi">与NLG差异</span><a href="#yu-nlg-chai-yi" class="header-anchor"></a></h1><p>在之前的脑洞中，我们将分类任务转变为NLG任务，即利用样本来生成对应的label description，而他与PET中的主要差别主要有几点：</p>
+<p>1.<em> NLG中我们并没有没有限制label description的长度，且不同label对应description也可能是不同长度；</em><br>2.<em> NLG中我们每个token的生成是有依赖关系的，即后面的token会依赖之前的token，所以token长度可以比PET中稍微长一些；</em><br>3.<em> PET中对应的解码空间大大减小，只需要得到label对应token的概率即可;</em><br>4.<em> PET中的pattern可以放在前缀也可以放在后缀，NLG可以看作是后缀PET.</em><br>5.<em> PET 中由于pre-train是mlm任务，所以zero-show性能更好。</em></p>
+<h1><span id="shi-yan">实验</span><a href="#shi-yan" class="header-anchor"></a></h1><p>针对这些差异尝试做了几组实验，验证一下想法。</p>
+<ol>
+<li>NLG中label长度同一且解码时利用PET的方式解码，在few-shot下准确率从$52.4%$上升到$52.9%$，所以生成的label越短，解码空间越小越准确；</li>
+<li>PET前缀pattern下准确率为%53.7%$,所以前缀pattern比后缀性能更好，这也与苏剑林<a href="https://spaces.ac.cn/archives/7764" target="_blank" rel="noopener">《必须要GPT3吗？不，BERT的MLM模型也能小样本学习》</a>的结论一致。</li>
+<li>zero-shot情况下，PET的准确率为$47.2%$, 而NLG只有$17.9%$，考虑到数据集全量下目前最好成绩才$60.7%$,说明PET的方式在zero-shot下效果相当惊人。</li>
+</ol>
+<p>主要实验代码在<a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_pet_seq2seq.py" target="_blank" rel="noopener">classification_pet_seq2seq</a> 与 <a href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_tnews_pet.py" target="_blank" rel="noopener">classification_tnews_pet</a></p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文介绍了一种新的转变分类任务获得更好性能的方法：即将分类任务转化为mlm模型进行完形填空，同时与之前脑洞的将分类转变为生成任务进行对比，通过实验验证了两者的差异与有效性。同时也提醒自己，多想几步，也许就能有新的发现。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1>]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>Classification</tag>
+        <tag>Few-shot</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>跨界之阿尔滋海默病的分类竞赛</title>
+    <url>/2020/11/21/ad-dti/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#bi-sai-jie-shao">比赛介绍</a></li>
+<li><a href="#shu-ju-te-dian">数据特点</a></li>
+<li><a href="#si-lu">思路</a></li>
+<li><a href="#jie-lun">结论</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<p>几周前受小王萌的邀请，参加了天津大学医学部组织的一场关于<a href="https://mp.weixin.qq.com/s/KlJOOvwqXkD1ANoVG2AOuw" target="_blank" rel="noopener">利用DTI影像进行阿尔滋海默病的分类竞赛</a>，结果虽然只得了第四名，但是这也是第一次跨界参加比赛，所以总结一下。</p>
+<h1><span id="bi-sai-jie-shao">比赛介绍</span><a href="#bi-sai-jie-shao" class="header-anchor"></a></h1><p>弥散磁共振影像（DTI）在<code>阿尔茨海默病（Alzheimer’s disease, AD）</code>中应用广泛，从DTI影像中提取扩散参数可以用来描述白质结构的完整性，进而显示AD中脑白质的退化模式。利用机器学习的方法可以比较有效的对AD进行诊断和分类。所以比赛的内容是希望选手通过给定的18条主要的脑白质纤维束的扩散指标作为特征，建立并评估出对AD和健康人群的最优分类模型，如果有可能，进一步探索对轻度认知损害患者的预测性能。<br>说成通俗一点就是给定由18个扩散指标组成的一系列特征，然后希望选手通过这些特征来对正常人与病人进行建模，而轻度患者由于比较难区分，所以，如果可能就继续做关于病人/轻度患者/正常人的分类模型。</p>
+<h1><span id="shu-ju-te-dian">数据特点</span><a href="#shu-ju-te-dian" class="header-anchor"></a></h1><p>本次的数据虽然是18个扩散指标，实际上拿到的是沿18条脑内主要纤维束上100个点的8种不同的指标，即每个纤维束上有8种不同指标，每个指标是按顺序固定间隔采样的100个点，合起来每个样本有$18 <em> 8 </em> 100 $个 基础特征。而样本包含三个类别才700个左右。所以此次的数据是一个样本少而基础特征特别多。<br>按每一百个点为一个集合，通过简单的统计，大多数均值方差都在0～1之间，也有几个为负值，还有几个为几百的大数。同时有部分数据为nan。</p>
+<h1><span id="si-lu">思路</span><a href="#si-lu" class="header-anchor"></a></h1><p>基于上述特点，首先要解决的是样本数量太少的问题，其次需要解决特征太多的问题。<br>针对特征太多的问题，可以看作是高维数据，这里我们采样SVM 与 XGBoost两种方案来做，SVM在高维稀疏数据上效果相对较好，而XGBoost我们将其看作是一个特征选择器（encoder），然后在其后面接一个LR进行分类。<br>此外，特征过多我们也尝试了两种平滑方案，将每一百个点的集合进行降纬。1. 对每一百个点的集合上，每十个点进行求均值方差来代替原始特征.  2. 对全量样本按label 求取其中心点，然后求取其对三个中心点的 <cdoe>Wasserstein Distance.<br>针对样本少的问题，也尝试了两种方案：1. 利用GAN 来生成，这个方案是借鉴之前看到的一篇利用GAN 来做CONV-19 的文章，其中由于样本过少，通过GAN 进行生成新样本后，提高了模型的性能；另一个方案是互换相同label 的样本之间的特征，这个方案是由GAN 联想到的，即GAN 实际上在生成分布类似的特征，然后组合成新样本，与其通过一个模型生成相同分布然后组合，不然直接互换，这样他们一定是同分布的。<br>此外，我们还尝试了利用CNN 来提取样本特征然后进行分类。</cdoe></p>
+<h1><span id="jie-lun">结论</span><a href="#jie-lun" class="header-anchor"></a></h1><ol>
+<li>SVM上效果实际比XGB 略差一些，所以最后没有采样SVM。</li>
+<li>XGB的效果最后，尤其是将其看作特征提取器，在后面接了一个分类器的模型。</li>
+<li>平均方差平滑与WD 效果类似，最后保留了WD </li>
+<li>GAN 的效果较差，一来是特征过多，二来是对GAN 不怎么熟，不太会调</li>
+<li>随机互换特征效果时好时坏，感觉这也正常，毕竟特征之间是有关系的</li>
+<li>深度学习在这种数据上基本不收敛</li>
+</ol>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本篇主要是总结一下跨界参加的一个脑科学比赛，出发点是觉得如果能有什么好的效果，说不定能做点贡献，实际参加后发现很多领域的问题由于各种各样的限制，实际上应用机器学习时还是有很大难度的。最后，贴一下排名吧。</p>
+<p><img src="/2020/11/21/ad-dti/result.png" alt></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>西伯利亚森林猫</p>
+]]></content>
+      <categories>
+        <category>MachineLearning</category>
+      </categories>
+      <tags>
+        <tag>Competition</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>NLP中的数据增强</title>
     <url>/2020/11/10/eda/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -2177,46 +2217,6 @@
       </categories>
       <tags>
         <tag>EDA</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>跨界之阿尔滋海默病的分类竞赛</title>
-    <url>/2020/11/21/ad-dti/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#bi-sai-jie-shao">比赛介绍</a></li>
-<li><a href="#shu-ju-te-dian">数据特点</a></li>
-<li><a href="#si-lu">思路</a></li>
-<li><a href="#jie-lun">结论</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<p>几周前受小王萌的邀请，参加了天津大学医学部组织的一场关于<a href="https://mp.weixin.qq.com/s/KlJOOvwqXkD1ANoVG2AOuw" target="_blank" rel="noopener">利用DTI影像进行阿尔滋海默病的分类竞赛</a>，结果虽然只得了第四名，但是这也是第一次跨界参加比赛，所以总结一下。</p>
-<h1><span id="bi-sai-jie-shao">比赛介绍</span><a href="#bi-sai-jie-shao" class="header-anchor"></a></h1><p>弥散磁共振影像（DTI）在<code>阿尔茨海默病（Alzheimer’s disease, AD）</code>中应用广泛，从DTI影像中提取扩散参数可以用来描述白质结构的完整性，进而显示AD中脑白质的退化模式。利用机器学习的方法可以比较有效的对AD进行诊断和分类。所以比赛的内容是希望选手通过给定的18条主要的脑白质纤维束的扩散指标作为特征，建立并评估出对AD和健康人群的最优分类模型，如果有可能，进一步探索对轻度认知损害患者的预测性能。<br>说成通俗一点就是给定由18个扩散指标组成的一系列特征，然后希望选手通过这些特征来对正常人与病人进行建模，而轻度患者由于比较难区分，所以，如果可能就继续做关于病人/轻度患者/正常人的分类模型。</p>
-<h1><span id="shu-ju-te-dian">数据特点</span><a href="#shu-ju-te-dian" class="header-anchor"></a></h1><p>本次的数据虽然是18个扩散指标，实际上拿到的是沿18条脑内主要纤维束上100个点的8种不同的指标，即每个纤维束上有8种不同指标，每个指标是按顺序固定间隔采样的100个点，合起来每个样本有$18 <em> 8 </em> 100 $个 基础特征。而样本包含三个类别才700个左右。所以此次的数据是一个样本少而基础特征特别多。<br>按每一百个点为一个集合，通过简单的统计，大多数均值方差都在0～1之间，也有几个为负值，还有几个为几百的大数。同时有部分数据为nan。</p>
-<h1><span id="si-lu">思路</span><a href="#si-lu" class="header-anchor"></a></h1><p>基于上述特点，首先要解决的是样本数量太少的问题，其次需要解决特征太多的问题。<br>针对特征太多的问题，可以看作是高维数据，这里我们采样SVM 与 XGBoost两种方案来做，SVM在高维稀疏数据上效果相对较好，而XGBoost我们将其看作是一个特征选择器（encoder），然后在其后面接一个LR进行分类。<br>此外，特征过多我们也尝试了两种平滑方案，将每一百个点的集合进行降纬。1. 对每一百个点的集合上，每十个点进行求均值方差来代替原始特征.  2. 对全量样本按label 求取其中心点，然后求取其对三个中心点的 <cdoe>Wasserstein Distance.<br>针对样本少的问题，也尝试了两种方案：1. 利用GAN 来生成，这个方案是借鉴之前看到的一篇利用GAN 来做CONV-19 的文章，其中由于样本过少，通过GAN 进行生成新样本后，提高了模型的性能；另一个方案是互换相同label 的样本之间的特征，这个方案是由GAN 联想到的，即GAN 实际上在生成分布类似的特征，然后组合成新样本，与其通过一个模型生成相同分布然后组合，不然直接互换，这样他们一定是同分布的。<br>此外，我们还尝试了利用CNN 来提取样本特征然后进行分类。</cdoe></p>
-<h1><span id="jie-lun">结论</span><a href="#jie-lun" class="header-anchor"></a></h1><ol>
-<li>SVM上效果实际比XGB 略差一些，所以最后没有采样SVM。</li>
-<li>XGB的效果最后，尤其是将其看作特征提取器，在后面接了一个分类器的模型。</li>
-<li>平均方差平滑与WD 效果类似，最后保留了WD </li>
-<li>GAN 的效果较差，一来是特征过多，二来是对GAN 不怎么熟，不太会调</li>
-<li>随机互换特征效果时好时坏，感觉这也正常，毕竟特征之间是有关系的</li>
-<li>深度学习在这种数据上基本不收敛</li>
-</ol>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本篇主要是总结一下跨界参加的一个脑科学比赛，出发点是觉得如果能有什么好的效果，说不定能做点贡献，实际参加后发现很多领域的问题由于各种各样的限制，实际上应用机器学习时还是有很大难度的。最后，贴一下排名吧。</p>
-<p><img src="/2020/11/21/ad-dti/result.png" alt></p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>西伯利亚森林猫</p>
-]]></content>
-      <categories>
-        <category>MachineLearning</category>
-      </categories>
-      <tags>
-        <tag>Competition</tag>
       </tags>
   </entry>
   <entry>
@@ -2536,34 +2536,6 @@
       </tags>
   </entry>
   <entry>
-    <title>辞旧迎新</title>
-    <url>/2021/02/19/happy-new-year/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#ci-jiu">辞旧</a></li>
-<li><a href="#ying-xin">迎新</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-<p></div><br>在新年这个重要的时间节点上，总应该做些总结与计划，来辞旧迎新，然而我总是懒惰加拖延，到了今天初八才正式开写，所以新的一年，第一个flag就是：希望能找到良药医治一下我的拖延症 - -！</p>
-<h1><span id="ci-jiu">辞旧</span><a href="#ci-jiu" class="header-anchor"></a></h1><p>2020年是神奇的一年，这一年里发生了很多意想不到的事，用网友们的话讲就是这一年总忙着见证历史了。而需要见证的历史太多，大多数我都没关注，所以只记录一下我自己”见证”的历史。<br>首先是过年回家，刚到家我就去县里的药店屯了口罩和感冒药，之后就是持续至今的新冠，而由于新冠初期，大家对其认识很少，所以限制出行，而我也就因此度过了高中以来在家最久的一次”寒假”–整整三个月，直到四月初，才买到了机票回来上班。<br>在家的三个月，对我最大的帮助可能就是心灵治愈了，<code>人间烟火气，最抚凡人心</code><br>虽然在家陪父母，但是后期还是需要正常打卡的，所以我也顺便研究了一下藏文语言模型和文本纠错，也就是这个时期，让我更坚定的想要一台自己的服务器，来实验想法。于是，回到北京后，我就开始调研硬件相关，然后自己动手搭了一台<a href="https://xv44586.github.io/2020/05/05/make-a-computer/">服务器</a>，这里还要感谢一下银翔老哥，帮我报销了2080Ti的钱，哈哈。<br>有了服务器，我就开始<code>放弃幻想，拥抱transformer </code>, 开始了看论文与写demo 的路程，期间参考<a href="https://github.com/bojone/bert4keras.git" target="_blank" rel="noopener">bert4keras</a> 与 <a href="https://github.com/CyberZHG/keras-bert" target="_blank" rel="noopener">keras-bert</a>, 实现了一下Bert，不过中间有次实验结果有些奇怪，为了查问题，API基本上改成bert4keras一致了。后面一些相transformer相关的实验代码基本也都在<a href="https://github.com/xv44586/toolkit4nlp" target="_blank" rel="noopener">toolkit4nlp</a><br>这里还有一个小插曲，王萌老哥带我打了一个脑科学的比赛，我们俩花了一天最后拿了个铜牌，这也让我了解到在很多领域，对机器学习和深度学习还是运用的相当少的，一方面是因为任务形态的原因，一方面也是这些领域接受新事物比较缓慢可能，所以我认为与机器学习做交叉，还是有很多事可以做的。<br>接着就到了十一月，由于看到群里有人讨论小学生解数学题的比赛，就去看了<a href="https://www.datafountain.cn/" target="_blank" rel="noopener">datafountain</a>，然后就写了<a href="https://www.datafountain.cn/competitions/474/datasets" target="_blank" rel="noopener">房产行业问答匹配比赛</a>的baseline：<a href="https://github.com/xv44586/ccf_2020_qa_match" target="_blank" rel="noopener">ccf_2020_qa_match</a>, 其实比赛到这就结束了，我就去看论文了，然而有时候事情就是这么奇妙，很多群里的同学看到我的baseline 邀请我去组队，后来与南大的”钞人小哥”刘猛组队，最终拿了第一还。不过答辩时发现，在看论文与做实验的纬度上，我们应该也是第一了- - ！无论如何，也要感谢一下刘猛小哥，不是他邀请我，我也不会拿到这个金牌。毕竟baseline 我写过不少，但是真的认真打到最后还是第一次～～</p>
-<p>总结一下，去年发生了新冠，直到现在大家还是备受困扰，我个人度过了最爽的一个年假，在NLP 上也有了实足的进步，不过也有很多年初的计划没有完成，比如每周一篇blog，看完花书等。</p>
-<h1><span id="ying-xin">迎新</span><a href="#ying-xin" class="header-anchor"></a></h1><p><code>凡事预则立，不预则废。</code>所以，flag还是要立的，新的一年，希望自己更少一点浮躁，做事能更多一点踏实。</p>
-<ul>
-<li>经典论文还有很多没读，最新的论文又源源不断，所以希望新的一年能找到适合自己的读论文节奏。</li>
-<li>一周一篇blog 可能太困难了，希望能一年写三十篇吧就</li>
-<li>感情上也要更成熟一些，对未来要有更清晰的规划</li>
-<li>有空就多运动</li>
-</ul>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>成都海洋馆的可爱白鲸</p>
-]]></content>
-      <categories>
-        <category>Life</category>
-      </categories>
-  </entry>
-  <entry>
     <title>多任务学习-以天池比赛为例的三种思路</title>
     <url>/2021/03/28/multi-task/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -2602,6 +2574,34 @@
       <tags>
         <tag>multi-task</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>辞旧迎新</title>
+    <url>/2021/02/19/happy-new-year/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#ci-jiu">辞旧</a></li>
+<li><a href="#ying-xin">迎新</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div><br>在新年这个重要的时间节点上，总应该做些总结与计划，来辞旧迎新，然而我总是懒惰加拖延，到了今天初八才正式开写，所以新的一年，第一个flag就是：希望能找到良药医治一下我的拖延症 - -！</p>
+<h1><span id="ci-jiu">辞旧</span><a href="#ci-jiu" class="header-anchor"></a></h1><p>2020年是神奇的一年，这一年里发生了很多意想不到的事，用网友们的话讲就是这一年总忙着见证历史了。而需要见证的历史太多，大多数我都没关注，所以只记录一下我自己”见证”的历史。<br>首先是过年回家，刚到家我就去县里的药店屯了口罩和感冒药，之后就是持续至今的新冠，而由于新冠初期，大家对其认识很少，所以限制出行，而我也就因此度过了高中以来在家最久的一次”寒假”–整整三个月，直到四月初，才买到了机票回来上班。<br>在家的三个月，对我最大的帮助可能就是心灵治愈了，<code>人间烟火气，最抚凡人心</code><br>虽然在家陪父母，但是后期还是需要正常打卡的，所以我也顺便研究了一下藏文语言模型和文本纠错，也就是这个时期，让我更坚定的想要一台自己的服务器，来实验想法。于是，回到北京后，我就开始调研硬件相关，然后自己动手搭了一台<a href="https://xv44586.github.io/2020/05/05/make-a-computer/">服务器</a>，这里还要感谢一下银翔老哥，帮我报销了2080Ti的钱，哈哈。<br>有了服务器，我就开始<code>放弃幻想，拥抱transformer </code>, 开始了看论文与写demo 的路程，期间参考<a href="https://github.com/bojone/bert4keras.git" target="_blank" rel="noopener">bert4keras</a> 与 <a href="https://github.com/CyberZHG/keras-bert" target="_blank" rel="noopener">keras-bert</a>, 实现了一下Bert，不过中间有次实验结果有些奇怪，为了查问题，API基本上改成bert4keras一致了。后面一些相transformer相关的实验代码基本也都在<a href="https://github.com/xv44586/toolkit4nlp" target="_blank" rel="noopener">toolkit4nlp</a><br>这里还有一个小插曲，王萌老哥带我打了一个脑科学的比赛，我们俩花了一天最后拿了个铜牌，这也让我了解到在很多领域，对机器学习和深度学习还是运用的相当少的，一方面是因为任务形态的原因，一方面也是这些领域接受新事物比较缓慢可能，所以我认为与机器学习做交叉，还是有很多事可以做的。<br>接着就到了十一月，由于看到群里有人讨论小学生解数学题的比赛，就去看了<a href="https://www.datafountain.cn/" target="_blank" rel="noopener">datafountain</a>，然后就写了<a href="https://www.datafountain.cn/competitions/474/datasets" target="_blank" rel="noopener">房产行业问答匹配比赛</a>的baseline：<a href="https://github.com/xv44586/ccf_2020_qa_match" target="_blank" rel="noopener">ccf_2020_qa_match</a>, 其实比赛到这就结束了，我就去看论文了，然而有时候事情就是这么奇妙，很多群里的同学看到我的baseline 邀请我去组队，后来与南大的”钞人小哥”刘猛组队，最终拿了第一还。不过答辩时发现，在看论文与做实验的纬度上，我们应该也是第一了- - ！无论如何，也要感谢一下刘猛小哥，不是他邀请我，我也不会拿到这个金牌。毕竟baseline 我写过不少，但是真的认真打到最后还是第一次～～</p>
+<p>总结一下，去年发生了新冠，直到现在大家还是备受困扰，我个人度过了最爽的一个年假，在NLP 上也有了实足的进步，不过也有很多年初的计划没有完成，比如每周一篇blog，看完花书等。</p>
+<h1><span id="ying-xin">迎新</span><a href="#ying-xin" class="header-anchor"></a></h1><p><code>凡事预则立，不预则废。</code>所以，flag还是要立的，新的一年，希望自己更少一点浮躁，做事能更多一点踏实。</p>
+<ul>
+<li>经典论文还有很多没读，最新的论文又源源不断，所以希望新的一年能找到适合自己的读论文节奏。</li>
+<li>一周一篇blog 可能太困难了，希望能一年写三十篇吧就</li>
+<li>感情上也要更成熟一些，对未来要有更清晰的规划</li>
+<li>有空就多运动</li>
+</ul>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>成都海洋馆的可爱白鲸</p>
+]]></content>
+      <categories>
+        <category>Life</category>
+      </categories>
   </entry>
   <entry>
     <title>对比学习心路历程</title>
@@ -3035,6 +3035,40 @@
       </tags>
   </entry>
   <entry>
+    <title>nohup踩坑记</title>
+    <url>/2022/07/05/nohup-debug/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#bei-jing">背景</a></li>
+<li><a href="#nohup">nohup</a></li>
+<li><a href="#ti-dai">替代</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+</div>
+
+<h1><span id="bei-jing">背景</span><a href="#bei-jing" class="header-anchor"></a></h1><p>最近在测试<a href="https://xv44586.github.io/2022/05/25/horovod/">horovod</a>下的单机多卡/多机多卡的性能，结果遇到一个神奇的现象：训练总是会在一段时间后意外停止，停止后从系统到程序，没有任何异常，没有任何错误日志。而训练停止这个现象总是能复现，但是复现时又不完全一样，即同样的训练脚本，其每次训练意外停止时完成的更新次数还不一样。<br>为了解决这个神奇的bug，我们尝试从物理机、系统资源、驱动、软件环境、训练脚本、训练数据等多个环节进行检查，均未发现任何问题，最终无意间发现使用xshell （之前使用的WSL2)后训练停止的现象不在发生。最终发现竟然是因为对nohup 的坑，特此记录一下。</p>
+<h1><span id="nohup">nohup</span><a href="#nohup" class="header-anchor"></a></h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nohup is a POSIX command which means &quot;no hang up&quot;. Its purpose is to execute a command such that it ignores the HUP (hangup) signal and therefore does not stop when the user logs out.</span><br></pre></td></tr></table></figure>
+<p>上面这段是引自<a href="https://en.wikipedia.org/wiki/Nohup#Overcoming_hanging" target="_blank" rel="noopener">wikipedia</a>，即nohup 的作用是忽略HUP 信号，从而让用户log out 时，程序依然保持执行而不中断。</p>
+<p>然而有些场景下，nohup 依然会失效，即使用了nohup 后程序依然可能被中断，如<a href="https://unix.stackexchange.com/questions/420594/why-process-killed-with-nohup" target="_blank" rel="noopener">hy-process-killed-with-nohup</a>提到的两个场景，此外，通常我们使用nohup 的场景时ssh 下，而ssh 为了避免丢失数据，会拒绝log out。 参考wiki中提到的：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Note that nohupping backgrounded jobs is typically used to avoid terminating them when logging off from a remote SSH session. A different issue that often arises in this situation is that ssh is refusing to log off (&quot;hangs&quot;), since it refuses to lose any data from/to the background job(s).[6][7] This problem can also be overcome by redirecting all three I/O streams:</span><br><span class="line"></span><br><span class="line">$ nohup ./myprogram &gt; foo.out 2&gt; foo.err &lt; /dev/null &amp;</span><br></pre></td></tr></table></figure></p>
+<p>我的训练脚本使用时，对stdout/stderr 进行了重定向，未对stdin 进行重定向，即：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nohup ./myprogram &gt; foo.out 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure></p>
+<p>最终导致训练在进行一段时间后意外中断而没有任何异常信息。而这个像幽灵一样无声无息的“小问题”让我们花了接近三周时间debug，最终在猜测中定位到nohup 。</p>
+<h1><span id="ti-dai">替代</span><a href="#ti-dai" class="header-anchor"></a></h1><p>由上面可以看出，nohup 并不是一个”好” 的后台执行解决方案，而对应的替代品，推荐使用<a href="https://github.com/tmux/tmux/wiki" target="_blank" rel="noopener">tmux</a><br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">tmux is a terminal multiplexer. It lets you switch easily between several programs in one terminal, detach them (they keep running in the background) and reattach them to a different terminal.</span><br></pre></td></tr></table></figure></p>
+<p>tmux稳定可靠，利用tmux，将session 与 terminal 进行detach，从而让程序在后台执行。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>深度debug</p>
+]]></content>
+      <categories>
+        <category>Programming</category>
+      </categories>
+      <tags>
+        <tag>horovod</tag>
+        <tag>nohup</tag>
+        <tag>debug</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>训练加速篇（3）horovod之多机多卡</title>
     <url>/2022/07/06/horovod-multi-nodes/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -3126,40 +3160,6 @@
       </tags>
   </entry>
   <entry>
-    <title>nohup踩坑记</title>
-    <url>/2022/07/05/nohup-debug/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#bei-jing">背景</a></li>
-<li><a href="#nohup">nohup</a></li>
-<li><a href="#ti-dai">替代</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-</div>
-
-<h1><span id="bei-jing">背景</span><a href="#bei-jing" class="header-anchor"></a></h1><p>最近在测试<a href="https://xv44586.github.io/2022/05/25/horovod/">horovod</a>下的单机多卡/多机多卡的性能，结果遇到一个神奇的现象：训练总是会在一段时间后意外停止，停止后从系统到程序，没有任何异常，没有任何错误日志。而训练停止这个现象总是能复现，但是复现时又不完全一样，即同样的训练脚本，其每次训练意外停止时完成的更新次数还不一样。<br>为了解决这个神奇的bug，我们尝试从物理机、系统资源、驱动、软件环境、训练脚本、训练数据等多个环节进行检查，均未发现任何问题，最终无意间发现使用xshell （之前使用的WSL2)后训练停止的现象不在发生。最终发现竟然是因为对nohup 的坑，特此记录一下。</p>
-<h1><span id="nohup">nohup</span><a href="#nohup" class="header-anchor"></a></h1><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nohup is a POSIX command which means &quot;no hang up&quot;. Its purpose is to execute a command such that it ignores the HUP (hangup) signal and therefore does not stop when the user logs out.</span><br></pre></td></tr></table></figure>
-<p>上面这段是引自<a href="https://en.wikipedia.org/wiki/Nohup#Overcoming_hanging" target="_blank" rel="noopener">wikipedia</a>，即nohup 的作用是忽略HUP 信号，从而让用户log out 时，程序依然保持执行而不中断。</p>
-<p>然而有些场景下，nohup 依然会失效，即使用了nohup 后程序依然可能被中断，如<a href="https://unix.stackexchange.com/questions/420594/why-process-killed-with-nohup" target="_blank" rel="noopener">hy-process-killed-with-nohup</a>提到的两个场景，此外，通常我们使用nohup 的场景时ssh 下，而ssh 为了避免丢失数据，会拒绝log out。 参考wiki中提到的：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Note that nohupping backgrounded jobs is typically used to avoid terminating them when logging off from a remote SSH session. A different issue that often arises in this situation is that ssh is refusing to log off (&quot;hangs&quot;), since it refuses to lose any data from/to the background job(s).[6][7] This problem can also be overcome by redirecting all three I/O streams:</span><br><span class="line"></span><br><span class="line">$ nohup ./myprogram &gt; foo.out 2&gt; foo.err &lt; /dev/null &amp;</span><br></pre></td></tr></table></figure></p>
-<p>我的训练脚本使用时，对stdout/stderr 进行了重定向，未对stdin 进行重定向，即：<br><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nohup ./myprogram &gt; foo.out 2&gt;&amp;1 &amp;</span><br></pre></td></tr></table></figure></p>
-<p>最终导致训练在进行一段时间后意外中断而没有任何异常信息。而这个像幽灵一样无声无息的“小问题”让我们花了接近三周时间debug，最终在猜测中定位到nohup 。</p>
-<h1><span id="ti-dai">替代</span><a href="#ti-dai" class="header-anchor"></a></h1><p>由上面可以看出，nohup 并不是一个”好” 的后台执行解决方案，而对应的替代品，推荐使用<a href="https://github.com/tmux/tmux/wiki" target="_blank" rel="noopener">tmux</a><br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">tmux is a terminal multiplexer. It lets you switch easily between several programs in one terminal, detach them (they keep running in the background) and reattach them to a different terminal.</span><br></pre></td></tr></table></figure></p>
-<p>tmux稳定可靠，利用tmux，将session 与 terminal 进行detach，从而让程序在后台执行。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>深度debug</p>
-]]></content>
-      <categories>
-        <category>Programming</category>
-      </categories>
-      <tags>
-        <tag>horovod</tag>
-        <tag>nohup</tag>
-        <tag>debug</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>tokenizers 总结</title>
     <url>/2022/09/08/tokenizers/</url>
     <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
@@ -3202,49 +3202,6 @@
         <tag>BPE</tag>
         <tag>WordPiece</tag>
         <tag>Unigram</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>few-shot视角下的fine-tuning</title>
-    <url>/2023/02/01/fine-tuning-at-few-shot/</url>
-    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
-
-<!-- toc -->
-<ul>
-<li><a href="#few-shot">few-shot</a></li>
-<li><a href="#fine-tuning">fine-tuning</a><ul>
-<li><a href="#supervised-fine-tuning">supervised fine-tuning</a></li>
-<li><a href="#instruction-tuning">instruction-tuning</a></li>
-<li><a href="#prompt-tuning">prompt tuning</a></li>
-<li><a href="#reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</a></li>
-</ul>
-</li>
-<li><a href="#qi-fa">启发</a></li>
-<li><a href="#zong-jie">总结</a></li>
-<li><a href="#guan-yu-tou-tu">关于头图</a></li>
-</ul>
-<!-- tocstop -->
-<p></div><br>LLM 目前的使用方式主要是zero-shot/few-shot,其是从context中的examle 数量来区分的，如果按这个角度进一步概括目前的fine-tuning 方案，感觉是个有趣的视角。<br><img src="/2023/02/01/fine-tuning-at-few-shot/few-shot.PNG" alt></p>
-<h1><span id="few-shot">few-shot</span><a href="#few-shot" class="header-anchor"></a></h1><p>目前LLM 的使用方式主要是zero-shot/few-shot，而通常few-shot 的性能也比zero-shot 要好，而且随着example 的数量的增加，few-shot 的性能也可能进一步提升；zero-shot 时只给出task input 效果可能不佳，通常需要给出对应的task description，而更”精准“ 的task description 通常也能得到更好的zero-shot 效果。<br>所以，提升LLM zero-shot /few-shot 的性能，主要的方式有两个：</p>
-<ol>
-<li>给出更”好“的task description</li>
-<li>给出更多的example</li>
-</ol>
-<h1><span id="fine-tuning">fine-tuning</span><a href="#fine-tuning" class="header-anchor"></a></h1><h2><span id="supervised-fine-tuning">supervised fine-tuning</span><a href="#supervised-fine-tuning" class="header-anchor"></a></h2><p>对于小模型来说，其in-context learning 能力较弱，性能不理想。为了提升模型的性能，一个可以尝试的方向是增加context 中的example 数量，但是由于模型的context 窗口有限，不支持我们无限制的将更多的example 塞进context 中，所以我们变通一下，采用通过更新参数的方式将example 塞进“context”。此时可以看作是无限example（inf-shot)；</p>
-<h2><span id="instruction-tuning">instruction-tuning</span><a href="#instruction-tuning" class="header-anchor"></a></h2><p>通常在supervised fine-tuning 时，我们是将一个任务的example “塞”进context，而instruction-tuning 可以看作是同时将多个任务的example “塞”进context，为了在使用时区分应该当前context 里应该使用哪些example，我们在不同的task 前面增加对应的description，作为判断依据。即：同时将多个任务的多个example 塞进模型的context 中，使用时通过不同的task description 来区分当前context 内的example 应该是哪些。</p>
-<h2><span id="prompt-tuning">prompt tuning</span><a href="#prompt-tuning" class="header-anchor"></a></h2><p>由于pretrain model 的任务是预测下一个token，而非处理用户的指令（instruction），为了提升模型zero-shot 的性能，一个可以尝试的方法就是找到模型视角下更好的task description（pattern），prompt-tuning 的思路即通过大量的监督样本，尝试寻找到更适应模型的task description，然后期望这个task description 能提高模型的zero-shot 的性能。</p>
-<h2><span id="reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</span><a href="#reinforcement-learning-with-human-feedback" class="header-anchor"></a></h2><p>prompt-tuning 时，我们尝试找到模型视角下更好的task description，而这个方法显然是不利于交互的，更好的方式是让模型理解人类视角下的task description。rlhf 就是按照这个思路，让模型反过来更好的理解人类视角下的task description，使得交互更方便。</p>
-<h1><span id="qi-fa">启发</span><a href="#qi-fa" class="header-anchor"></a></h1><p>从这个视角看，我们发现即使是小模型，也是有一定的in-context learning 的能力的，只是不够强，所以我们需要更多的example 他才能发挥出更好的效果；<br>pretrain+fine-tuning 的模式之所以能work，是因为pretrain 后的model 有in-context learning 的能力，in-context learning 并不要求task 的形式与pretrain 的一致，所以我们才能在pretrain 的基础上根据下游任务的不同，来构造不同的fine-tuning 过程，在few-shot 视角下，其对应的是在context 中”塞“进更多的example；<br>in-context learning 的增强，对应的是所需的样本逐渐减少，从supervised fine-tuning 的大量样本到few-shot 的少量样本最终到zero-shot 的不需要提供样本，只需提供任务描述。</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文是笔者最近思考pretrain + fine-tuning 模式为什么能work 时，通过在few-shot 视角下的一个解释。通过该思路，笔者尝试将目前的fine-tuning 主流思路统一起来。</p>
-<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>太空视角下的喜马拉雅山脉</p>
-]]></content>
-      <categories>
-        <category>NLP</category>
-      </categories>
-      <tags>
-        <tag>LLM</tag>
-        <tag>In-context learning</tag>
-        <tag>fine-tuning</tag>
       </tags>
   </entry>
   <entry>
@@ -3496,10 +3453,53 @@
         <category>NLP</category>
       </categories>
       <tags>
-        <tag>LLM</tag>
-        <tag>In-context learning</tag>
         <tag>GPT-3</tag>
+        <tag>In-context learning</tag>
+        <tag>LLM</tag>
         <tag>ChatGPT</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>few-shot视角下的fine-tuning</title>
+    <url>/2023/02/01/fine-tuning-at-few-shot/</url>
+    <content><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><div class="toc">
+
+<!-- toc -->
+<ul>
+<li><a href="#few-shot">few-shot</a></li>
+<li><a href="#fine-tuning">fine-tuning</a><ul>
+<li><a href="#supervised-fine-tuning">supervised fine-tuning</a></li>
+<li><a href="#instruction-tuning">instruction-tuning</a></li>
+<li><a href="#prompt-tuning">prompt tuning</a></li>
+<li><a href="#reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</a></li>
+</ul>
+</li>
+<li><a href="#qi-fa">启发</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+<p></div><br>LLM 目前的使用方式主要是zero-shot/few-shot,其是从context中的examle 数量来区分的，如果按这个角度进一步概括目前的fine-tuning 方案，感觉是个有趣的视角。<br><img src="/2023/02/01/fine-tuning-at-few-shot/few-shot.PNG" alt></p>
+<h1><span id="few-shot">few-shot</span><a href="#few-shot" class="header-anchor"></a></h1><p>目前LLM 的使用方式主要是zero-shot/few-shot，而通常few-shot 的性能也比zero-shot 要好，而且随着example 的数量的增加，few-shot 的性能也可能进一步提升；zero-shot 时只给出task input 效果可能不佳，通常需要给出对应的task description，而更”精准“ 的task description 通常也能得到更好的zero-shot 效果。<br>所以，提升LLM zero-shot /few-shot 的性能，主要的方式有两个：</p>
+<ol>
+<li>给出更”好“的task description</li>
+<li>给出更多的example</li>
+</ol>
+<h1><span id="fine-tuning">fine-tuning</span><a href="#fine-tuning" class="header-anchor"></a></h1><h2><span id="supervised-fine-tuning">supervised fine-tuning</span><a href="#supervised-fine-tuning" class="header-anchor"></a></h2><p>对于小模型来说，其in-context learning 能力较弱，性能不理想。为了提升模型的性能，一个可以尝试的方向是增加context 中的example 数量，但是由于模型的context 窗口有限，不支持我们无限制的将更多的example 塞进context 中，所以我们变通一下，采用通过更新参数的方式将example 塞进“context”。此时可以看作是无限example（inf-shot)；</p>
+<h2><span id="instruction-tuning">instruction-tuning</span><a href="#instruction-tuning" class="header-anchor"></a></h2><p>通常在supervised fine-tuning 时，我们是将一个任务的example “塞”进context，而instruction-tuning 可以看作是同时将多个任务的example “塞”进context，为了在使用时区分应该当前context 里应该使用哪些example，我们在不同的task 前面增加对应的description，作为判断依据。即：同时将多个任务的多个example 塞进模型的context 中，使用时通过不同的task description 来区分当前context 内的example 应该是哪些。</p>
+<h2><span id="prompt-tuning">prompt tuning</span><a href="#prompt-tuning" class="header-anchor"></a></h2><p>由于pretrain model 的任务是预测下一个token，而非处理用户的指令（instruction），为了提升模型zero-shot 的性能，一个可以尝试的方法就是找到模型视角下更好的task description（pattern），prompt-tuning 的思路即通过大量的监督样本，尝试寻找到更适应模型的task description，然后期望这个task description 能提高模型的zero-shot 的性能。</p>
+<h2><span id="reinforcement-learning-with-human-feedback">Reinforcement learning with human feedback</span><a href="#reinforcement-learning-with-human-feedback" class="header-anchor"></a></h2><p>prompt-tuning 时，我们尝试找到模型视角下更好的task description，而这个方法显然是不利于交互的，更好的方式是让模型理解人类视角下的task description。rlhf 就是按照这个思路，让模型反过来更好的理解人类视角下的task description，使得交互更方便。</p>
+<h1><span id="qi-fa">启发</span><a href="#qi-fa" class="header-anchor"></a></h1><p>从这个视角看，我们发现即使是小模型，也是有一定的in-context learning 的能力的，只是不够强，所以我们需要更多的example 他才能发挥出更好的效果；<br>pretrain+fine-tuning 的模式之所以能work，是因为pretrain 后的model 有in-context learning 的能力，in-context learning 并不要求task 的形式与pretrain 的一致，所以我们才能在pretrain 的基础上根据下游任务的不同，来构造不同的fine-tuning 过程，在few-shot 视角下，其对应的是在context 中”塞“进更多的example；<br>in-context learning 的增强，对应的是所需的样本逐渐减少，从supervised fine-tuning 的大量样本到few-shot 的少量样本最终到zero-shot 的不需要提供样本，只需提供任务描述。</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文是笔者最近思考pretrain + fine-tuning 模式为什么能work 时，通过在few-shot 视角下的一个解释。通过该思路，笔者尝试将目前的fine-tuning 主流思路统一起来。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>太空视角下的喜马拉雅山脉</p>
+]]></content>
+      <categories>
+        <category>NLP</category>
+      </categories>
+      <tags>
+        <tag>In-context learning</tag>
+        <tag>LLM</tag>
+        <tag>fine-tuning</tag>
       </tags>
   </entry>
   <entry>
@@ -3555,7 +3555,7 @@
 <ol>
 <li>第一步时，在(The, dog)/(The, nice)/(The car)  三个路径中选择概率最高的两条path:(The, nice), (The, dog)</li>
 <li>第二步时，在(The, nice, wowan)/(The, nice, house)/(The, nice, guy)/(The, dog, and)/(The,dog,runs)/(The,dog,has) 中选择路径概率（单步概率连乘）最高的两条path:(The, dog, has), (The, nice, woman)</li>
-<li>一次类推，直到满足终止采样.</li>
+<li>依此类推，直到满足终止采样.</li>
 </ol>
 <p>此前Greedy Search 未找到的最优路径，此次通过Beam Search 找到了，但是依然无法保证每次都能找到全局最优。PS: num_beams =1 时，与Greedy Search 过程相同。</p>
 <h2><span id="sampling">Sampling</span><a href="#sampling" class="header-anchor"></a></h2><p>以上两种方法都是确定性解码（deterministic），缺点就是不够丰富，不够”surprise“；为了让生成的内容更加的丰富多样有惊喜，我们可以采用另一种策略：采样（Sampling).</p>
@@ -3625,7 +3625,7 @@
 </table>
 <h1><span id="gpt-generation">GPT generation</span><a href="#gpt-generation" class="header-anchor"></a></h1><p>GPT2 model architecture</p>
 <p><img src="/2023/03/10/llm-inf/Pasted image 20230310005359.png" alt></p>
-<h2><span id="ops-vs-bytes">ops vs bytes</span><a href="#ops-vs-bytes" class="header-anchor"></a></h2><p>我们忽略所有的bias/layernorm/activation/add 操作,计算生成一个token 时的ops vs bytes, q切分head 与不切对应的ops/bytes 是一样的，我们按不切计算。</p>
+<h2><span id="ops-vs-bytes">ops vs bytes</span><a href="#ops-vs-bytes" class="header-anchor"></a></h2><p>我们忽略所有的bias/layernorm/activation/add 操作,计算生成一个token 时的ops vs bytes, 切分head 与不切对应的ops/bytes 是一样的，为了简单我们按不切计算。</p>
 <ol>
 <li><p>Embedding<br>multiply:$E_{token}∈R^{V\times d_{model}}$,  $E_p\in R^{s_{maxseq} \times d_{models}}$<br>mem: $2 \ast (V \ast d_{model} + s_{maxseq} \ast d_{model})$<br>flops:   0</p>
 </li>
@@ -3648,7 +3648,7 @@
 <p>按照上面我们的结论，此时对于A100-80G 来说，性能主要受限于内存带宽，计算1 个token 与计算153个token 对应的latency 是一样的！为了提升整体性能，我们应该增加$batch\_size \ast input\_length$直到 inputs 扩大至153倍.</p>
 <h2><span id="attention">attention</span><a href="#attention" class="header-anchor"></a></h2><p>现在回过头来再看一眼刚刚被我随意丢弃掉的一项ops：attention output<br>由于我们计算是由长度为1 的token 生成 1 个token， 假设输入的token 长度为$s$, 则：<br>$q,k,v \in R^{s\times d_{model}}$<br>flops: $ 2 \ast s \ast d_{model} \ast s + 2 \ast s \ast d_{model} \approx 2 \ast s^2 \ast d_{model}$  </p>
 <p>随着inputs 的长度增加，达到$\sqrt{d_{model}}$ 时，这一项已经不能丢弃了，进一步增加，长度到$12 \ast \sqrt{d_{model}}$ 时，这一项已经与其他部分的ops 想当了，此时的$ops/bytes \approx 2$.<br>以10B 的模型为例，$d_{model} = 4096$ ,当输入的长度为64 时，attention output 这项ops 与其他部分想当；当长度增长为768 时，对应的$ops/bytes$ 增长到2，此时整体的计算量已经扩大了768 倍，$768 &gt; (153 / 2 ) $，已经转变为性能受限于计算带宽，增大batch 不会带来性能提升。</p>
-<h2><span id="cache">cache</span><a href="#cache" class="header-anchor"></a></h2><p>随着整个生成过程的迭代，输入的长度会逐步增加，对应的每步所需的计算量也指数倍的增加，整体性能都被他拖垮了。<br>对于$Y = A \cdot X$ ,当$X$ ,$A$ 不变时，对应的结果$Y$ 是不变的；而在迭代过程中，模型的权重是不变的，即$X$ 都是一样的，对于$step_t$ 与 $step_{t-1}$ 来说，都会计算$A[:, :t-1]$ 对应的结果，既然重叠了，就不需要重复计算了，我们每次只需要计算最后一个token 就好了。<br>等等，有一个层只有计算没有weights，即其对应的$A$, $X$ 都来动态的，需要我们单独处理。这一层就是attention output。（哈，又是你。attention is all I want remove！）</p>
+<h2><span id="cache">cache</span><a href="#cache" class="header-anchor"></a></h2><p>随着整个生成过程的迭代，输入的长度会逐步增加，对应的每步所需的计算量也指数倍的增加，整体性能都被他拖垮了。<br>对于$Y = A \cdot X$ ,当$X$ ,$A$ 不变时，对应的结果$Y$ 是不变的；而在迭代过程中，模型的权重是不变的，即$X$ 都是一样的，对于$step_t$ 与 $step_{t-1}$ 来说，都会计算$A[:, :t-1]$ 对应的结果，既然重叠了，就不需要重复计算了，我们每次只需要计算最后一个token 就好了。<br>等等，有一个层只有计算没有weights，即其对应的$A$, $X$ 都来动态的，需要我们单独处理。这一层就是attention output。（哈，又是你。attention is all I want to remove！）</p>
 <p>对于$step_t$ 来说，对应的计算是:<br>$$softmax(q[:, t-1:t] \cdot k[:,0:t] \div \sqrt(d_head) ) \cdot v[:,0:t]$$<br>此时我们缺少的是$k[:,:t-1]/v[:,:t-1]$ ,好在我们在$step_{t-1}$ 时已经计算过这两个结果了，只要把上一个时刻的这个结果“拿到”拼接回去即可。<br>完整的流程是：对于迭代$step_t$ ,把对应attention qkv 的结果$q[:,t]/k[:,t]/v[:,t]$ 拼接到之前的之前的缓存$q[:,:t-1]/k[:,:t-1]/v[:,:t-1]$ 后面，为下一个时刻准备；计算attention output 时，先将之前的$k\_cache[:,t-1]/v\_cache[:,:t-1]$ 拼接到$k[:,t]/v[:,t]$ 前面，还原真实的$k/v$.</p>
 <p>经过cache 后，attention output 的计算回到了$O(s\cdot d_{model})$ 的水平，至少在大部分时候又可以基本忽略了。此外，随着$s$ 的增长，对应的cache 也在线性增长，需要的内存带宽也在增长，所以有些情况下可能增加cache 反而降低性能。</p>
 <p>PS:不管是生成过程中的k_cache/v_cache 还是prompt cache 还是context cache，只要是可能重复计算，就值得思考要不要将之前的结果做cache，已减少后续的计算量。</p>
