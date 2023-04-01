@@ -12,8 +12,54 @@ tags:
 cover: /2022/09/08/tokenizers/cannot_code.PNG
 ---
 <!-- toc -->
-# 前言
-tokenizer 目前主流的方式是subword level，至于char level /word level 都由于粒度问题已被主流抛弃。目前subword level 的tokenizer BPE, Bytes BPE, WordPiece, Unigram, SentencePiece,下面简单总结一下各个方法。 
+# tokenizer
+目前的机器学习模型都是数学模型，其对应的输入要求必须是数字形式（number）的，而我们处理的真实场景往往会包含许多非数字形式的输入（有时候即使原始输入是数字形式，我们也需要转换），最典型的就是NLP 中的文字(string),为了让文字能够作为输入参与到模型的计算中去，我们就需要构建一个映射关系(mapping):将对应的文字映射到一个数字形式上去，而其对应的数字就是token。而对应的这个映射关系，就是我们的tokenizer：他可以将文字映射到其对应的数字上去(encode)，也可以将数字映射回对应的文字上(decode).
+
+## word level
+那如何构建这个映射关系呢？最简单的想法：一个词对应一个id 不就好了。也就是"word level"。然后，"词"缺不是那么好分的:对于中文，词到底分成什么粒度，”苹果手机“到底是一个词还是二个词呢？”武汉市/长江/大桥/欢迎/你“与”武汉/市长/江大桥/欢迎/你“应该选择哪个方案呢？此外，对于”虚坤“/”鸡你太美“等这些新词怎么识别呢？对这部分感兴趣的可以看我更早期关于分词总结的博客：[分词算法综述](https://xv44586.github.io/2019/10/22/cutwords/).
+
+中文有分词的问题，那英语总没有了吧，空格+标点就是天然分隔符，然而事情也没那么简单：
+```bash
+Don't cry!
+```
+按照空格与标点切分，得到的结果是：
+```
+["Don", "'", "t", "cry", "!"]
+```
+哈，有点怪，我们需要把"Don't" -> "Do"/"n't",这样才更合理一点。即：
+```
+["Do", "n't", "cry", "!"]
+```
+
+除了如何切分成词外，还有一个最大的问题是结果集太大。比如TransformerXL 中，使用标点和空格，切分后的词表大小有267K，如此大的词表，不管是对存储还是计算都有压力。
+
+此外，随着文化发展，每天都有大批的新词出现，用词粒度做映射就越来越不理想了。
+
+## char level
+既然分词这么麻烦，我不分不好了，我就按“字”(char) 来做最小单元做映射。这样词表就小多了：英文只需要26个字母即可，中文根据2013年[中华人民共和国教育部《通用规范汉字表》定义“规范汉字”](http://www.moe.gov.cn/jyb_xwfb/s5147/201308/t20130828_156423.html)，国家规定的通用规范汉字一共为8105个，相比之下也不算大。
+
+然而char level 的主要问题是切分的太细：
+```
+pneumonoultramicroscopicsilicovolcanoconiosis
+
+（医）肺尘病、矽肺病
+```
+上面这个单词是我找到的最长的英语单词，他有45个字母组成，而中文中也存在大量的成语/歇后语/专用名词等，如：
+```
+只许州官放火不许百姓点灯
+```
+目前我们NLP 的主要思路是对句子进行，即：
+$$
+P(S)=P(w_1,w_2,..w_n)=P(w_1)∗P(w_2|w_1)∗P(w_3|w_1,w_2)∗…∗P(w_n|w_1,w_2,..w_{n−1})
+$$
+而切分太细，则对应$S$ 的长度会变长，无疑大大增加建模难度（通过字来学习词的语义），也常常导致模型效果不理想。
+
+## subword level
+为了缓解两种方式的问题，一个想法是取长补短，即目前的主流方案：subword level.
+
+subword level 的主要出发点是：我们应该尽量保留高频词，对低频词进行逐级切分，以获得一个词表大小合适，又对后续建模友好的方案。
+
+目前subword level 的tokenizer 方法主要有BPE, Bytes BPE, WordPiece, Unigram, SentencePiece,下面简单总结一下各个方法。 
 
 ## BPE
 bpe 的方案是通过统计词频来确定两个相邻的pair subwords 要不要合并，具体做法：
@@ -81,8 +127,7 @@ SentencePiece 其实并不是一个新的tokenizer 方法，他其实是一个�
 3.token 格式不统一。以英文为例，表示token 时会有 ##xx, xx/s 这种，表示subword 是否出现在词的首尾，然而中文中是没有这种概念的；
 4.解码困难，如BPE解码时需要进行一些标准化，最常见的是去除标点符号。而我们解码后是 [new] [york]两个token，我们并不知道原来的词是 newyork/new york/new-york 中的哪一个.
 SentencePiece 的做法：
-[
-SentencePiece treats the input text just as a sequence of Unicode characters. Whitespace is also handled as a normal symbol. To handle the whitespace as a basic token explicitly, SentencePiece first escapes the whitespace with a meta symbol "▁" (U+2581) as follows.](https://github.com/google/sentencepiece)
+[SentencePiece treats the input text just as a sequence of Unicode characters. Whitespace is also handled as a normal symbol. To handle the whitespace as a basic token explicitly, SentencePiece first escapes the whitespace with a meta symbol "▁" (U+2581) as follows.](https://github.com/google/sentencepiece)
 
 即首先将空格转换为一个标准的字符"▁",然后将text 转换为unicode，其实这里的unicode 是NFKC-based normalization后的unicode，至于unicode 标准化，可以参考[unicode文本标准化](https://blog.csdn.net/weixin_43866211/article/details/98384017) ，虽然通常我们使用NFKC 标准化，但sentencepiece 内部四种方法都实现了。
 通过上述的空格转换加normalize，所有的语言经过转换后就有统一的格式了，这样多语言的问题就彻底的与token 切分解偶了，tokenizer 就有了一个完全端到端的解决方案。
