@@ -73,16 +73,10 @@ class ProportionalAdd(Layer):
 ```
 文本分类：CLUE的iflytek数据集
 
-$$
-\\begin{array}{c|c|c} 
-\\hline 
-& \\text{直接微调} & \\text{BERT-of-Theseus}\\\\ 
-\\hline 
-\\begin{array}{c}\\text{层数} \\\\ \\text{效果}\\end{array} & \\begin{array}{ccc}\\text{完整12层} & \\text{前6层} & \\text{前3层} 
-\\\\ 60.11\% & 58.99\%  & 57.96\%\\end{array} & \\begin{array}{cc}\\text{6层} & \\text{3层} \\\\ 59.7\%  & 59.5\% \\end{array}\\\\ 
-\\hline 
-\\end{array}
-$$
+|            | 直接微调                                    | BERT-of-Theseus      |
+|------------|---------------------------------------------|----------------------|
+| **层数**   | 完整12层 / 前6层 / 前3层                    | 6层 / 3层            |
+| **效果**   | 60.11% / 58.99% / 57.96%                    | 59.7% / 59.5%        |
 
 结果上看确实更稳定了，也更好一点点了，基本比predecessor低<code>0.5%~1%</code> .
 

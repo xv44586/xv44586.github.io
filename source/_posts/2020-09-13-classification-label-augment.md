@@ -30,14 +30,9 @@ cover: /2020/09/13/classification-label-augment/lake.jpeg
 # 实验结果
 两组实验结果如下：
 
-$$
-\\begin{array}{c|c|c} 
-\\hline \\\\
-\\text{seq2seq} & \\text{similarity} \\\\ 
-\\hline \\\\
-59.91\% & 56.9\% 
-\\end{array}
-$$
+| seq2seq | similarity |
+|---------|------------|
+| 59.91%  | 56.9%      |
 
 可以看到，对于构造seq2seq 任务，其结果与直接fine-tuning 结果基本一致，这也符合预期。而构造相似性任务，其结果直接fine-tuning 结果相比反而更差了。原因可能是样本不均衡，所以同一batch 内有较高概率出现同一类别的样本，同时通过让样本与同一样本相似来间接相似，这种方式可能有些曲折了，不过最根本的原因应该还是batch 内同一类别样本的出现干扰了学习。
 具体实验代码可以查阅[classification_ifytek_auxiliary_seq2seq_task](https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_auxiliary_seq2seq_task.py) 和[classification_ifytek_with_similarity](https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_with_similarity.py)
