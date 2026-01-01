@@ -2,6 +2,41 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://xv44586.github.io/2019/10/13/gil/</loc>
+    
+    <lastmod>2026-01-01T22:46:22.835Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/10/13/skipgram/</loc>
+    
+    <lastmod>2026-01-01T22:45:21.914Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/10/13/nnlm/</loc>
+    
+    <lastmod>2026-01-01T22:43:37.620Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/10/14/xgb/</loc>
+    
+    <lastmod>2026-01-01T22:38:04.751Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/10/16/bagging/</loc>
+    
+    <lastmod>2026-01-01T22:36:42.592Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://xv44586.github.io/2020/08/31/bert-01/</loc>
     
     <lastmod>2026-01-01T22:23:33.151Z</lastmod>
@@ -156,20 +191,6 @@
   </url>
   
   <url>
-    <loc>https://xv44586.github.io/2019/10/13/skipgram/</loc>
-    
-    <lastmod>2021-03-28T03:20:44.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2019/10/13/nnlm/</loc>
-    
-    <lastmod>2021-03-28T01:22:52.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://xv44586.github.io/2019/10/17/glove/</loc>
     
     <lastmod>2021-03-28T00:51:38.000Z</lastmod>
@@ -254,13 +275,6 @@
   </url>
   
   <url>
-    <loc>https://xv44586.github.io/2019/10/14/xgb/</loc>
-    
-    <lastmod>2020-11-11T15:39:42.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://xv44586.github.io/2020/10/14/focal-loss/</loc>
     
     <lastmod>2020-11-11T14:47:58.000Z</lastmod>
@@ -338,13 +352,6 @@
   </url>
   
   <url>
-    <loc>https://xv44586.github.io/2019/10/16/bagging/</loc>
-    
-    <lastmod>2020-10-25T02:47:50.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://xv44586.github.io/2020/10/19/triangle/</loc>
     
     <lastmod>2020-10-20T15:11:24.000Z</lastmod>
@@ -376,13 +383,6 @@
     <loc>https://xv44586.github.io/2020/01/11/npm-environment/</loc>
     
     <lastmod>2020-01-11T06:37:47.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2019/10/13/gil/</loc>
-    
-    <lastmod>2019-10-17T14:08:09.000Z</lastmod>
     
   </url>
   

@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://xv44586.github.io/2019/10/13/gil/</loc>
+    <lastmod>2026-01-01</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/13/skipgram/</loc>
+    <lastmod>2026-01-01</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/13/nnlm/</loc>
+    <lastmod>2026-01-01</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/14/xgb/</loc>
+    <lastmod>2026-01-01</lastmod>
+  </url>
+  <url>
+    <loc>https://xv44586.github.io/2019/10/16/bagging/</loc>
+    <lastmod>2026-01-01</lastmod>
+  </url>
+  <url>
     <loc>https://xv44586.github.io/2020/08/31/bert-01/</loc>
     <lastmod>2026-01-01</lastmod>
   </url>
@@ -85,14 +105,6 @@
     <lastmod>2021-03-28</lastmod>
   </url>
   <url>
-    <loc>https://xv44586.github.io/2019/10/13/skipgram/</loc>
-    <lastmod>2021-03-28</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/13/nnlm/</loc>
-    <lastmod>2021-03-28</lastmod>
-  </url>
-  <url>
     <loc>https://xv44586.github.io/2019/10/17/glove/</loc>
     <lastmod>2021-03-28</lastmod>
   </url>
@@ -141,10 +153,6 @@
     <lastmod>2020-11-23</lastmod>
   </url>
   <url>
-    <loc>https://xv44586.github.io/2019/10/14/xgb/</loc>
-    <lastmod>2020-11-11</lastmod>
-  </url>
-  <url>
     <loc>https://xv44586.github.io/2020/10/14/focal-loss/</loc>
     <lastmod>2020-11-11</lastmod>
   </url>
@@ -189,10 +197,6 @@
     <lastmod>2020-10-25</lastmod>
   </url>
   <url>
-    <loc>https://xv44586.github.io/2019/10/16/bagging/</loc>
-    <lastmod>2020-10-25</lastmod>
-  </url>
-  <url>
     <loc>https://xv44586.github.io/2020/10/19/triangle/</loc>
     <lastmod>2020-10-20</lastmod>
   </url>
@@ -211,10 +215,6 @@
   <url>
     <loc>https://xv44586.github.io/2020/01/11/npm-environment/</loc>
     <lastmod>2020-01-11</lastmod>
-  </url>
-  <url>
-    <loc>https://xv44586.github.io/2019/10/13/gil/</loc>
-    <lastmod>2019-10-17</lastmod>
   </url>
   <url>
     <loc>https://xv44586.github.io/2019/10/13/multiThreads/</loc>

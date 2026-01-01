@@ -202,11 +202,11 @@
 </div>
 
 <h1><span id="pian-chai-yu-fang-chai">偏差与方差</span><a href="#pian-chai-yu-fang-chai" class="header-anchor"></a></h1><p><strong>偏差 (bias)</strong><br><img src="/2019/10/16/bagging/fx.png"><br>即模型的期望预测与真实值之间的差异。</p>
-<p><strong>方差 (variance)</strong><br><img src="/2019/10/156/bagging/var.png"><br>方差通常衡量模型对<strong>不同数据集</strong>的敏感程度，也可以认为是衡量模型的不稳定性。若方差大，则表示数据的微小变动就能导致学习出的模型产生较大差异，即对应的模型结构风险更高。</p>
+<p><strong>方差 (variance)</strong><br><img src="/2019/10/16/bagging/var.png"><br>方差通常衡量模型对<strong>不同数据集</strong>的敏感程度，也可以认为是衡量模型的不稳定性。若方差大，则表示数据的微小变动就能导致学习出的模型产生较大差异，即对应的模型结构风险更高。</p>
 <p>有了偏差和方差的定义，我们就能推导出模型的期望泛化误差：</p>
 <p><img src="/2019/10/16/bagging/ed.png"><br>如果我们能在保持bias基本不变时，降低variance，则模型的期望泛化误差降低，从而降低模型过拟合风险。</p>
 <h1><span id="jiang-di-mo-xing-guo-ni-he">降低模型过拟合</span><a href="#jiang-di-mo-xing-guo-ni-he" class="header-anchor"></a></h1><h2><span id="ji-cheng-mo-xing">集成模型</span><a href="#ji-cheng-mo-xing" class="header-anchor"></a></h2><p>假设我们现在有一个集成模型，其过程为从整体样本中进行采样，得到n份独立且与整体同分布的样本集，然后选择同样的模型进行训练，最后取平均。由于单个模型对应数据同分布，模型相同，则对应的bias和variance相同，而</p>
-<p><img src="/2019/10/16/bagging/exi.png"></p>
+<p><img src="/2019/10/16/bagging/varxi.png"></p>
 <p>所以最终模型的bias与单模型的bias相同；另一方面，由于各个子模型独立，则</p>
 <p><img src="/2019/10/16/bagging/varn.png"></p>
 <p>此时可以显著降低模型的variance，根据模型泛化误差期望公式，此时的集成模型的期望泛化误差将小于单模型的期望泛化误差，从而降低了模型的过拟合。</p>
