@@ -206,7 +206,18 @@
 <h2><span id="zi-jian-du">自监督</span><a href="#zi-jian-du" class="header-anchor"></a></h2><p>构造新label，我们可以借鉴自监督的方式，如Mask Language Model，AutoRegressive，而BERT中已使用来MLM，UniLM中也告诉我们增加Seq2Seq的AR 任务对NLU任务提高不显著，不过今年的论文<a target="_blank" rel="noopener" href="http://arxiv.org/abs/2004.10964">Don’t Stop Pretraining: Adapt Language Models to Domains and Tasks</a> 实验证明了进一步预训练是能进一步提升下游任务的性能。而当前任务是文本分类，MLM也许不是很合适，所以Seq2Seq 的方式可以尝试。<br>具体的，我们让模型学习目标类别的同时，希望模型能同时生成样本的描述字段（或者人为给定的某种相关性短语），即利用类别对应描述字段构造一个seq2seq任务。</p>
 <h2><span id="xiang-si-xing">相似性</span><a href="#xiang-si-xing" class="header-anchor"></a></h2><p>对于同一个类别的样本，他们必然有某种相似性，至少比与其他类别的样本更相似。而何如构造样本呢？<br>一种简单的方式是对每个样本都从类当中抽取一个样本与他组成一对，然后让每个<code>i</code>样本与<code>i+1</code>样本相似。这种方式由于每次样本都是shuffle 的，只要让batch size 小于label number，一个batch 内同时出现多个同一类别的样本概率就会很小。<br>既然在构造seq2seq任务时，我们使用来label对应的描述，此时我们也可以继续尝试使用：每个样本构造一个新的样本，新样本由label对应描述与label id组成。</p>
 <h1><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h1><p>两组实验结果如下：</p>
-<p>$$<br>\begin{array}{c|c|c}<br>\hline \\<br>\text{seq2seq} &amp; \text{similarity} \\<br>\hline \\<br>59.91% &amp; 56.9%<br>\end{array}<br>$$</p>
+<table>
+<thead>
+<tr>
+<th>seq2seq</th>
+<th>similarity</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>59.91%</td>
+<td>56.9%</td>
+</tr>
+</tbody></table>
 <p>可以看到，对于构造seq2seq 任务，其结果与直接fine-tuning 结果基本一致，这也符合预期。而构造相似性任务，其结果直接fine-tuning 结果相比反而更差了。原因可能是样本不均衡，所以同一batch 内有较高概率出现同一类别的样本，同时通过让样本与同一样本相似来间接相似，这种方式可能有些曲折了，不过最根本的原因应该还是batch 内同一类别样本的出现干扰了学习。<br>具体实验代码可以查阅<a target="_blank" rel="noopener" href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_auxiliary_seq2seq_task.py">classification_ifytek_auxiliary_seq2seq_task</a> 和<a target="_blank" rel="noopener" href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_with_similarity.py">classification_ifytek_with_similarity</a></p>
 <h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文只是由于之前实验想到的尝试对label 做增强来实现模型增强的尝试，最后两组实验都没取得什么好的结果。</p>
 <h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>摄于翠湖湿地</p>

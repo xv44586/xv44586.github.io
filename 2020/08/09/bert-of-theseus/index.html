@@ -232,7 +232,25 @@
 <p>在bert-of-theseus中，首先固定predecessor的权重，然后将6层的Bert分为3个block，每个block与successor的一层对应，训练过程分为两个stage：<br>首先用successor中的层概率替换predecessor中对应的block，在下游任务中直接fine-tuning（只训练successor），<br>然后将successor从bert-of-theseus中分离出来，单独在下游任务中进行fine-tuning，直到指标不再上升。<br>所谓替换，就是输出的替换，在进入下一层前在predecessor和successor的输出中二选一。<br>替换概率作者也给出了两种方式，一种是固定 0.5,一种是线性从0-1,如下图所示：<br><img src="/2020/08/09/bert-of-theseus/figure2.png"></p>
 <h2><span id="shi-yan-xiao-guo">实验效果</span><a href="#shi-yan-xiao-guo" class="header-anchor"></a></h2><p>实验代码主要参考<a target="_blank" rel="noopener" href="https://github.com/bojone/bert-of-theseus">bert-of-theseus</a>, 实验主要做了三组，一组文本分类两组ner-crf，结果如下：</p>
 <p>文本分类：CLUE的iflytek数据集</p>
-<p>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 60.11% &amp; 58.99%  &amp; 57.96%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 59.6%  &amp; 59.3% \end{array}\\<br>\hline<br>\end{array}<br>$$</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>直接微调</th>
+<th>BERT-of-Theseus</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>层数</strong></td>
+<td>完整12层 &#x2F; 前6层 &#x2F; 前3层</td>
+<td>6层 &#x2F; 3层</td>
+</tr>
+<tr>
+<td><strong>效果</strong></td>
+<td>60.11% &#x2F; 58.99% &#x2F; 57.96%</td>
+<td>59.6% &#x2F; 59.3%</td>
+</tr>
+</tbody></table>
 <p>ner-crf: 公司数据</p>
 <table>
 <thead>

@@ -2,65 +2,93 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://xv44586.github.io/2025/12/31/goodbye-2025/</loc>
+    <loc>https://xv44586.github.io/2020/08/31/bert-01/</loc>
     
-    <lastmod>2026-01-01T21:54:17.603Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2019/11/30/statistics/</loc>
-    
-    <lastmod>2026-01-01T21:40:40.020Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2019/12/09/longton/</loc>
-    
-    <lastmod>2026-01-01T21:38:37.402Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2020/08/22/qa-augmentation/</loc>
-    
-    <lastmod>2026-01-01T21:31:35.322Z</lastmod>
+    <lastmod>2026-01-01T22:23:33.151Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://xv44586.github.io/2020/08/09/bert-of-theseus/</loc>
     
-    <lastmod>2026-01-01T21:31:19.999Z</lastmod>
+    <lastmod>2026-01-01T22:19:20.793Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://xv44586.github.io/2021/01/20/ccf-qa-2/</loc>
+    <loc>https://xv44586.github.io/2020/08/22/qa-augmentation/</loc>
     
-    <lastmod>2026-01-01T21:28:17.454Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2023/03/10/llm-inf/</loc>
-    
-    <lastmod>2026-01-01T14:12:44.192Z</lastmod>
+    <lastmod>2026-01-01T22:19:05.823Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://xv44586.github.io/2021/08/14/speed-up/</loc>
+    <loc>https://xv44586.github.io/2020/08/19/bert-of-theseus-2/</loc>
     
-    <lastmod>2026-01-01T13:40:51.758Z</lastmod>
+    <lastmod>2026-01-01T22:17:06.800Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2020/09/13/classification-label-augment/</loc>
+    
+    <lastmod>2026-01-01T22:10:21.758Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://xv44586.github.io/2023/03/25/gpt4/</loc>
     
-    <lastmod>2026-01-01T13:37:50.076Z</lastmod>
+    <lastmod>2026-01-01T21:57:47.315Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2025/12/31/goodbye-2025/</loc>
+    
+    <lastmod>2026-01-01T21:57:47.315Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2021/08/14/speed-up/</loc>
+    
+    <lastmod>2026-01-01T21:57:47.310Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2023/03/10/llm-inf/</loc>
+    
+    <lastmod>2026-01-01T21:57:47.310Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2021/01/20/ccf-qa-2/</loc>
+    
+    <lastmod>2026-01-01T21:57:47.309Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/11/30/statistics/</loc>
+    
+    <lastmod>2026-01-01T21:57:47.308Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2019/12/09/longton/</loc>
+    
+    <lastmod>2026-01-01T21:57:47.308Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://xv44586.github.io/2022/09/08/tokenizers/</loc>
+    
+    <lastmod>2026-01-01T21:57:47.227Z</lastmod>
     
   </url>
   
@@ -93,13 +121,6 @@
   </url>
   
   <url>
-    <loc>https://xv44586.github.io/2022/09/08/tokenizers/</loc>
-    
-    <lastmod>2022-09-22T12:14:57.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://xv44586.github.io/2021/07/06/cl2rdrop/</loc>
     
     <lastmod>2022-09-08T08:50:09.000Z</lastmod>
@@ -117,13 +138,6 @@
     <loc>https://xv44586.github.io/2022/05/25/horovod/</loc>
     
     <lastmod>2022-06-02T08:53:13.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2020/08/19/bert-of-theseus-2/</loc>
-    
-    <lastmod>2022-05-31T07:59:55.000Z</lastmod>
     
   </url>
   
@@ -297,20 +311,6 @@
   
   <url>
     <loc>https://xv44586.github.io/2019/12/26/from-softmax-to-crf/</loc>
-    
-    <lastmod>2020-10-25T02:55:33.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2020/08/31/bert-01/</loc>
-    
-    <lastmod>2020-10-25T02:55:33.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://xv44586.github.io/2020/09/13/classification-label-augment/</loc>
     
     <lastmod>2020-10-25T02:55:33.000Z</lastmod>
     

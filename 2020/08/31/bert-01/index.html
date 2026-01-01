@@ -286,7 +286,26 @@
 <h2><span id="teacher-to-student">Teacher-to-Student</span><a href="#teacher-to-student" class="header-anchor"></a></h2><p>Teacher model 在train data 上训练，然后在train data 上生成对应的soften labels，Student model 学习ground truth 和 soften labels。 </p>
 <h2><span id="student-to-student">student-to-student</span><a href="#student-to-student" class="header-anchor"></a></h2><p>既然soften labels 是一种对labels 的一种平滑估计，那我们可以用任何方式去估计他，所以这里我们就用student 去做一个估计：<br>student model 在train data 上进行训练，然后在train data 上生成对应的soften labels ，将 student model 利用bert 预训练结果重新初始化，<br>然后去学习ground truth 和 soften labels.</p>
 <h2><span id="normal-noise-training">normal-noise-training</span><a href="#normal-noise-training" class="header-anchor"></a></h2><p>既然是对labels 的一个估计，那假如给一个随机的估计，只要保证生成的logits 中true label 对应的值最大，就能对Student 模型进行一定程度的提升：<br>直接在train label 上添加一个normal noise ，然后重新进行平滑后归一，作为soften labels让student model 去学习。</p>
-<h1><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h1><p>$$<br>\begin{array}{c|c|c}<br>\hline \\<br>\text{teacher standalone} &amp; \text{student standalone} &amp; \text{teacher-to-student} &amp; \text{teacher-to-teacher} &amp; \text{student-to-student} &amp; \text{normal-noise-student}\\<br>\hline \\<br>60.21% &amp; 58.14% &amp; 60.14% &amp; 60.14% &amp; 61.07% &amp; 59.5%<br>\end{array}<br>$$</p>
+<h1><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h1><table>
+<thead>
+<tr>
+<th align="left">teacher standalone</th>
+<th align="left">student standalone</th>
+<th align="left">teacher-to-student</th>
+<th align="left">teacher-to-teacher</th>
+<th align="left">student-to-student</th>
+<th align="left">normal-noise-student</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">60.21%</td>
+<td align="left">58.14%</td>
+<td align="left">60.14%</td>
+<td align="left">60.14%</td>
+<td align="left">61.07%</td>
+<td align="left">59.5%</td>
+</tr>
+</tbody></table>
 <p>从结果中可以看到：</p>
 <ol>
 <li><strong>优于随机的logits 对Student 模型有一定的提升，估计越准确，提升越高；</strong></li>
