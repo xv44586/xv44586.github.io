@@ -220,9 +220,159 @@
 
 <h2><span id="yi-xie-ce-shi-jie-guo">一些测试结果</span><a href="#yi-xie-ce-shi-jie-guo" class="header-anchor"></a></h2><p>笔者在V100 下用bert-base 做了部分测试，测试结果如下：</p>
 <p><strong>batch_size&#x3D;32, maxlen&#x3D;128</strong></p>
-<p>| |epoch 1 | epoch 2 | epoch 3 | epoch 4 | epoch 5|<br>| —- | —- | —- | —- | —- | —- | —- |<br>| 开启前：| |  |  |  |  |<br>| |277s | 246s | 244s | 246s | 244s|<br>| |164ms&#x2F;step | 147ms&#x2F;step | 146ms&#x2F;step | 147ms&#x2F;step | 146ms&#x2F;step|<br>| | bset acc: |  <code>0.57</code><br>|开启后：|  |  |  |  |  |<br>| |235s | 200s | 201s | 200s | 201s|<br>| |140ms&#x2F;step| 120ms&#x2F;step | 121ms&#x2F;step | 120ms&#x2F;step | 121ms&#x2F;step|<br>| |best acc:| <code>0.576</code></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>epoch 1</th>
+<th>epoch 2</th>
+<th>epoch 3</th>
+<th>epoch 4</th>
+<th>epoch 5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>开启前：</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>277s</td>
+<td>246s</td>
+<td>244s</td>
+<td>246s</td>
+<td>244s</td>
+</tr>
+<tr>
+<td></td>
+<td>164ms&#x2F;step</td>
+<td>147ms&#x2F;step</td>
+<td>146ms&#x2F;step</td>
+<td>147ms&#x2F;step</td>
+<td>146ms&#x2F;step</td>
+</tr>
+<tr>
+<td></td>
+<td>best acc:</td>
+<td><code>0.57</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>开启后：</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>235s</td>
+<td>200s</td>
+<td>201s</td>
+<td>200s</td>
+<td>201s</td>
+</tr>
+<tr>
+<td></td>
+<td>140ms&#x2F;step</td>
+<td>120ms&#x2F;step</td>
+<td>121ms&#x2F;step</td>
+<td>120ms&#x2F;step</td>
+<td>121ms&#x2F;step</td>
+</tr>
+<tr>
+<td></td>
+<td>best acc:</td>
+<td><code>0.576</code></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
 <p><strong>batch_size&#x3D;64, maxlen&#x3D;128</strong></p>
-<p>| |epoch 1 | epoch 2 | epoch 3 | epoch 4 | epoch 5|<br>|:—-:|:—-:|:—-:|:—-:|:—-:|:—-:|:—-:|<br>|开启前：| |  |  |  |  |<br>| |234s | 202s |  201s | 203s | 203s|<br>| |281ms&#x2F;step | 242ms&#x2F;step | 241ms&#x2F;step | 244ms&#x2F;step | 244ms&#x2F;step|<br>| |best acc:| <code>0.567</code><br>|开启后:|  |  |  |  |  |<br>| |180s | 141s | 140s | 140s |141s|<br>| |216ms&#x2F;step | 169ms&#x2F;step | 168ms&#x2F;step | 168ms&#x2F;step | 169ms&#x2F;step|<br>| |best acc: | <code>0.571</code></p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">epoch 1</th>
+<th align="center">epoch 2</th>
+<th align="center">epoch 3</th>
+<th align="center">epoch 4</th>
+<th align="center">epoch 5</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">开启前：</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">234s</td>
+<td align="center">202s</td>
+<td align="center">201s</td>
+<td align="center">203s</td>
+<td align="center">203s</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">281ms&#x2F;step</td>
+<td align="center">242ms&#x2F;step</td>
+<td align="center">241ms&#x2F;step</td>
+<td align="center">244ms&#x2F;step</td>
+<td align="center">244ms&#x2F;step</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">best acc:</td>
+<td align="center"><code>0.567</code></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">开启后：</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">180s</td>
+<td align="center">141s</td>
+<td align="center">140s</td>
+<td align="center">140s</td>
+<td align="center">141s</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">216ms&#x2F;step</td>
+<td align="center">169ms&#x2F;step</td>
+<td align="center">168ms&#x2F;step</td>
+<td align="center">168ms&#x2F;step</td>
+<td align="center">169ms&#x2F;step</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">best acc:</td>
+<td align="center"><code>0.571</code></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody></table>
 <p>可以看到，batch size越大，加速比越可观，约能节省1&#x2F;3的训练时间，同时，性能不会出现明显下降甚至可能也会高一点点。<br>另外，测试使用的bert 是keras 代码，其中有一条日志是<code> converted 1265/17548 nodes to float16 precision</code>，所以约有不到10%的节点使用了半精度？所以猜测使用半精度的节点越多加速比越可观。</p>
 <h1><span id="tui-li-jia-su">推理加速</span><a href="#tui-li-jia-su" class="header-anchor"></a></h1><p>推理时通常需要我们提供一个SDK或一个API 服务，这里我们只讨论API 服务的情况。<br>而API 服务通常有两种做法：</p>
 <ol>

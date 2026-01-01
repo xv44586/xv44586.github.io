@@ -233,7 +233,26 @@
 <h2><span id="shi-yan-xiao-guo">实验效果</span><a href="#shi-yan-xiao-guo" class="header-anchor"></a></h2><p>实验代码主要参考<a target="_blank" rel="noopener" href="https://github.com/bojone/bert-of-theseus">bert-of-theseus</a>, 实验主要做了三组，一组文本分类两组ner-crf，结果如下：</p>
 <p>文本分类：CLUE的iflytek数据集</p>
 <p>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 60.11% &amp; 58.99%  &amp; 57.96%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 59.6%  &amp; 59.3% \end{array}\\<br>\hline<br>\end{array}<br>$$</p>
-<p>ner-crf: 公司数据<br>$$<br>\begin{array}{c|c|c}<br>\hline<br>&amp; \text{直接微调} &amp; \text{BERT-of-Theseus}\\<br>\hline<br>\begin{array}{c}\text{层数} \\ \text{效果}\end{array} &amp; \begin{array}{ccc}\text{完整12层} &amp; \text{前6层} &amp; \text{前3层}<br>\\ 97.5% &amp; 97.0%  &amp; 96.1%\end{array} &amp; \begin{array}{cc}\text{6层} &amp; \text{3层} \\ 97.3%  &amp; 96.6% \end{array}\\<br>\hline<br>\end{array}<br>$$</p>
+<p>ner-crf: 公司数据</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>直接微调</th>
+<th>BERT-of-Theseus</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>层数</strong></td>
+<td>完整12层 &#x2F; 前6层 &#x2F; 前3层</td>
+<td>6层 &#x2F; 3层</td>
+</tr>
+<tr>
+<td><strong>效果</strong></td>
+<td>97.5% &#x2F; 97.0% &#x2F; 96.1%</td>
+<td>97.3% &#x2F; 96.6%</td>
+</tr>
+</tbody></table>
 <p>可以看到，相比直接那前几层微调，bert-of-theseus的效果确实更好，此外，我还尝试了线性策略的替换概率，效果上差别不大。<br>实验代码：<a target="_blank" rel="noopener" href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_bert_of_theseus.py">classification_ifytek_bert_of_theseus</a><br><a target="_blank" rel="noopener" href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/sequence_labeling_ner_bert_of_theseus.py">sequence_labeling_ner_bert_of_theseus</a></p>
 <h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p><a target="_blank" rel="noopener" href="https://github.com/JetRunner/BERT-of-Theseus">论文原作者配图</a></p>
 

@@ -236,12 +236,13 @@
 <h1><span id="generation">generation</span><a href="#generation" class="header-anchor"></a></h1><p>上一篇我们讲了为了解决自然语言问题，我们引入了统计语言模型：$S$ 表示一连串特定顺序排列的词$w_1$, $w_2$, …, $w_n$,其中$n$ 是序列的长度，则$S$ 出现的概率$P(S)&#x3D;P(w_1,w_2,…w_n)$. 通过序列的概率，来判断对应句子是否合理。而这个概率$P(S)$ 很难估算，所以我们将其转化一下。首先，利用条件概率公式将其展开:<br>$$<br>P(S)&#x3D;P(w_1​,w_2​,…,w_n​)&#x3D;P(w_1​)∗P(w_2​∣w_1​)∗P(w_3​∣w_1​,w_2​)∗…∗P(w_n​∣w_1​,w_2​,…,w_{n−1}​)<br>$$<br>即：<br>$$<br>P(w_1^n​)&#x3D;\prod​P(w_i​∣w_1^{i−1}​)<br>$$<br>然后用深度神经网络，对$P(w_i|w_1^{i-1})$ 进行建模，即：<br>$$<br>P(w_i|w_1^{i-1}) &#x3D; g(w_1^{i-1})<br>$$</p>
 <p>其中$g$ 是深度神经网络，如MLP&#x2F;RNN&#x2F;Transformer 等。</p>
 <p>文本生成的过程，即我们在已有的深度神经网络$g$ 下，生成（采样）合理句子（序列）的过程。其中$g$ 能生成给定context  $C$  时下一个时刻对应的词表分布, 其中$C$ 是由$w_1$, $w_2$, …, $w_m$ 组成的序列。<br>目前我们训练$g$ 通常采用Teacher-Forcing 的方式：训练阶段，每个时刻$t$ 之前的label $y_{&lt;t}$都是已知的，就像是老师讲课一样，将每一步的正确解题思路都告诉你，你只需要跟着老师的思路一步一步推导就能得到正确答案；然而在inference 阶段，我们是没法知道当前时刻之前的真实label 是什么的，所以需要将所有可能的序列的概率都求解出来，最后在所有可能性中选择概率最大的。如同考试时没了参考步骤，只能尝试多个思路，最后保留我们觉得”正确“的。</p>
-<p>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230307215330.png)<br>求解过程是一个求解最优路径问题，然而这个计算量太大了。假设我们的词表大小是$V$, 生成序列的长度为$k$, 每一个时刻都需要对所有状态（整个词表）进行计算，即使我们的词表只有五万个词，要生成五个token 也需要计算25万次，这个计算量实在是太大了。所以我们需要一些更高效的生成策略。</p>
+<p><img src="/2023/03/10/llm-inf/Pasted-image-20230307215330.png" alt="Pasted-image-20230307215330"></p>
+<p>求解过程是一个求解最优路径问题，然而这个计算量太大了。假设我们的词表大小是$V$, 生成序列的长度为$k$, 每一个时刻都需要对所有状态（整个词表）进行计算，即使我们的词表只有五万个词，要生成五个token 也需要计算25万次，这个计算量实在是太大了。所以我们需要一些更高效的生成策略。</p>
 <blockquote>
 <p>概率值$p$ 是一个范围在$0\sim 1$ ，多次连乘后会很快接近0，所以通常我们会将$max\prod p_i$ 转换为求$max \sum log(p_i)$ </p>
 </blockquote>
-<h2><span id="greedy-search">Greedy Search</span><a href="#greedy-search" class="header-anchor"></a></h2><p>Greedy search 的思路是：每次都选择概率最高的词作为最终采样结果，即: $w_t &#x3D; argmax_wP(w|w_1^{t-1})$<br>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230307223501.png)<br>该方法是缺点也很明显：局部最优的最终结果很可能不是全局最优，由于每次都是选局部最优，这也扼杀了模型找到全局最优的可能性。如上图中Greedy search 的结果是(The, nice, woman),而全局最优是(The, dog, has) .除此之外，模型的生成结果也不够”丰富“，甚至会出现不停重复之前的内容。</p>
-<h2><span id="beam-search">Beam Search</span><a href="#beam-search" class="header-anchor"></a></h2><p>”多一个选择，多一次机会“。为了缓解Greedy search 的问题，我们在每次选择时，不再只保留最高概率的一个，而是所有候选中保留概率最高的N 个(num_beams&#x2F;beam_width) path。<br>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230308095954.png)<br>上图是num_beams&#x3D;2 的示例：</p>
+<h2><span id="greedy-search">Greedy Search</span><a href="#greedy-search" class="header-anchor"></a></h2><p>Greedy search 的思路是：每次都选择概率最高的词作为最终采样结果，即: $w_t &#x3D; argmax_wP(w|w_1^{t-1})$<br><img src="/2023/03/10/llm-inf/Pasted-image-20230307223501.png" alt="Pasted-image-20230307223501"><br>该方法是缺点也很明显：局部最优的最终结果很可能不是全局最优，由于每次都是选局部最优，这也扼杀了模型找到全局最优的可能性。如上图中Greedy search 的结果是(The, nice, woman),而全局最优是(The, dog, has) .除此之外，模型的生成结果也不够”丰富“，甚至会出现不停重复之前的内容。</p>
+<h2><span id="beam-search">Beam Search</span><a href="#beam-search" class="header-anchor"></a></h2><p>”多一个选择，多一次机会“。为了缓解Greedy search 的问题，我们在每次选择时，不再只保留最高概率的一个，而是所有候选中保留概率最高的N 个(num_beams&#x2F;beam_width) path。<br><img src="/2023/03/10/llm-inf/Pasted-image-20230308095954.png" alt="Pasted-image-20230308095954"><br>上图是num_beams&#x3D;2 的示例：</p>
 <ol>
 <li>第一步时，在(The, dog)&#x2F;(The, nice)&#x2F;(The car)  三个路径中选择概率最高的两条path:(The, nice), (The, dog)</li>
 <li>第二步时，在(The, nice, wowan)&#x2F;(The, nice, house)&#x2F;(The, nice, guy)&#x2F;(The, dog, and)&#x2F;(The,dog,runs)&#x2F;(The,dog,has) 中选择路径概率（单步概率连乘）最高的两条path:(The, dog, has), (The, nice, woman)</li>
@@ -276,8 +277,9 @@
 <h3><span id="penalty">* penalty</span><a href="#penalty" class="header-anchor"></a></h3><p>除了temperature 这种对整体分布进行修改外，还有些场景需要我们对特定的某些token 的分布进行修改，此时就诞生了各种penalty，如repetition_penalty&#x2F;diversity_penalty等参数。注意：这里是对其分布乘以一个系数，其结果有可能并不改变其大小顺序。</p>
 <h3><span id="qiang-zhi-x2f-jin-zhi-te-ding-token-de-chu-xian">强制&#x2F;禁止 特定token 的出现</span><a href="#qiang-zhi-x2f-jin-zhi-te-ding-token-de-chu-xian" class="header-anchor"></a></h3><p>一些场景下，我们要求更加苛刻：希望某些token 一定&#x2F;永不 出现，同理，此时将满足条件的token 的分布直接调整为100%&#x2F;0%，如bad_words_ids&#x2F;no_repeat_ngram_size&#x2F;force_words_ids 等参数。</p>
 <h1><span id="gpu">GPU</span><a href="#gpu" class="header-anchor"></a></h1><p>下面已A100-80G SXM 为例，了解一下GPU 的基本信息。</p>
-<p>A100 specifications<br>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230307111416.png)<br>simplified view of the GPU architecture<br>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230309090721.png)</p>
-<p>Multiply-add operations per clock per SM<br>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230308160737.png)</p>
+<p>A100 specifications<br><img src="/2023/03/10/llm-inf/Pasted-image-20230307111416.png" alt="Pasted-image-20230307111416"></p>
+<p>simplified view of the GPU architecture<br><img src="/2023/03/10/llm-inf/Pasted-image-20230309090721.png" alt="Pasted-image-20230309090721"></p>
+<p>Multiply-add operations per clock per SM<br><img src="/2023/03/10/llm-inf/Pasted-image-20230308160737.png" alt="Pasted-image-20230308160737"></p>
 <ul>
 <li>FP16 Tensor Core peak dense throughputs:<br>$$1024 (Tensor cores) \ast 108 (SMs) \ast 1.41 GHz (clock rate)  \ast 2 (multiply-add) &#x3D;  312 TFLOPS $$</li>
 </ul>
@@ -312,7 +314,7 @@
 </tr>
 </tbody></table>
 <h1><span id="gpt-generation">GPT generation</span><a href="#gpt-generation" class="header-anchor"></a></h1><p>GPT2 model architecture</p>
-<p>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230310005359.png)</p>
+<p><img src="/2023/03/10/llm-inf/Pasted-image-20230310005359.png"></p>
 <h2><span id="ops-vs-bytes">ops vs bytes</span><a href="#ops-vs-bytes" class="header-anchor"></a></h2><p>我们忽略所有的bias&#x2F;layernorm&#x2F;activation&#x2F;add 操作,计算生成一个token 时的ops vs bytes, 切分head 与不切对应的ops&#x2F;bytes 是一样的，为了简单我们按不切计算。</p>
 <ol>
 <li><p>Embedding<br>  multiply:$E_{token}∈R^{V\times d_{model}}$,  $E_p\in R^{s_{maxseq} \times d_{models}}$<br>  mem: $2 \ast (V \ast d_{model} + s_{maxseq} \ast d_{model})$<br>  flops:   0</p>

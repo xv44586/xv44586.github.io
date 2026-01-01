@@ -245,26 +245,129 @@ ccf问答匹配比赛也结束了一段时间了，这篇算是一个下篇吧�
 <h1><span id="qian-yan">前言</span><a href="#qian-yan" class="header-anchor"></a></h1><p>在<a href="https://xv44586.github.io/2020/11/08/ccf-qa/">上一篇</a>中,笔者对比赛做了简单说明，提出了四种baseline（QA Pair&#x2F;QA Point&#x2F;PET&#x2F;Concat),并做了部分尝试（focal loss&#x2F;对抗训练&#x2F;梯度惩罚&#x2F;kfold&#x2F;post training),没看过的同学可以先看上篇，这里只简单再介绍一下：</p>
 <h2><span id="sai-ti">赛题</span><a href="#sai-ti" class="header-anchor"></a></h2><p>本次赛题的任务是：给定IM交流片段，片段包含一个客户问题以及随后的经纪人若干IM消息，从这些随后的经纪人消息中找出一个是对客户问题的回答。</p>
 <ul>
-<li>数据示例<br>$$<br>\begin{array}{c|c|c|c|c}<br>\hline<br>\text{对话id} &amp;  \text{客户问题} &amp; \text{经纪人回复id} &amp; \text{经纪人回复内容} &amp; \text{回复标签} \\<br>\hline<br>1 &amp; \text{您好，请问这个户型有什么优缺点} &amp; 1 &amp; \text{你是想看看这套房子是吗} &amp; 0 \\<br>\hline<br> &amp; &amp; \text{2} &amp; \text{在的} &amp;\text{0} \\<br>\hline<br> &amp; &amp; \text{3} &amp; \text{此房房型方正 得房率高 多层不带电梯4&#x2F;6楼<br>} &amp;\text{1} \\<br>\hline<br>\end{array}<br>$$</li>
+<li>数据示例<table>
+<thead>
+<tr>
+<th>对话id</th>
+<th>客户问题</th>
+<th>经纪人回复id</th>
+<th>经纪人回复内容</th>
+<th>回复标签</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>您好，请问这个户型有什么优缺点</td>
+<td>1</td>
+<td>你是想看看这套房子是吗</td>
+<td>0</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>2</td>
+<td>在的</td>
+<td>0</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<p>|        |                              | 3            | 此房房型方正 得房率高 多层不带电梯4&#x2F;6楼     | 1        |</p>
+<ul>
 <li>评测标准</li>
 </ul>
-<p>f1：2 * (精度 * 召回) &#x2F; (精度 + 召回)</p>
+<p>f1：$$2 * (精度 * 召回) &#x2F; (精度 + 召回)$$</p>
 <h2><span id="qa-pair">QA pair</span><a href="#qa-pair" class="header-anchor"></a></h2><p>由于回答列表是不连续的，所以不考虑问答之间的顺序关系，将其拆分为query-answer pair，然后进行判断。<br><img src="/2021/01/20/ccf-qa-2/pair.png" alt="pair"></p>
 <h2><span id="qa-point">QA Point</span><a href="#qa-point" class="header-anchor"></a></h2><p>考虑对话连贯性、相关性，将所有回答顺序拼接后再与问题拼接，组成query-answer list，模型对一个问题的所有答案进行预测。此外，我们还给模型增加了“大局观”，即新增一个任务来预测全局所有回答中是否存在label为 1 的回答。<br><img src="/2021/01/20/ccf-qa-2/point.png" alt="point"></p>
 <h2><span id="pattern-exploiting-training-pet">Pattern-Exploiting Training (PET)</span><a href="#pattern-exploiting-training-pet" class="header-anchor"></a></h2><p>此方案通过增加一个pattern，将任务转换为MLM任务，然后通过pattern的得分来判断对应的类别。<br>如本次比赛可以添加一个前缀pattern：“间接回答问题”&#x2F; “直接回答问题”，分别对应label 0 &#x2F; 1，pattern的得分只需看第一个位置中“间”&#x2F;“直”两个token的概率谁高即可。对于unlabel data，可以不增加pattern 进行mlm任务，这也在一定程度增加了模型的泛化能力。此外，通过多个不同pattern进行融合也能进一步提高其性能。<br><img src="/2021/01/20/ccf-qa-2/pet.png" alt="pet"></p>
 <h2><span id="concat">Concat</span><a href="#concat" class="header-anchor"></a></h2><p>由于bert 中不同的transformer 层提取到的语义粒度不同，而不同粒度的信息对分类来说起到的作用也可能不同，所以可以将所有粒度的语义信息拼接后作为特征进行分类。<br><img src="/2021/01/20/ccf-qa-2/concat.png" alt="concat"></p>
 <h2><span id="focal-loss">focal loss</span><a href="#focal-loss" class="header-anchor"></a></h2><p>由于针对性回答与非针对性回答在数量上有不小差距，大约3:1，所以也想到尝试在loss上进行调节。<br>最终结果是没有多少提升，猜测样本不均衡的问题影响是非常小的，所以将Binary-Crossentropy训练后的模型在train data上进行了predict，并借鉴之前<a href="https://xv44586.github.io/2020/10/14/focal-loss/">focal loss</a>中的方式分析了一下，画出对应的难易样本分布。根据图形上的分布结果，也证实了之前的猜测。<br><img src="/2021/01/20/ccf-qa-2/focalloss.png" alt="focalloss"></p>
 <h2><span id="dui-kang-xun-lian">对抗训练</span><a href="#dui-kang-xun-lian" class="header-anchor"></a></h2><p>对抗训练主要尝试了<a target="_blank" rel="noopener" href="https://kexue.fm/archives/7234">FGM 方法对Embedding进行扰动</a>，线下对比提升大约一个点上下。<br>线下测试结果：</p>
-<p>$$<br>\begin{array}{c|c}<br>\hline<br>\text{without adt} &amp; \text{with adt} \\<br>\hline<br>\text{0.831} &amp; \text{0.838} \\<br>\end{array}<br>$$</p>
+<table>
+<thead>
+<tr>
+<th>without adt</th>
+<th>with adt</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.831</td>
+<td>0.838</td>
+</tr>
+</tbody></table>
 <h2><span id="post-training">post training</span><a href="#post-training" class="header-anchor"></a></h2><p>上一篇中，提到post training 做的效果不好，然而pet 的效果又很好，两者比较矛盾，所以我也重新阅读了几篇关于优化bert 与post training 相关的论文，重新思考了一下，这篇就从重新做post training开始。</p>
 <h1><span id="post-training">Post Training</span><a href="#post-training" class="header-anchor"></a></h1><p>post training一般包括两部分：Domain-Adaptive training 和 Task-Adaptive training，通过在同领域与任务数据上继续预训练，可以让模型更适应任务，有利于提高模型在下游的性能。而bert 在训练时主要有两个任务：mlm 与nsp ，接下来针对每个任务进行讨论。</p>
-<h2><span id="mlm">MLM</span><a href="#mlm" class="header-anchor"></a></h2><p>在post training 阶段尝试进一步优化的只找到刘知远老师的<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2004.09733">Train No Evil: Selective Masking for Task-Guided Pre-Training</a>，论文里的思路是通过建立一个二分类模型，来有针对性的选择token 来进行mask，不过由于这个方法比较麻烦，需要三个中间模型，所以没有尝试，不过这个论文给出了一个结论：在继续预训练的过程中，优化mask 策略，是可以进一步提高下游性能的。<br>让我们回归一下bert 的mask 策略即后续的改进：<br>$$<br>\begin{array}{c|c|}<br>\hline<br>\text{model} &amp; \text{mask sstrategy} \\<br>\hline<br>\text{bert} &amp; \text{random mask} \\<br>\hline<br>\text{RoBERTa} &amp; \text{dynamic mask} \\<br>\hline<br>\text{RoBERTa-wwm-ext} &amp; \text{whole word mask} \\<br>\hline<br>\text{ERNIE} &amp; \text{entity&#x2F;phrase mask} \\<br>\hline<br>\text{SpanBERT} &amp; \text{n-gram mask}\\<br>\hline<br>\end{array}<br>$$</p>
+<h2><span id="mlm">MLM</span><a href="#mlm" class="header-anchor"></a></h2><p>在post training 阶段尝试进一步优化的只找到刘知远老师的<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2004.09733">Train No Evil: Selective Masking for Task-Guided Pre-Training</a>，论文里的思路是通过建立一个二分类模型，来有针对性的选择token 来进行mask，不过由于这个方法比较麻烦，需要三个中间模型，所以没有尝试，不过这个论文给出了一个结论：在继续预训练的过程中，优化mask 策略，是可以进一步提高下游性能的。<br>让我们回归一下bert 的mask 策略即后续的改进：</p>
+<table>
+<thead>
+<tr>
+<th>model</th>
+<th>mask strategy</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bert</td>
+<td>random mask</td>
+</tr>
+<tr>
+<td>RoBERTa</td>
+<td>dynamic mask</td>
+</tr>
+<tr>
+<td>RoBERTa-wwm-ext</td>
+<td>whole word mask</td>
+</tr>
+<tr>
+<td>ERNIE</td>
+<td>entity&#x2F;phrase mask</td>
+</tr>
+<tr>
+<td>SpanBERT</td>
+<td>n-gram mask</td>
+</tr>
+</tbody></table>
 <p>这里笔者思考后认为，不同的mask 策略本质区别是对更多的“固定搭配”进行同时mask，从而降低模型对局部、浅层信息的过拟合，增加任务的难度，提高模型的泛化能力。<br>所谓“固定搭配”，不仅仅包含词，或者说是更广义的“词”。字的固定搭配可以构成词，进一步固定搭配又可以形成短语。比如考虑“好好学习，天天向上”，“08北京奥运会”，如果只mask 其中一部分，是比较“容易”通过剩余的部分来还原的。<br>既然“固定搭配”是更广义的词，这里我们就可以来挖掘这些“固定搭配”了。最简单的方式就是新词&#x2F;短语挖掘，而新词&#x2F;短语挖掘最常用的方法是计算左右熵和紧密度，不过这种方式计算量较大，这次比赛笔者舍弃了这种方式，采用借鉴苏神的博客<a target="_blank" rel="noopener" href="https://kexue.fm/archives/5476">最小熵原理（二）：“当机立断”之词库构建</a>中的思路，用PMI表征紧密度，用相邻两个字之间的紧密度判断两者是否存在“固定搭配”,最终未被切分的为一个整体。最后将挖掘出的新词通过jieba 过滤掉已在词库内的，并只保留长度2~5的新词，添加到jieba的词库内。这里选择用jieba 做分词工具的原因是因为笔者用的是NEZHA，而NEZHA在训练时使用的就是jieba 处理的数据，这里与他保持一致，而长度选择上，主要借鉴spanBert中的结论。<br>最后挖掘了2736个新词，而如果是实际工作中，则可以进一步将积累的词也加入。<br><img src="/2021/01/20/ccf-qa-2/new_words.png" alt="new_words"><br>以上的方式中全程没有人为参与，所以新词的质量是无法保证的，即存在词的边界不准确。而此时的全词mask 退化为n-gram mask，依然是一种有效的提升方案。</p>
 <h2><span id="nsp">nsp</span><a href="#nsp" class="header-anchor"></a></h2><p>原始bert 在训练时，句子级别的任务为nsp，而RoBERTa 中给出的结论是句子级别的任务没什么用，所以取消了句子级别的任务；而albert 中则将句子级别的任务切换为sop，而SpanBERT中则切换为sbo。这里笔者认为下游任务是句子级别的分类任务，所以句子级别的任务是有用的，不过由于nsp 会引入大量噪音，所以这里选择sop&#x2F;aop：在qa pair格式的样本下互换qa(sop)，在q a-list格式的样本下，保持query 在最前面，只shuffle a-list(aop)。</p>
-<p>$$<br>\begin{array}{c|c|c}<br>\hline<br> &amp; \text{without sop&#x2F;aop} &amp; \text{with sop&#x2F;aop} \\<br>\hline<br>\text{qa pair} &amp; \text{0.784} &amp; \text{0.79} \\<br>\hline<br>\text{q a-list} &amp; \text{0.799} &amp; \text{0.802} \\<br>\hline<br>\end{array}<br>$$</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>without sop&#x2F;aop</th>
+<th>with sop&#x2F;aop</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>qa pair</td>
+<td>0.784</td>
+<td>0.79</td>
+</tr>
+<tr>
+<td>q a-list</td>
+<td>0.799</td>
+<td>0.802</td>
+</tr>
+</tbody></table>
 <h2><span id="model-adaptive">model-adaptive</span><a href="#model-adaptive" class="header-anchor"></a></h2><p>由于样本的组织方式有qa pair 和 q a-list两种方式，而task 相关的数据是相对较小的，所以这里笔者认为两个阶段的样本组织方式相同的情况下，性能会更好，即：用qa pair格式post training后的模型，来微调qa pair格式的baseline，q a-list格式post training后的模型微调q a-list格式的baseline。</p>
 <h2><span id="geng-xin-ci-shu">更新次数</span><a href="#geng-xin-ci-shu" class="header-anchor"></a></h2><p>这里参考邱锡鹏老师的<a target="_blank" rel="noopener" href="http://arxiv.org/abs/1905.05583">How to Fine-Tune BERT for Text Classification?</a>，实验时每10 个epochs保存一次模型，最后通过在下游任务上的表现，得出与论文中基本一致的结论：更新10K steps左右模型在下游的表现是最好的。<br><img src="/2021/01/20/ccf-qa-2/update.png" alt="update"></p>
-<h2><span id="zui-zhong-jie-guo">最终结果</span><a href="#zui-zhong-jie-guo" class="header-anchor"></a></h2><p>$$<br>\begin{array}{c|c|c}<br>\hline<br> \text{post-train&#x2F;fine-tuning}&amp; \text{pair} &amp; \text{point} \\<br>\hline<br>\text{pair} &amp; \text{0.79} &amp; \text{0.794} \\<br>\hline<br>\text{point} &amp; \text{0.786} &amp; \text{0.802} \\<br>\hline<br>\end{array}<br>$$</p>
+<h2><span id="zui-zhong-jie-guo">最终结果</span><a href="#zui-zhong-jie-guo" class="header-anchor"></a></h2><table>
+<thead>
+<tr>
+<th>post-train&#x2F;fine-tuning</th>
+<th>pair</th>
+<th>point</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>pair</td>
+<td>0.79</td>
+<td>0.794</td>
+</tr>
+<tr>
+<td>point</td>
+<td>0.786</td>
+<td>0.802</td>
+</tr>
+</tbody></table>
 <p>此时我们认为已经将bert的能力最大化了，于是这里也尝试了在bert 后面接一些复杂的分类层（cnn&#x2F;rnn&#x2F;dgcnn&#x2F;..),发现都无法进一步提高，所以也证实了之前的判断。</p>
 <h1><span id="rong-ru-zhi-shi">融入知识</span><a href="#rong-ru-zhi-shi" class="header-anchor"></a></h1><p>既然从“内部”已经无法进一步提高bert的能力，所以此时尝试融入外部知识来增强。而融合的方式主要尝试了两种：  </p>
 <ul>
@@ -273,7 +376,27 @@ ccf问答匹配比赛也结束了一段时间了，这篇算是一个下篇吧�
 <li><p>最顶层注入<br>在transformer output 层融入外部Embedding。优点：更灵活，不局限外部知识的形式（可以是Embedding，也可以说是其他特征，如手工特征）。<br><img src="/2021/01/20/ccf-qa-2/outside.png"></p>
 </li>
 </ul>
-<p>在知识选择上，首先想到的是Graph EMbedding，参考<a target="_blank" rel="noopener" href="http://arxiv.org/abs/2004.05707">VGCN-BERT: Augmenting BERT with Graph Embedding for Text Classification</a>,我们重跑了一下论文的代码，发现无法重现其中的结论，而我对Graph Embedding也不熟，所以放弃了这个方案。<br>然后尝试简单的embedding，即用gensim 在task data上训练了一版词向量(dims&#x3D;100),作为外部知识来实验。<br>线下测试结果：<br>$$<br>\begin{array}{c|c}<br>\hline<br> \text{model} &amp; \text{score} \\<br>\hline<br>\text{bert} &amp; \text{0.831} \\<br>\hline<br>\text{external-embedding bottom} &amp; \text{0.82} \\<br>\hline<br>\text{external-embedding top} &amp; \text{0.83} \\<br>\hline<br>\end{array}<br>$$</p>
+<p>在知识选择上，首先想到的是Graph EMbedding，参考<a target="_blank" rel="noopener" href="http://arxiv.org/abs/2004.05707">VGCN-BERT: Augmenting BERT with Graph Embedding for Text Classification</a>,我们重跑了一下论文的代码，发现无法重现其中的结论，而我对Graph Embedding也不熟，所以放弃了这个方案。<br>然后尝试简单的embedding，即用gensim 在task data上训练了一版词向量(dims&#x3D;100),作为外部知识来实验。<br>线下测试结果：</p>
+<table>
+<thead>
+<tr>
+<th>model</th>
+<th>score</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bert</td>
+<td>0.831</td>
+</tr>
+<tr>
+<td>external-embedding bottom</td>
+<td>0.82</td>
+</tr>
+<tr>
+<td>external-embedding top</td>
+<td>0.83</td>
+</tr>
+</tbody></table>
 <p>可以看到，两种方式都是无法进一步提高的，主要原因可能是：1.词向量的质量较差；2.词向量也是bert的“内部”知识；3.融入的方式或者调参没做好。</p>
 <h1><span id="dui-bi-xue-xi">对比学习</span><a href="#dui-bi-xue-xi" class="header-anchor"></a></h1><p>在模型上，还能通过增加新的任务来尝试提高性能。而今年比较热的一个思路就是对比学习，所以这里尝试通过增加一个对比学习任务来提高性能。<br>对比学习的主要思路是拉近到正样本之间的距离，拉远到负样本之间的距离。<br><img src="/2021/01/20/ccf-qa-2/cl.png"><br>对比学习主要又分为两种：监督对比学习和分监督对比学习。监督对比学习中，将相同label的样本看做是正例，其他的为负例；而非监督对比学习中，则通过对每个样本构造一对view，view之间互为正例，其他的为负例。</p>
 <h2><span id="fei-jian-du-dui-bi-xue-xi">非监督对比学习</span><a href="#fei-jian-du-dui-bi-xue-xi" class="header-anchor"></a></h2><p>非监督对比学习中，通过互换QA位置，同时随机mask 15% 的token，来构造一对view。</p>
@@ -297,7 +420,26 @@ ccf问答匹配比赛也结束了一段时间了，这篇算是一个下篇吧�
 <h2><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h2><ul>
 <li>线下结果：</li>
 </ul>
-<p>$$<br>\begin{array}{c|c}<br>\hline<br> \text{model} &amp; \text{score} \\<br>\hline<br>\text{bert} &amp; \text{0.831} \\<br>\hline<br>\text{self-supervised contrastive learning} &amp; \text{0.80} \\<br>\hline<br>\text{supervised contrastive learning} &amp; \text{0.824} \\<br>\hline<br>\end{array}<br>$$</p>
+<table>
+<thead>
+<tr>
+<th>model</th>
+<th>score</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>bert</td>
+<td>0.831</td>
+</tr>
+<tr>
+<td>self-supervised contrastive learning</td>
+<td>0.80</td>
+</tr>
+<tr>
+<td>supervised contrastive learning</td>
+<td>0.824</td>
+</tr>
+</tbody></table>
 <ul>
 <li><p>非监督对比学习结果可视化<br><img src="/2021/01/20/ccf-qa-2/ssc-vis.png"></p>
 </li>
@@ -311,24 +453,132 @@ ccf问答匹配比赛也结束了一段时间了，这篇算是一个下篇吧�
 <h2><span id="shi-yan-jie-guo">实验结果</span><a href="#shi-yan-jie-guo" class="header-anchor"></a></h2><ul>
 <li>线上结果</li>
 </ul>
-<p>$$<br>\begin{array}{c|c}<br>\hline<br> \text{without DA} &amp; \text{with DA} \\<br>\hline<br>\text{0.802} &amp; \text{0.806} \\<br>\hline<br>\end{array}<br>$$</p>
+<table>
+<thead>
+<tr>
+<th>without DA</th>
+<th>with DA</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.802</td>
+<td>0.806</td>
+</tr>
+</tbody></table>
 <h1><span id="zi-zheng-liu">自蒸馏</span><a href="#zi-zheng-liu" class="header-anchor"></a></h1><p>借助知识蒸馏，我们尝试了自蒸馏方案：即Teacher 与 Student 为同一个模型，Teacher模型先学习一遍后，对训练样本打上soft labels，Student 同时学习true labels 与 soft labels. </p>
 <ul>
 <li><p>soft labels：<br>$$<br>q_i &#x3D; \frac{exp(\frac{z_i}{T})}{\sum_j exp(\frac{z_j}{T})}<br>$$</p>
 </li>
-<li><p>线下测试结果：<br>$$<br>\begin{array}{c|c}<br>\hline<br> \text{without KD} &amp; \text{with KD} \\<br>\hline<br>\text{0.831} &amp; \text{0.84} \\<br>\hline<br>\end{array}<br>$$</p>
+<li><p>线下测试结果：</p>
+<table>
+<thead>
+<tr>
+<th>without KD</th>
+<th>with KD</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.831</td>
+<td>0.84</td>
+</tr>
+</tbody></table>
 </li>
 </ul>
 <h1><span id="shuffle-jie-ma">shuffle 解码</span><a href="#shuffle-jie-ma" class="header-anchor"></a></h1><p>对于q a-list 的模型，可以在预测时，对answer list 进行全排列，然后将结果投票，一来可以将answer label之间的影响降低，二来可以在非常小的成本下融合，也算是一种trick。不过此次比赛的数据对顺序比较敏感，shuffle后大多数情况下会降低模型的性能，所以最终融合后结果没提升反而降低了。</p>
 <h1><span id="mo-xing-rong-he">模型融合</span><a href="#mo-xing-rong-he" class="header-anchor"></a></h1><p>为了提高模型的稳定性与泛化能力，我们进行了模型融合。融合时，我们期望模型间能“和而不同”：每个单模型的性能之间差异小（都要接近最优单模型），且模型之间差异尽量大(架构或者优化方案上差异尽量大）。根据以上策略，对QA Pair 与 QA Point两种模型进行融合。</p>
 <h1><span id="shi-yan-zong-jie">实验总结</span><a href="#shi-yan-zong-jie" class="header-anchor"></a></h1><ul>
-<li><p>能work的方案<br>$$<br>\begin{array}{c|c}<br>\hline<br> \text{task-adaptive training} &amp; \text{+1.5%<del>3%} \\<br>\hline<br>\text{加入新词} &amp; \text{+0.5%</del>1%} \\<br>\hline<br>\text{加入sop&#x2F;aop} &amp; \text{+0.1%<del>0.3%} \\<br>\hline<br>\text{model-adaptive} &amp; \text{+0.5%</del>0.7%} \\<br>\hline<br>\text{对抗训练} &amp; \text{+0.5%<del>0.9%} \\<br>\hline<br>\text{EDA} &amp; \text{+0.3%</del>0.5%} \\<br>\hline<br>\text{模型融合} &amp; \text{+0.5%~0.7%} \\<br>\hline<br>\end{array}<br>$$</p>
-</li>
-<li><p>不能work的方案<br>$$<br>\begin{array}{c|c}<br>\hline<br> \text{external-embedding bottom} &amp; \text{-0.2%<del>0%} \\<br>\hline<br>\text{external-embedding top} &amp; \text{-0.1%</del>0%} \\<br>\hline<br>\text{self-supervised contrastive learning} &amp; \text{-0.4%<del>-0.2%} \\<br>\hline<br>\text{supervised contrastive learning} &amp; \text{-0.1%</del>0%} \\<br>\hline<br>\text{focal loss} &amp; \text{0%} \\<br>\hline<br>\text{shuffle trick} &amp; \text{-0.15%~0} \\<br>\end{array}<br>$$</p>
-</li>
-<li><p>线下有效但未提交<br>$$<br>\begin{array}{c|c}<br>\hline<br> \text{自蒸馏} &amp; \text{+0.5%<del>1%} \\<br>\hline<br>\text{伪标签} &amp; \text{+0.1%</del>0.3%} \\<br>\hline<br>\end{array}<br>$$</p>
-</li>
+<li>能work的方案</li>
 </ul>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>提升</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>task-adaptive training</td>
+<td>+1.5%~3%</td>
+</tr>
+<tr>
+<td>加入新词</td>
+<td>+0.5%~1%</td>
+</tr>
+<tr>
+<td>加入sop&#x2F;aop</td>
+<td>+0.1%~0.3%</td>
+</tr>
+<tr>
+<td>model-adaptive</td>
+<td>+0.5%~0.7%</td>
+</tr>
+<tr>
+<td>对抗训练</td>
+<td>+0.5%~0.9%</td>
+</tr>
+<tr>
+<td>EDA</td>
+<td>+0.3%~0.5%</td>
+</tr>
+<tr>
+<td>模型融合</td>
+<td>+0.5%~0.7%</td>
+</tr>
+</tbody></table>
+<ul>
+<li>不能work的方案</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>提升</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>external-embedding bottom</td>
+<td>-0.2%~0%</td>
+</tr>
+<tr>
+<td>external-embedding top</td>
+<td>-0.1%~0%</td>
+</tr>
+<tr>
+<td>self-supervised contrastive learning</td>
+<td>-0.4%~-0.2%</td>
+</tr>
+<tr>
+<td>supervised contrastive learning</td>
+<td>-0.1%~0%</td>
+</tr>
+<tr>
+<td>focal loss</td>
+<td>0%</td>
+</tr>
+<tr>
+<td>shuffle trick</td>
+<td>-0.15%~0</td>
+</tr>
+</tbody></table>
+<ul>
+<li>线下有效但未提交</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>提升</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>自蒸馏</td>
+<td>+0.5%~1%</td>
+</tr>
+<tr>
+<td>伪标签</td>
+<td>+0.1%~0.3%</td>
+</tr>
+</tbody></table>
 <p>对于PET ，在post training后的效果并不是很好，不过由于没有时间了，所以没有继续优化。这里提一下可以优化的点：1.可以增加解码空间；2.增加多个pattern 进行融合的方式尝试优化。笔者本人是比较喜欢PET 这个思路的，统一了两个阶段，所以可做的事还有很多。</p>
 <h1><span id="bi-sai-jie-guo">比赛结果</span><a href="#bi-sai-jie-guo" class="header-anchor"></a></h1><p>比赛最终的线上成绩在A&#x2F;B 榜均是第一，答辩阶段也得到了第一。</p>
 <ul>

@@ -228,7 +228,21 @@ question：usb线电压
 answer: ['5伏']
 generate question: usb线电压 </blockquote>
 
-<p>解码时，有两种选择：随机抽样与 beam search 。随机抽样可以增加问题的多样性，并且可以生成多个问题；beam search近似最优，得到一个最优的<br>问题。由于我们是使用 train data 训练模型，在对 train data 生成新的问题时，beam search 将可能产生很多一摸一样的问题，这样将降低新增<br>数据的量；而随机抽样能产生很多新的问题，但可能新生成的问题与答案并不配套，还需要一些后处理之后才能真正拿来用。这里两种方式都拿来做实验，<br>并对生成的问题做一个简单的过滤：新生成的问题与原问题中有70%以上的字是重合的。<br>$$<br>\begin{array}{c|c|c}<br>\hline \\<br>\text{base line} &amp; \text{beam search} &amp; \text{random sample}\\<br>\hline \\<br>80.39% &amp; 81.0% &amp; 79.8%<br>\end{array}<br>$$</p>
+<p>解码时，有两种选择：随机抽样与 beam search 。随机抽样可以增加问题的多样性，并且可以生成多个问题；beam search近似最优，得到一个最优的<br>问题。由于我们是使用 train data 训练模型，在对 train data 生成新的问题时，beam search 将可能产生很多一摸一样的问题，这样将降低新增<br>数据的量；而随机抽样能产生很多新的问题，但可能新生成的问题与答案并不配套，还需要一些后处理之后才能真正拿来用。这里两种方式都拿来做实验，<br>并对生成的问题做一个简单的过滤：新生成的问题与原问题中有70%以上的字是重合的。</p>
+<table>
+<thead>
+<tr>
+<th>base line</th>
+<th>beam search</th>
+<th>random sample</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>80.39%</td>
+<td>81.0%</td>
+<td>79.8%</td>
+</tr>
+</tbody></table>
 <p>random sample的样本经过了很多次过滤之后才能基本达到baseline的效果，所以生成的问题如果”问非所答”，对最终的效果反而是不好的，这也符合预期。</p>
 <h2><span id="wen-ti-da-an-dui-sheng-cheng">问题答案对生成</span><a href="#wen-ti-da-an-dui-sheng-cheng" class="header-anchor"></a></h2><p>问题答案对生成时，由于答案是在 context 内的，相对问题生成简单一些，所以我们先生成答案，再根据 context 和生成的 answer 来生成对应的<br>question。不过为了让问题答案对更丰富多样，解码答案时我们采用随机抽样，而生成问题时，为了让问题尽量准确，我们采用 beam search。<br>样本形如 <code>[CLS]context[SEP]answer[SEP][question][SEP]</code>，生成的效果如下：</p>
 <blockquote>
@@ -239,15 +253,9 @@ generate question: 孕妇6个月体重增加多少
 generate answer: 12.5公斤左右
 </blockquote>
 不过也由于train data 参与训练，所以很多生成的问题答案对与原始问题答案对一致，如果有更多的外部数据，可以利用外部数据来训练。
-$$
-\\begin{array}{c|c|c|c} 
-\\hline \\\\
-\\text{base line} & \\text{beam search} & \\text{random sample} & \\text{question answer generation}\\\\ 
-\\hline \\\\
-80.39\% & 81.0\% & 79.8\% & 81.76\% \\\\
-\\hline 
-\\end{array}
-$$
+| base line | beam search | random sample | question answer generation |
+|-----------|-------------|---------------|----------------------------|
+| 80.39%    | 81.0%       | 79.8%         | 81.76%                     |
 
 <h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>通过生成新的问题与新的问题答案对能在一定程度上提高qa 任务的性能，在生成问题时，用beam search 得到的新问题虽然量少但由于更准确，所以<br>能带来一定的提升；用随机采样生成的问题会有部分与答案无关的或者语义有点不通顺的问题，所以可能反而会导致性能降低；问题答案对的生成时，<br>先生成相对简单的回答再生成对应问题，能对性能带来不错的提升，在做qa相关任务时，可以尝试使用一下。<br>实验代码：<br><a target="_blank" rel="noopener" href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/qa_baseline.py">qa_baseline</a><br><a target="_blank" rel="noopener" href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/qa_question_generation_seq2seq.py">qa_question_generation_seq2seq</a><br><a target="_blank" rel="noopener" href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/qa_question_answer_generation_seq2seq.py">qa_question_answer_generation_seq2seq</a></p>
 <h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>看瓜的怒气小猫</p>
