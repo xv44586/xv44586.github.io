@@ -38,3 +38,22 @@
     </script>
     <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 {% endif %}
+{% if page.comments !== false %}
+<div id="comment-container" class="comment-container" style="margin-top: 50px;">
+    <script src="https://giscus.app/client.js"
+            data-repo="xv44586/giscus"
+            data-repo-id="R_kgDOIC6Ipg"
+            data-category="Announcements"
+            data-category-id="DIC_kwDOIC6Ips4CRkmo"
+            data-mapping="pathname"
+            data-strict="0"
+            data-reactions-enabled="1"
+            data-emit-metadata="0"
+            data-input-position="bottom"
+            data-theme="preferred_color_scheme"
+            data-lang="zh-CN"
+            crossorigin="anonymous"
+            async>
+    </script>
+</div>
+{% endif %}

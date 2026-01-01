@@ -21,18 +21,26 @@
             <a itemprop="url" href="{{ url_for(post.path) }}" title="{{ post.title }}">{{ post.title }}</a>
         </h3>
         <p class="mini-article__author">by 
-            {% if Array.isArray(post.author) %}
-                {% for user in post.author %}
-                    <span class="author__item" itemprop="author" itemscope itemtype="http://schema.org/Person">
-                        <a itemprop="url" href="{{ user.link }}" target="_blank">
-                            <span itemprop="name">{{ titlecase(user.name || user.nick) }}</span>
+            {% if post.author %}
+                {% if post.author.length %}
+                    {% for user in post.author %}
+                        <span class="author__item" itemprop="author" itemscope itemtype="http://schema.org/Person">
+                            <a itemprop="url" href="{{ user.link || '/' }}" target="_blank">
+                                <span itemprop="name">{{ titlecase(user.name || user.nick || 'unknown') }}</span>
+                            </a>
+                        </span>
+                    {% endfor %}
+                {% else %}
+                    <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+                        <a itemprop="url" href="{{ post.author.link || '/' }}" target="_blank">
+                            <span itemprop="name">{{ titlecase(post.author.name || post.author.nick || 'unknown') }}</span>
                         </a>
                     </span>
-                {% endfor %}
+                {% endif %}
             {% else %}
                 <span itemprop="author" itemscope itemtype="http://schema.org/Person">
-                    <a itemprop="url" href="{{ post.author.link }}" target="_blank">
-                        <span itemprop="name">{{ titlecase(post.author.name || post.author.nick) }}</span>
+                    <a itemprop="url" href="/" target="_blank">
+                        <span itemprop="name">{{ get_setting('author', 'name') }}</span>
                     </a>
                 </span>
             {% endif %}

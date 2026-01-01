@@ -17,7 +17,7 @@ body {
 .post__cover {
     width: 100%;
 
-    & > img {
+    &>img {
         display: block;
         width: 100%;
     }
@@ -61,11 +61,11 @@ body {
         float: left;
         margin-right: 5px;
 
-        & > span {
+        &>span {
             vertical-align: middle;
         }
 
-        & > a {
+        &>a {
             @include link($main-color);
             color: $main-fc;
             vertical-align: middle;
@@ -98,7 +98,7 @@ body {
         flex: 1 0 0;
         overflow: hidden;
 
-        & > a {
+        &>a {
             font-size: $main-fs;
             display: inline-block;
             max-width: 100%;
@@ -120,7 +120,7 @@ body {
                 color: $main-color--hover;
             }
 
-            & > i {
+            &>i {
                 font-size: 16px;
             }
         }

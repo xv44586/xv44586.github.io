@@ -56,14 +56,9 @@ generate question: usb线电压 </blockquote>
 问题。由于我们是使用 train data 训练模型，在对 train data 生成新的问题时，beam search 将可能产生很多一摸一样的问题，这样将降低新增
 数据的量；而随机抽样能产生很多新的问题，但可能新生成的问题与答案并不配套，还需要一些后处理之后才能真正拿来用。这里两种方式都拿来做实验，
 并对生成的问题做一个简单的过滤：新生成的问题与原问题中有70%以上的字是重合的。
-$$
-\\begin{array}{c|c|c} 
-\\hline \\\\
-\\text{base line} & \\text{beam search} & \\text{random sample}\\\\ 
-\\hline \\\\
-80.39\% & 81.0\% & 79.8\% 
-\\end{array}
-$$
+| base line | beam search | random sample |
+|-----------|-------------|---------------|
+| 80.39%    | 81.0%       | 79.8%         |
 
 random sample的样本经过了很多次过滤之后才能基本达到baseline的效果，所以生成的问题如果"问非所答"，对最终的效果反而是不好的，这也符合预期。
 
@@ -79,15 +74,9 @@ generate question: 孕妇6个月体重增加多少
 generate answer: 12.5公斤左右
 </blockquote>
 不过也由于train data 参与训练，所以很多生成的问题答案对与原始问题答案对一致，如果有更多的外部数据，可以利用外部数据来训练。
-$$
-\\begin{array}{c|c|c|c} 
-\\hline \\\\
-\\text{base line} & \\text{beam search} & \\text{random sample} & \\text{question answer generation}\\\\ 
-\\hline \\\\
-80.39\% & 81.0\% & 79.8\% & 81.76\% \\\\
-\\hline 
-\\end{array}
-$$
+| base line | beam search | random sample | question answer generation |
+|-----------|-------------|---------------|----------------------------|
+| 80.39%    | 81.0%       | 79.8%         | 81.76%                     |
 
 # 总结
 通过生成新的问题与新的问题答案对能在一定程度上提高qa 任务的性能，在生成问题时，用beam search 得到的新问题虽然量少但由于更准确，所以

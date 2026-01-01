@@ -93,16 +93,10 @@ $$
 $$
 
 ner-crf: 公司数据
-$$
-\\begin{array}{c|c|c} 
-\\hline 
-& \\text{直接微调} & \\text{BERT-of-Theseus}\\\\ 
-\\hline 
-\\begin{array}{c}\\text{层数} \\\\ \\text{效果}\\end{array} & \\begin{array}{ccc}\\text{完整12层} & \\text{前6层} & \\text{前3层} 
-\\\\ 97.5\% & 97.0\%  & 96.1\%\\end{array} & \\begin{array}{cc}\\text{6层} & \\text{3层} \\\\ 97.3\%  & 96.6\% \\end{array}\\\\ 
-\\hline 
-\\end{array}
-$$
+|            | 直接微调                                    | BERT-of-Theseus      |
+|------------|---------------------------------------------|----------------------|
+| **层数**   | 完整12层 / 前6层 / 前3层                    | 6层 / 3层            |
+| **效果**   | 97.5% / 97.0% / 96.1%                       | 97.3% / 96.6%        |
 
 可以看到，相比直接那前几层微调，bert-of-theseus的效果确实更好，此外，我还尝试了线性策略的替换概率，效果上差别不大。
 实验代码：[classification_ifytek_bert_of_theseus](https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_ifytek_bert_of_theseus.py)

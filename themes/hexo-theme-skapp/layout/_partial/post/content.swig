@@ -10,15 +10,21 @@
             <div class="mark__block">
                 <i class="mark__icon iconfont icon-write"></i>
                 <ul class="mark__list clearfix">
-                    {% if Array.isArray(page.author) %}
-                        {% for user in page.author %}
+                    {% if page.author %}
+                        {% if page.author.length %}
+                            {% for user in page.author %}
+                                <li class="mark__item">
+                                    <a href="{{ url_for(user.link || '') }}">{{ (user.nick || user.name)|default(get_setting('author', 'name')) }}</a>
+                                </li>
+                            {% endfor %}
+                        {% else %}
                             <li class="mark__item">
-                                <a href="{{ url_for(user.link || '') }}">{{ (user.nick || user.name)|default(get_setting(author.name)) }}</a>
+                                <a href="{{ url_for(page.author.link || '') }}">{{ (page.author.nick || page.author.name)|default(get_setting('author', 'name')) }}</a>
                             </li>
-                        {% endfor %}
+                        {% endif %}
                     {% else %}
                         <li class="mark__item">
-                            <a href="{{ url_for(page.author.link || '') }}">{{ (page.author.nick || page.author.name)|default(get_setting(author.name)) }}</a>
+                            <a href="{{ url_for('/') }}">{{ get_setting('author', 'name') }}</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -55,17 +61,13 @@
 
     <div class="post__content">
         {{ render(page.content) }}
-
-
-        <div class="content-footer-sponsor">
-            <h1>
+        
+        <div class="content-footer-sponsor" style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee;">
+            <h2 style="text-align: left; margin-bottom: 10px;">
                 <span id="sponsor">Buy me a coffee</span>
-            </h1>
-            <p>如果觉得这篇文章不错，对你有帮助，欢迎打赏一杯蜜雪冰城。</p>
-            <!-- 图片剧中显示
-            <img src="/img/sponsor.JPG" alt="logo" title="sponsor" style="display:block;margin:0 auto;">
-            -->
-            <img src="/img/sponsor.JPG" alt="logo" title="sponsor">
+            </h2>
+            <p style="text-align: left; color: #666; margin-bottom: 20px;">如果觉得这篇文章不错，对你有帮助，欢迎打赏一杯蜜雪冰城。</p>
+            <img src="/img/sponsor.JPG" alt="赞赏" style="width: 200px; display: block; margin: 0 auto;">
         </div>
 
         <div class="post__prevs">

@@ -210,22 +210,28 @@
 
     table {
         width: 100%;
-        border: 1px solid $border-c;
+        border: 1px solid #4a90e2;
         border-collapse: collapse;
 
         th {
             font-weight: 700;
+            background-color: #4a90e2;
+            color: white;
         }
 
         th,
         td {
             padding: .5em;
             text-align: left;
-            border: 1px solid #ddd;
+            border: 1px solid #4a90e2;
         }
 
         tbody > tr:nth-child(2n+1)>td {
-            background-color: rgba(102,128,153,.05);
+            background-color: rgba(74, 144, 226, 0.08);
+        }
+        
+        tbody > tr:hover>td {
+            background-color: rgba(74, 144, 226, 0.15);
         }
     }
 }

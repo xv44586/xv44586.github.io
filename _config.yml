@@ -193,3 +193,13 @@ sitemap:
 #   admin: 
 #     - xv44586
 
+
+# Optimization: Disable heavy assets cleanup during server/dev
+# filter_cleanup:
+#   img:
+#     enable: true
+#   favicons:
+#     enable: true
+
+# marked:
+#   math: true
