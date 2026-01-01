@@ -1,4 +1,3 @@
-https://xv44586.github.io/2026/01/01/test-minimal/
 https://xv44586.github.io/2025/12/31/goodbye-2025/
 https://xv44586.github.io/2023/03/25/gpt4/
 https://xv44586.github.io/2023/03/10/llm-inf/
@@ -55,3 +54,4 @@ https://xv44586.github.io/2019/10/13/gil/
 https://xv44586.github.io/2019/10/13/multiThreads/
 https://xv44586.github.io/2019/10/13/singleton/
 https://xv44586.github.io/2019/10/13/logistic/
+https://xv44586.github.io/2019/10/10/hello-world/
