@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    
+        <title>LLM Inference串讲 | 小蛋子</title>
+    
+
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="format-detection" content="telephone=no">
+<meta name="author" content="[object Object]" />
+<meta name="designer" content="minfive" />
+<meta name="keywords" content="NLP, 机器学习, 深度学习, Python, Backend"/>
+<meta name="description" content="NLP | Machine Learning | Developer" />
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="format-detection" content="telephone=yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="robots" content="all" />
+
+<link rel="canonical" href="https://xv44586.github.io/2023/03/10/llm-inf/index.html">
+
+<link rel="icon" type="image/png" href="/img/favicon.ico" sizes="32x32">
+
+
+  <meta name="google-site-verification" content="tbK2z0UTHcAWdqNCgEwykaDA9vvvXnN4ZSp_LFbAbDc" />
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="NBO0j1DAOy" />
+
+
+  <meta name="baidu-site-verification" content="ulZR80nUkv" />
+
+
+
+
+
+
+<!-- Prefetch -->
+
+
+
+
+
+
+<!-- CSS -->
+
+<link rel="stylesheet" href="/scss/base/index.css">
+
+
+<!-- RSS -->
+<link rel="alternate" href="/atom.xml" title="小蛋子" type="application/atom+xml">
+
+<!-- 统计 -->
+<!-- 百度统计 -->
+
+    <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?b1d2a1d2b250300950a8ffb5caa20818";
+      var s = document.getElementsByTagName("script")[0]; 
+      s.parentNode.insertBefore(hm, s);
+    })();
+    </script>
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    
+    
+    
+<link rel="stylesheet" href="/scss/views/page/post.css">
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body ontouchstart>
+    
+        <!-- loading 页面 -->
+<div id="page-loading" class="page page-loading" style="background-image: url('/other/loading.gif')"></div>
+    
+
+    <div id="page" class="page js-hidden">
+        
+    <!-- 页头 -->
+<header class="page__small-header page__header--small">
+    <nav class="page__navbar">
+        <div class="page__container navbar-container">
+            <a class="page__logo" href="/" title="小蛋子" alt="小蛋子">
+                <img src="/img/lg.png" alt="小蛋子">
+            </a>
+
+            <nav class="page__nav">
+                <ul class="nav__list clearfix">
+                    
+                        
+                        <li class="nav__item">
+                            <a href="/" alt="首页" title="首页">首页</a>
+                        </li>
+                    
+                        
+                        <li class="nav__item">
+                            <a href="/archives" alt="归档" title="归档">归档</a>
+                        </li>
+                    
+                        
+                        <li class="nav__item">
+                            <a href="/about" alt="关于" title="关于">关于</a>
+                        </li>
+                    
+                </ul>
+            </nav>
+
+            <button class="page__menu-btn" type="button">
+                <i class="iconfont icon-menu"></i>
+            </button>
+        </div>
+    </nav>
+</header>
+
+
+        
+    <main class="page__container page__main">
+    <div class="page__content">
+        <article class="page__post">
+    <div class="post__cover">
+        <img src="/2023/03/10/llm-inf/sd.PNG" alt="LLM Inference串讲">
+    </div>
+
+    <header class="post__info">
+        <h1 class="post__title">LLM Inference串讲</h1>
+
+        <div class="post__mark">
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-write"></i>
+                <ul class="mark__list clearfix">
+                    
+                        
+                            <li class="mark__item">
+                                <a target="_blank" rel="noopener" href="https://github.com/xv44586">小蛋子</a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+            
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-time"></i>
+                <ul class="mark__list clearfix">
+                    <li class="mark__item"><span>2023-03-10</span></li>
+                </ul>
+            </div>
+
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-tab"></i>
+                <ul class="mark__list clearfix">
+                    
+                        <li class="mark__item">
+                            <a href="/tags/LLM/">LLM</a>
+                        </li>
+                    
+                        <li class="mark__item">
+                            <a href="/tags/Inference/">Inference</a>
+                        </li>
+                    
+                        <li class="mark__item">
+                            <a href="/tags/GPU/">GPU</a>
+                        </li>
+                    
+                </ul>
+            </div>
+
+            
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-eye"></i>
+                <ul class="mark__list clearfix">
+                    <li id="busuanzi_container_page_pv" class="mark__item"><span id="busuanzi_value_page_pv"></span>次</li>
+                </ul>
+            </div>
+            
+        </div>
+    </header>
+
+    <div class="post__content">
+        <div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#generation">generation</a><ul>
+<li><a href="#greedy-search">Greedy Search</a></li>
+<li><a href="#beam-search">Beam Search</a></li>
+<li><a href="#sampling">Sampling</a><ul>
+<li><a href="#topk">topK</a></li>
+<li><a href="#topp">topP</a></li>
+<li><a href="#beam-search-sampling">beam-search sampling</a></li>
+</ul>
+</li>
+<li><a href="#generate-parameters">generate parameters</a><ul>
+<li><a href="#temperature">Temperature</a></li>
+<li><a href="#penalty">* penalty</a></li>
+<li><a href="#qiang-zhi-jin-zhi-te-ding-token-de-chu-xian">强制&#x2F;禁止 特定token 的出现</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#gpu">GPU</a><ul>
+<li><a href="#performance">performance</a></li>
+</ul>
+</li>
+<li><a href="#gpt-generation">GPT generation</a><ul>
+<li><a href="#ops-vs-bytes">ops vs bytes</a></li>
+<li><a href="#attention">attention</a></li>
+<li><a href="#cache">cache</a></li>
+<li><a href="#ding-liang-ping-gu-you-hua-fang-an">定量评估优化方案</a></li>
+</ul>
+</li>
+<li><a href="#jie-lun">结论</a></li>
+<li><a href="#ref">ref</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+本文主要概述一下当前LLM 是如何生成文本及为什么对应的资源（cost/latency)与prompt 和completion 都有关系。
+
+<h1><span id="generation">generation</span><a href="#generation" class="header-anchor"></a></h1><p>上一篇我们讲了为了解决自然语言问题，我们引入了统计语言模型：$S$ 表示一连串特定顺序排列的词$w_1$, $w_2$, …, $w_n$,其中$n$ 是序列的长度，则$S$ 出现的概率$P(S)&#x3D;P(w_1,w_2,…w_n)$. 通过序列的概率，来判断对应句子是否合理。而这个概率$P(S)$ 很难估算，所以我们将其转化一下。首先，利用条件概率公式将其展开:<br>$$<br>P(S)&#x3D;P(w_1​,w_2​,…,w_n​)&#x3D;P(w_1​)∗P(w_2​∣w_1​)∗P(w_3​∣w_1​,w_2​)∗…∗P(w_n​∣w_1​,w_2​,…,w_{n−1}​)<br>$$<br>即：<br>$$<br>P(w_1^n​)&#x3D;\prod​P(w_i​∣w_1^{i−1}​)<br>$$<br>然后用深度神经网络，对$P(w_i|w_1^{i-1})$ 进行建模，即：<br>$$<br>P(w_i|w_1^{i-1}) &#x3D; g(w_1^{i-1})<br>$$</p>
+<p>其中$g$ 是深度神经网络，如MLP&#x2F;RNN&#x2F;Transformer 等。</p>
+<p>文本生成的过程，即我们在已有的深度神经网络$g$ 下，生成（采样）合理句子（序列）的过程。其中$g$ 能生成给定context  $C$  时下一个时刻对应的词表分布, 其中$C$ 是由$w_1$, $w_2$, …, $w_m$ 组成的序列。<br>目前我们训练$g$ 通常采用Teacher-Forcing 的方式：训练阶段，每个时刻$t$ 之前的label $y_{&lt;t}$都是已知的，就像是老师讲课一样，将每一步的正确解题思路都告诉你，你只需要跟着老师的思路一步一步推导就能得到正确答案；然而在inference 阶段，我们是没法知道当前时刻之前的真实label 是什么的，所以需要将所有可能的序列的概率都求解出来，最后在所有可能性中选择概率最大的。如同考试时没了参考步骤，只能尝试多个思路，最后保留我们觉得”正确“的。</p>
+<p>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230307215330.png)<br>求解过程是一个求解最优路径问题，然而这个计算量太大了。假设我们的词表大小是$V$, 生成序列的长度为$k$, 每一个时刻都需要对所有状态（整个词表）进行计算，即使我们的词表只有五万个词，要生成五个token 也需要计算25万次，这个计算量实在是太大了。所以我们需要一些更高效的生成策略。</p>
+<blockquote>
+<p>概率值$p$ 是一个范围在$0\sim 1$ ，多次连乘后会很快接近0，所以通常我们会将$max\prod p_i$ 转换为求$max \sum log(p_i)$ </p>
+</blockquote>
+<h2><span id="greedy-search">Greedy Search</span><a href="#greedy-search" class="header-anchor"></a></h2><p>Greedy search 的思路是：每次都选择概率最高的词作为最终采样结果，即: $w_t &#x3D; argmax_wP(w|w_1^{t-1})$<br>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230307223501.png)<br>该方法是缺点也很明显：局部最优的最终结果很可能不是全局最优，由于每次都是选局部最优，这也扼杀了模型找到全局最优的可能性。如上图中Greedy search 的结果是(The, nice, woman),而全局最优是(The, dog, has) .除此之外，模型的生成结果也不够”丰富“，甚至会出现不停重复之前的内容。</p>
+<h2><span id="beam-search">Beam Search</span><a href="#beam-search" class="header-anchor"></a></h2><p>”多一个选择，多一次机会“。为了缓解Greedy search 的问题，我们在每次选择时，不再只保留最高概率的一个，而是所有候选中保留概率最高的N 个(num_beams&#x2F;beam_width) path。<br>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230308095954.png)<br>上图是num_beams&#x3D;2 的示例：</p>
+<ol>
+<li>第一步时，在(The, dog)&#x2F;(The, nice)&#x2F;(The car)  三个路径中选择概率最高的两条path:(The, nice), (The, dog)</li>
+<li>第二步时，在(The, nice, wowan)&#x2F;(The, nice, house)&#x2F;(The, nice, guy)&#x2F;(The, dog, and)&#x2F;(The,dog,runs)&#x2F;(The,dog,has) 中选择路径概率（单步概率连乘）最高的两条path:(The, dog, has), (The, nice, woman)</li>
+<li>依此类推，直到满足终止采样.</li>
+</ol>
+<p>此前Greedy Search 未找到的最优路径，此次通过Beam Search 找到了，但是依然无法保证每次都能找到全局最优。PS: num_beams &#x3D;1 时，与Greedy Search 过程相同。</p>
+<h2><span id="sampling">Sampling</span><a href="#sampling" class="header-anchor"></a></h2><p>以上两种方法都是确定性解码（deterministic），缺点就是不够丰富，不够”surprise“；为了让生成的内容更加的丰富多样有惊喜，我们可以采用另一种策略：采样（Sampling).</p>
+<p>采样的基本思路是在概率分布上进行随机采样，选择一个作为下一个词$w_t$:<br>$$<br>w_t \sim P(w|w_1^{t-1})<br>$$<br>然而由于模型$g$ 距离真实的$P(w|w_1{t-1})$ 还是会有差距，直接按照$g$ 生成的”概率分布“采样风险太大，很容易走偏；一个折中的办法是控制候选集，在“低风险”范围内采样。<br>候选集的构造方式也有多个，常用的有topK&#x2F;topP&#x2F;beam-search.</p>
+<h3><span id="topk">topK</span><a href="#topk" class="header-anchor"></a></h3><p>每次选择概率最大的K 个作为候选集，然后重新归一化，获取新的分布后进行采样。</p>
+<ol>
+<li>对词表进行排序，选择概率最高的K 个；</li>
+<li>对候选集中的K 个候选的概率值进行归一化，构造K 个候选对应的分布$\widetilde{P}$</li>
+<li>从分布$\widetilde{P}$ 中采样一个词作为$w_t$</li>
+</ol>
+<h3><span id="topp">topP</span><a href="#topp" class="header-anchor"></a></h3><p>topp sampling 又叫nucleus sampling,其思路是不在从通过保留最大的K 个作为候选，而是保留概率累计和范围$p$ 内的所有词作为候选集，候选集大小随着分布变化而动态调整。</p>
+<ol>
+<li>对词表进行排序，从大到小进行排列</li>
+<li>依照概率大小，依次将词加入候选集，直到新增的词进入候选集后，整个候选集内的概率累计和大于$p$ 停止；</li>
+<li>对候选集内的词进行归一化，构造新的分布$\widetilde{P}$</li>
+<li>从分布$\widetilde{P}$ 采样一个词作为$w_t$</li>
+</ol>
+<p>topk 与topp 也可以一起使用，通常实现时是先进行topk，然后在topk 归一化后的候选集上进行topp 采样。</p>
+<h3><span id="beam-search-sampling">beam-search sampling</span><a href="#beam-search-sampling" class="header-anchor"></a></h3><p>该方法是beam-search 的samling 版，其主要思路是： 在每次选择时，不在直接选择所有候选中概率最高的num_beams 个，而是从中采样。</p>
+<h2><span id="generate-parameters">generate parameters</span><a href="#generate-parameters" class="header-anchor"></a></h2><h3><span id="temperature">Temperature</span><a href="#temperature" class="header-anchor"></a></h3><p>通常模型的输出是一些值（logits)而不是分布（probability distribution),我们需要将其转换成分布，转换通常使用的是softmax 函数：<br>$$\frac{\exp(z_i)}{\sum_jexp(z_j)}$$</p>
+<p>softmax 函数的特点是：</p>
+<ol>
+<li>保持其原有的相对顺序;</li>
+<li>累计和为1。</li>
+</ol>
+<p>然而其缺点也明显：很容易扩大&#x2F;缩小内部元素的差异（softmax 变 max&#x2F;mean），如 [11, 12, 13 ] softmax 后为[0.0900, 0.2447, 0.6652], 这将导致最终我们采样后的结果不够丰富；而[0.01,0.02,0.03] softmax 后[0.3300, 0.3333, 0.3367],这将导致最终的采样方法是在随机采样，生成不合理的序列。为为了解决这个问题，我们需要有个办法调节，让softmax 后的分布进一步符合我们的预期，对应的办法就是增加参数$T$:<br>$$\frac{\exp(z_i&#x2F;T)}{\sum_jexp(z_j&#x2F;T)}$$<br><img src="/2023/03/10/llm-inf/1_p1iKxUJcXDlSEZCpMCwNgg.gif"></p>
+<p>$T$ 越大，分布越趋近均匀分布(uniform distribution)，采样结果随机性越大，生成的序列是不合理句子的概率就越高；<br>$T$ 越小，分布越趋近与单点分布(one-point distribution)，采样结果越趋近保持一致。</p>
+<h3><span id="penalty">* penalty</span><a href="#penalty" class="header-anchor"></a></h3><p>除了temperature 这种对整体分布进行修改外，还有些场景需要我们对特定的某些token 的分布进行修改，此时就诞生了各种penalty，如repetition_penalty&#x2F;diversity_penalty等参数。注意：这里是对其分布乘以一个系数，其结果有可能并不改变其大小顺序。</p>
+<h3><span id="qiang-zhi-x2f-jin-zhi-te-ding-token-de-chu-xian">强制&#x2F;禁止 特定token 的出现</span><a href="#qiang-zhi-x2f-jin-zhi-te-ding-token-de-chu-xian" class="header-anchor"></a></h3><p>一些场景下，我们要求更加苛刻：希望某些token 一定&#x2F;永不 出现，同理，此时将满足条件的token 的分布直接调整为100%&#x2F;0%，如bad_words_ids&#x2F;no_repeat_ngram_size&#x2F;force_words_ids 等参数。</p>
+<h1><span id="gpu">GPU</span><a href="#gpu" class="header-anchor"></a></h1><p>下面已A100-80G SXM 为例，了解一下GPU 的基本信息。</p>
+<p>A100 specifications<br>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230307111416.png)<br>simplified view of the GPU architecture<br>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230309090721.png)</p>
+<p>Multiply-add operations per clock per SM<br>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230308160737.png)</p>
+<ul>
+<li>FP16 Tensor Core peak dense throughputs:<br>$$1024 (Tensor cores) \ast 108 (SMs) \ast 1.41 GHz (clock rate)  \ast 2 (multiply-add) &#x3D;  312 TFLOPS $$</li>
+</ul>
+<h2><span id="performance">performance</span><a href="#performance" class="header-anchor"></a></h2><p>性能主要受限于三个因素：内存带宽(memory bandwidth)，计算带宽(math bandwidth), 延时(latency).</p>
+<p>假设我们访问内存花费的时间为$T_{mem}$ ,计算花费的时间为$T_{math}$, 计算和访问内存可以”你算上一个，我读&#x2F;写 下一个“，这样两者的时间大部分都可以重叠，此时花费的所有时间就为$max (T_{mem}, T_{math})$.<br>$$T_{mem} &#x3D; bytes&#x2F;BW_{mem}$$<br>$$<br>  T_{math} &#x3D; ops&#x2F;BW_{math}<br>$$<br>当性能受限于计算带宽时：<br>$$<br>T_{math} &gt; T_{mem}<br>&#x3D;&gt;<br>ops&#x2F;BW_{math} &gt; bytes&#x2F;BW_{mem} &#x3D;&gt; ops&#x2F;bytes &gt; BW_{math}&#x2F;BW_{mem}<br>$$<br>假设我们使用float16 进行计算，而A100-80G SXM  对应的$BW_{math} &#x2F; BW_{mem}&#x3D;312e12 flops&#x2F;2039e9 bytes&#x3D;153  Flops&#x2F;Byte$.<br>即在当前显卡下，如果一个函数的计算量与所需的存储量的比值&gt; 153 Flops&#x2F;Byte 时，此时的性能主要受限于计算带宽，反之则受限于内存带宽。</p>
+<blockquote>
+<p> 如何计算一个矩阵乘法的flops<br> 假设$A∈R^{1×n}$  ,$B∈R^{n×1}$,计算$AB$ 则需要 n 次乘法运算(operations)和n 次加法运算，对应的就是 $2n$ operations, 即$2n$ flops；同理：$A∈R^{m×n}$, $B∈R^{n×p}$ ,则需要 $2mnp$ flops.</p>
+</blockquote>
+<blockquote>
+<p>如何计算存储大小<br>通常我们使用float16&#x2F;bfloat16 存储，对应一个参数需要2 个bytes ,对于矩阵$A∈R^{m×n}$ 则需要 $2 \ast m \ast n$ bytes</p>
+</blockquote>
+<p>下面做个最简单的矩阵乘法：$A∈R^{1×n}$，$B∈R^{n×p}$<br>$$ops&#x2F;bytes &#x3D; 2np &#x2F; (2n + 2np + 2p) &lt; 1 &lt; 153$$<br>除了需要将矩阵读进来还需要将结果写进内存，参数使用半精度(2 bytes)，所以对应的总内存为: $2n + 2np + 2p$<br>此时的性能主要受限于内存带宽，如果此时将$A$ 扩大$153$ 倍至 $A∈R^{153×n}$ 消耗的计算时间是一样的，忽略内存带宽$(152 \ast 2 \ast n + 152 \ast 2 \ast p )$ bytes新增带来的影响，则扩大batch size 整体latency 基本不变。</p>
+<p>具体深度学习Layer示例</p>
+<table>
+<thead>
+<tr>
+<th>operation</th>
+<th>ops&#x2F;bytes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Linear layer (4096 outputs, 1024 inputs, batch size 512)</td>
+<td>315 Flops&#x2F;B</td>
+</tr>
+<tr>
+<td>Linear layer (4096 outputs, 1024 inputs, batch size 1)</td>
+<td>1 Flops&#x2F;B</td>
+</tr>
+<tr>
+<td>Max pooling with 3x3 window and unit stride</td>
+<td>2.25 Flops&#x2F;B</td>
+</tr>
+</tbody></table>
+<h1><span id="gpt-generation">GPT generation</span><a href="#gpt-generation" class="header-anchor"></a></h1><p>GPT2 model architecture</p>
+<p>![](&#x2F;2023&#x2F;03&#x2F;10&#x2F;llm-inf&#x2F;Pasted image 20230310005359.png)</p>
+<h2><span id="ops-vs-bytes">ops vs bytes</span><a href="#ops-vs-bytes" class="header-anchor"></a></h2><p>我们忽略所有的bias&#x2F;layernorm&#x2F;activation&#x2F;add 操作,计算生成一个token 时的ops vs bytes, 切分head 与不切对应的ops&#x2F;bytes 是一样的，为了简单我们按不切计算。</p>
+<ol>
+<li><p>Embedding<br>  multiply:$E_{token}∈R^{V\times d_{model}}$,  $E_p\in R^{s_{maxseq} \times d_{models}}$<br>  mem: $2 \ast (V \ast d_{model} + s_{maxseq} \ast d_{model})$<br>  flops:   0</p>
+</li>
+<li><p>attention qkv<br>multiply: $t_e \in R^{1 \times d_{model}}, W_q, W_K, W_V\in R^{d_{model}\times d_{model}}, t_e \times W_q&#x2F;W_k&#x2F;W_v &#x3D;&gt; q&#x2F;k&#x2F;v$<br>mem: $ 2 \ast 3\ast d_{model}^2$<br>flops: $ 2 \ast 3 \ast d_{model}^2$</p>
+</li>
+<li><p>attention output<br> multiply: $q,k,v\in R^{1\times d_{model}}, softmax((q\cdot k)\div \sqrt{d_{head}}) \cdot v &#x3D;&gt; o$<br> mem: 0<br> flops: $2 \ast 2 \ast d_{model}$</p>
+</li>
+<li><p>output projection<br>multiply: $o \in R^{1\times d_{model}}$,   $W_o\in R^{d_{model}\times d_{model}}$, $o \times W_o &#x3D;&gt; a$<br>mem: $2\ast d_{model}^2$<br>flops: $2 \ast d_{model}^2$</p>
+</li>
+<li><p>feed-forward<br> multiply:$a\in R^{1\times d_{model}}$,   $W_1\in R^{d_{model}\times 4d_{model}}$, $W_2\in R^{4d_{model}\times d_{model}}$, $a\times W_1 \times W_2 &#x3D;&gt;z$<br> mem: $2 \ast 2 \ast d_{model} \ast 4d_{model} &#x3D; 16 d_{model}^2$<br> flops: $2 \ast 2 \ast d_{model} \ast 4d_{model} &#x3D;&gt; 16 d_{model}^2$</p>
+</li>
+</ol>
+<p>剩下的计算就是重复$n\_layers$ 次2-5.现在我们来汇总一下计算总的ops &#x2F; bytes:</p>
+<p>$$<br>\frac{ops}{ bytes} &#x3D; \frac{n_{layers} \ast (6d_{model}^2 + 4d_{model} + 2d_{model}^2 + 16d_{model}^2)}  {2 \ast (V \ast d_{model} + s_{maxseq} \ast d_{model}) + n_{layers} \ast (6d_{model}^2 + 2d_{model}^2 + 16d_{model}^2)}<br>$$</p>
+<p>越大的模型$d_{model}$ 越大，如10B 的模型 $d_{model}&#x3D;4096$, 所以这里我们去掉$d_{model}$ 的常数项：</p>
+<p>$$<br>\frac{ops} { bytes} \approx \frac{n_{layers} \ast (6d_{model}^2 + 2d_{model}^2 + 16d_{model}^2)}  { n_{layers} \ast (6d_{model}^2 + 2d_{model}^2 + 16d_{model}^2)} &#x3D; 1<br>$$</p>
+<blockquote>
+<p>速记法<br>对于transformer-base encoder&#x2F;decoder :<br>ops $\approx 2 \ast Parameters$,<br>float16&#x2F;bfloat16 下:bytes $\approx 2 \ast Parameters$.</p>
+</blockquote>
+<p>按照上面我们的结论，此时对于A100-80G 来说，性能主要受限于内存带宽，计算1 个token 与计算153个token 对应的latency 是一样的！为了提升整体性能，我们应该增加$batch\_size \ast input\_length$直到 inputs 扩大至153倍.</p>
+<h2><span id="attention">attention</span><a href="#attention" class="header-anchor"></a></h2><p>现在回过头来再看一眼刚刚被我随意丢弃掉的一项ops：attention output<br>由于我们计算是由长度为1 的token 生成 1 个token， 假设输入的token 长度为$s$, 则：<br>$q,k,v \in R^{s\times d_{model}}$<br>flops: $ 2 \ast s \ast d_{model} \ast s + 2 \ast s \ast d_{model} \approx 2 \ast s^2 \ast d_{model}$  </p>
+<p>随着inputs 的长度增加，达到$\sqrt{d_{model}}$ 时，这一项已经不能丢弃了，进一步增加，长度到$12 \ast \sqrt{d_{model}}$ 时，这一项已经与其他部分的ops 想当了，此时的$ops&#x2F;bytes \approx 2$.<br>以10B 的模型为例，$d_{model} &#x3D; 4096$ ,当输入的长度为64 时，attention output 这项ops 与其他部分想当；当长度增长为768 时，对应的$ops&#x2F;bytes$ 增长到2，此时整体的计算量已经扩大了768 倍，$768 &gt; (153 &#x2F; 2 ) $，已经转变为性能受限于计算带宽，增大batch 不会带来性能提升。</p>
+<h2><span id="cache">cache</span><a href="#cache" class="header-anchor"></a></h2><p>随着整个生成过程的迭代，输入的长度会逐步增加，对应的每步所需的计算量也指数倍的增加，整体性能都被他拖垮了。<br>对于$Y &#x3D; A \cdot X$ ,当$X$ ,$A$ 不变时，对应的结果$Y$ 是不变的；而在迭代过程中，模型的权重是不变的，即$X$ 都是一样的，对于$step_t$ 与 $step_{t-1}$ 来说，都会计算$A[:, :t-1]$ 对应的结果，既然重叠了，就不需要重复计算了，我们每次只需要计算最后一个token 就好了。<br>等等，有一个层只有计算没有weights，即其对应的$A$, $X$ 都来动态的，需要我们单独处理。这一层就是attention output。（哈，又是你。attention is all I want to remove！）</p>
+<p>对于$step_t$ 来说，对应的计算是:<br>$$softmax(q[:, t-1:t] \cdot k[:,0:t] \div \sqrt(d_head) ) \cdot v[:,0:t]$$<br>此时我们缺少的是$k[:,:t-1]&#x2F;v[:,:t-1]$ ,好在我们在$step_{t-1}$ 时已经计算过这两个结果了，只要把上一个时刻的这个结果“拿到”拼接回去即可。<br>完整的流程是：对于迭代$step_t$ ,把对应attention qkv 的结果$q[:,t]&#x2F;k[:,t]&#x2F;v[:,t]$ 拼接到之前的之前的缓存$q[:,:t-1]&#x2F;k[:,:t-1]&#x2F;v[:,:t-1]$ 后面，为下一个时刻准备；计算attention output 时，先将之前的$k\_cache[:,t-1]&#x2F;v\_cache[:,:t-1]$ 拼接到$k[:,t]&#x2F;v[:,t]$ 前面，还原真实的$k&#x2F;v$.</p>
+<p>经过cache 后，attention output 的计算回到了$O(s\cdot d_{model})$ 的水平，至少在大部分时候又可以基本忽略了。此外，随着$s$ 的增长，对应的cache 也在线性增长，需要的内存带宽也在增长，所以有些情况下可能增加cache 反而降低性能。</p>
+<p>PS:不管是生成过程中的k_cache&#x2F;v_cache 还是prompt cache 还是context cache，只要是可能重复计算，就值得思考要不要将之前的结果做cache，已减少后续的计算量。</p>
+<h2><span id="ding-liang-ping-gu-you-hua-fang-an">定量评估优化方案</span><a href="#ding-liang-ping-gu-you-hua-fang-an" class="header-anchor"></a></h2><p>上面是一个相对简化的思路计算，而真实情况会比较复杂。比如我们忽略了一部分操作所需的ops；中间结果的每次写入&#x2F;读取所需的内存带宽；CUDA Core 与 Tensor Core 的性能差异等；此外不同的硬件参数也不相同，具体的operation 实现也不相同，所以要定量给出优化方案实在太难，通常（主要是我）只能通过测试给出大致范围。</p>
+<h1><span id="jie-lun">结论</span><a href="#jie-lun" class="header-anchor"></a></h1><p>现在回到最初的问题：为什么当前的LLM 生成文本时对应的资源与prompt 与 completion 都有关系：</p>
+<ol>
+<li>需要迭代$n$ 次，其中$n &#x3D; len(completion)$</li>
+<li>每次迭代所需要的资源都接近$O(s)$ ,其中$s_i&#x3D;len_(prompt) + step_i$</li>
+</ol>
+<h1><span id="ref">ref</span><a href="#ref" class="header-anchor"></a></h1><p><a target="_blank" rel="noopener" href="https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/nvidia-a100-datasheet-us-nvidia-1758950-r4-web.pdf">NVIDIA A100 TENSOR CORE GPU</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html#gpu-arch">dl-performance-gpu-background</a></p>
+<p><a target="_blank" rel="noopener" href="https://developer.nvidia.com/blog/nvidia-ampere-architecture-in-depth/">nvidia-ampere-architecture-in-depth</a></p>
+<p><a target="_blank" rel="noopener" href="https://huggingface.co/blog/how-to-generate">how to generate</a></p>
+<p><a target="_blank" rel="noopener" href="https://medium.com/mlearning-ai/softmax-temperature-5492e4007f71">softmax-temperature</a></p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>stable diffusion生成</p>
+
+
+
+        <div class="content-footer-sponsor">
+            <h1>
+                <span id="sponsor">Buy me a coffee</span>
+            </h1>
+            <p>如果觉得这篇文章不错，对你有帮助，欢迎打赏一杯蜜雪冰城。</p>
+            <!-- 图片剧中显示
+            <img src="/img/sponsor.JPG" alt="logo" title="sponsor" style="display:block;margin:0 auto;">
+            -->
+            <img src="/img/sponsor.JPG" alt="logo" title="sponsor">
+        </div>
+
+        <div class="post__prevs">
+            <div class="post__prev">
+                
+                <a href="/2023/02/01/fine-tuning-at-few-shot/" title="few-shot视角下的fine-tuning"><i class="iconfont icon-prev"></i>few-shot视角下的fine-tuning</a>
+                
+            </div>
+            <div class="post__prev post__prev--right">
+                
+                <a href="/2023/03/25/gpt4/" title="GPT-4 yes!! but">GPT-4 yes!! but<i class="iconfont icon-next"></i></a>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+        <script src="https://giscus.app/client.js"
+        data-repo="xv44586/giscus"
+        data-repo-id="R_kgDOIC6Ipg"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOIC6Ips4CRkmo"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="light"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+    </script>
+    </div>
+
+    <aside class="page__sidebar">
+    <!--  -->
+
+    <form id="page-search-from" class="page__search-from" action="/search/">
+        <label class="search-form__item">
+            <input class="input" type="text" name="search" placeholder="Search...">
+            <i class="iconfont icon-search"></i>
+        </label>
+    </form>
+
+    
+        <div class="sidebar__block">
+            <h3 class="block__title">简介</h3>
+            <p class="block__text">NLP | Machine Learning | Developer</p>
+        </div>
+    
+
+    <div class="sidebar__block">
+        <h3 class="block__title">文章分类</h3>
+        <ul class="block-list"><li class="block-list-item"><a class="block-list-link" href="/categories/Programming/">Programming</a><span class="block-list-count">4</span></li><li class="block-list-item"><a class="block-list-link" href="/categories/NLP/">NLP</a><span class="block-list-count">33</span></li><li class="block-list-item"><a class="block-list-link" href="/categories/Math/">Math</a><span class="block-list-count">5</span></li><li class="block-list-item"><a class="block-list-link" href="/categories/MachineLearning/">MachineLearning</a><span class="block-list-count">8</span></li><li class="block-list-item"><a class="block-list-link" href="/categories/Life/">Life</a><span class="block-list-count">7</span></li></ul>
+    </div>
+    
+    <div class="sidebar__block">
+        <h3 class="block__title">最新文章</h3>
+        
+        <ul class="block-list latest-post-list">
+            
+                    <li class="latest-post-item">
+                        <a href="/2026/01/01/test-minimal/" title="simple test">
+                            <div class="item__cover">
+                                <img src="/img/default_cover.jpeg" alt="simple test" />
+                            </div>
+                            <div class="item__info">
+                                <h3 class="item__title">simple test</h3>
+                                <span class="item__text">2026-01-01</span>
+                            </div>
+                        </a>
+                    </li>
+                
+                    <li class="latest-post-item">
+                        <a href="/2025/12/31/goodbye-2025/" title="再见 2025，你好 2026">
+                            <div class="item__cover">
+                                <img src="/2025/12/31/goodbye-2025/2025-09-甘孜-红海子.jpeg" alt="再见 2025，你好 2026" />
+                            </div>
+                            <div class="item__info">
+                                <h3 class="item__title">再见 2025，你好 2026</h3>
+                                <span class="item__text">2025-12-31</span>
+                            </div>
+                        </a>
+                    </li>
+                
+                    <li class="latest-post-item">
+                        <a href="/2023/03/25/gpt4/" title="GPT-4 yes!! but">
+                            <div class="item__cover">
+                                <img src="/2023/03/25/gpt4/bg.jpeg" alt="GPT-4 yes!! but" />
+                            </div>
+                            <div class="item__info">
+                                <h3 class="item__title">GPT-4 yes!! but</h3>
+                                <span class="item__text">2023-03-25</span>
+                            </div>
+                        </a>
+                    </li>
+                
+                    <li class="latest-post-item">
+                        <a href="/2023/03/10/llm-inf/" title="LLM Inference串讲">
+                            <div class="item__cover">
+                                <img src="/2023/03/10/llm-inf/sd.PNG" alt="LLM Inference串讲" />
+                            </div>
+                            <div class="item__info">
+                                <h3 class="item__title">LLM Inference串讲</h3>
+                                <span class="item__text">2023-03-10</span>
+                            </div>
+                        </a>
+                    </li>
+                
+        </ul>
+    
+    </div>
+
+    <div class="sidebar__block">
+        <h3 class="block__title">文章标签</h3>
+        
+        <ul class="block-list tag-list clearfix">
+            
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Annual-Summary/">Annual Summary</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/BERT/">BERT</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/BPE/">BPE</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Bagging/">Bagging</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Boosting/">Boosting</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/CCF/">CCF</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/CRF/">CRF</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/CUDA/">CUDA</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/ChatGPT/">ChatGPT</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Classification/">Classification</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Competition/">Competition</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Deep-Learning/">Deep Learning</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Distillation/">Distillation</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/EDA/">EDA</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/FastBERT/">FastBERT</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Few-shot/">Few-shot</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/GPT-3/">GPT-3</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/GPT-4/">GPT-4</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/GPU/">GPU</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Game/">Game</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Glove/">Glove</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Hexo/">Hexo</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/In-context-learning/">In-context learning</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Inference/">Inference</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/LLM/">LLM</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/LR/">LR</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Language-Model/">Language Model</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Life/">Life</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Loss/">Loss</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/MarkDown/">MarkDown</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Math/">Math</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Matrix/">Matrix</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/NLG/">NLG</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Optimizer/">Optimizer</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Python/">Python</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/QA/">QA</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/R-Drop/">R-Drop</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Random-Forest/">Random Forest</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Segmentation/">Segmentation</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/SimCSE/">SimCSE</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Statistics/">Statistics</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Survey/">Survey</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/T5/">T5</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/UniLM/">UniLM</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Unigram/">Unigram</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/WordPiece/">WordPiece</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Words-Distance/">Words Distance</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Xgboost/">Xgboost</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/debug/">debug</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/faster-decoder/">faster decoder</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/fine-tuning/">fine-tuning</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/horovod/">horovod</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/multi-task/">multi-task</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/nohup/">nohup</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/npm/">npm</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/simbert/">simbert</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/skipgram/">skipgram</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/speed-up/">speed-up</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/swift/">swift</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/tensorflow-gpu/">tensorflow-gpu</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/word2vec/">word2vec</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/%E4%BF%A1%E6%81%AF%E7%86%B5/">信息熵</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/%E6%96%B0%E8%AF%8D%E5%8F%91%E7%8E%B0/">新词发现</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/%E6%A0%B7%E6%9C%AC%E4%B8%8D%E5%9D%87%E8%A1%A1/">样本不均衡</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/%E8%A3%85%E6%9C%BA/">装机</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/%E9%A2%86%E5%9F%9F%E8%AF%8D%E6%8C%96%E6%8E%98/">领域词挖掘</a>
+                    </li>  
+                
+        </ul>
+    
+    </div>
+
+    <!-- <div class="sidebar__block">
+        <h3 class="block__title">友情链接</h3>
+        <ul class="block-list">
+            
+        </ul>
+    </div> -->
+</aside>
+</main>
+
+
+        
+            <!-- 页脚 -->
+<footer class="page__footer">
+    <section class="footer__top">
+        <div class="page__container footer__container">
+            
+            <div class="footer-top__item footer-top__item--2">
+                <h3 class="item__title">关于</h3>
+                <div class="item__content">
+                    <p class="item__text">本站是基于 Hexo 搭建的静态资源博客，主要用于分享日常学习、生活及工作的一些心得总结。</p>
+                    <ul class="footer__contact-info">
+                        <li class="contact-info__item">
+                            <i class="iconfont icon-address"></i>
+                            <span>Beijing, China</span>
+                        </li>
+                        <li class="contact-info__item">
+                            <i class="iconfont icon-email2"></i>
+                            <span>xv44586@gmail.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            
+            
+            
+            
+            
+                
+                    <div class="footer-top__item">
+                        <h3 class="item__title">友情链接</h3>
+                        <div class="item__content">
+                            <ul class="footer-top__list">
+                                
+                                    <li class="list-item">
+                                        <a href="http://www.matrix67.com/" title="Matrix67" target="_blank">Matrix67</a>
+                                    </li>
+                                
+                                    <li class="list-item">
+                                        <a href="https://spaces.ac.cn/" title="Spaces" target="_blank">科学空间</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                
+            
+        </div>
+    </section>
+    <section class="footer__bottom">
+        <div class="page__container footer__container">
+            <p class="footer__copyright">©
+                <a href="https://github.com/Mrminfive/hexo-theme-skapp" target="_blank">Skapp</a> 2017 powered by
+                <a href="http://hexo.io/" target="_blank">Hexo</a>, made by 
+                <a href="https://github.com/Mrminfive" target="_blank">minfive</a>. modified by
+                <a href="https://github.com/xv44586" target="_blank">小蛋子</a>
+            </p>
+            <ul class="footer__social-network clearfix">
+                
+                
+                    <li class="social-network__item">
+                        <a href="https://github.com/xv44586" target="_blank" title="github">
+                            <i class="iconfont icon-github"></i>
+                        </a>
+                    </li>
+                
+                    <li class="social-network__item">
+                        <a href="xv44586@gmail.com" target="_blank" title="email">
+                            <i class="iconfont icon-email"></i>
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        </div>
+    </section>
+</footer>
+        
+
+        
+            <!-- 返回顶部 -->
+<div id="back-top" class="back-top back-top--hidden js-hidden">
+    <i class="iconfont icon-top"></i>
+</div>
+        
+    </div>
+
+    <!-- build:js /js/common.js -->
+        <script type="text/javascript" src="/js/common/utils.js"></script>
+        <script type="text/javascript" src="/js/common/pack.js"></script>
+        <script type="text/javascript" src="/js/common/animation.js"></script>
+        <script type="text/javascript" src="/js/layout/loading.js"></script>
+        <script type="text/javascript" src="/js/layout/header.js"></script>
+        <script type="text/javascript" src="/js/layout/back-top.js"></script>
+        <script type="text/javascript" src="/js/layout/post.js"></script>
+    <!-- endbuild -->
+
+    
+    
+<script src="/js/page/post.js"></script>
+
+
+    
+    
+    
+
+
+
+    <!-- 不蒜子统计 -->
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+     
+
+  
+
+  
+  
+
+  
+    
+    
+              
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+                processEscapes: true,
+                skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+            });
+        </script>
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+                for (i=0; i < all.length; i += 1) {
+                all[i].SourceElement().parentNode.className += ' has-jax';
+                }
+            });
+        </script>      
+        <script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>    
+    
+    
+  
+
+
+
+
+
+
+
+
+
+    
+</body>
+</html>

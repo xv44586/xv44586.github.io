@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    
+        <title>AdaBelief-更稳定的优化器 | 小蛋子</title>
+    
+
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="format-detection" content="telephone=no">
+<meta name="author" content="[object Object]" />
+<meta name="designer" content="minfive" />
+<meta name="keywords" content="NLP, 机器学习, 深度学习, Python, Backend"/>
+<meta name="description" content="NLP | Machine Learning | Developer" />
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="format-detection" content="telephone=yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="robots" content="all" />
+
+<link rel="canonical" href="https://xv44586.github.io/2020/10/25/adabelief/index.html">
+
+<link rel="icon" type="image/png" href="/img/favicon.ico" sizes="32x32">
+
+
+  <meta name="google-site-verification" content="tbK2z0UTHcAWdqNCgEwykaDA9vvvXnN4ZSp_LFbAbDc" />
+
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="NBO0j1DAOy" />
+
+
+  <meta name="baidu-site-verification" content="ulZR80nUkv" />
+
+
+
+
+
+
+<!-- Prefetch -->
+
+
+
+
+
+
+<!-- CSS -->
+
+<link rel="stylesheet" href="/scss/base/index.css">
+
+
+<!-- RSS -->
+<link rel="alternate" href="/atom.xml" title="小蛋子" type="application/atom+xml">
+
+<!-- 统计 -->
+<!-- 百度统计 -->
+
+    <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?b1d2a1d2b250300950a8ffb5caa20818";
+      var s = document.getElementsByTagName("script")[0]; 
+      s.parentNode.insertBefore(hm, s);
+    })();
+    </script>
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    
+    
+    
+<link rel="stylesheet" href="/scss/views/page/post.css">
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+<body ontouchstart>
+    
+        <!-- loading 页面 -->
+<div id="page-loading" class="page page-loading" style="background-image: url('/other/loading.gif')"></div>
+    
+
+    <div id="page" class="page js-hidden">
+        
+    <!-- 页头 -->
+<header class="page__small-header page__header--small">
+    <nav class="page__navbar">
+        <div class="page__container navbar-container">
+            <a class="page__logo" href="/" title="小蛋子" alt="小蛋子">
+                <img src="/img/lg.png" alt="小蛋子">
+            </a>
+
+            <nav class="page__nav">
+                <ul class="nav__list clearfix">
+                    
+                        
+                        <li class="nav__item">
+                            <a href="/" alt="首页" title="首页">首页</a>
+                        </li>
+                    
+                        
+                        <li class="nav__item">
+                            <a href="/archives" alt="归档" title="归档">归档</a>
+                        </li>
+                    
+                        
+                        <li class="nav__item">
+                            <a href="/about" alt="关于" title="关于">关于</a>
+                        </li>
+                    
+                </ul>
+            </nav>
+
+            <button class="page__menu-btn" type="button">
+                <i class="iconfont icon-menu"></i>
+            </button>
+        </div>
+    </nav>
+</header>
+
+
+        
+    <main class="page__container page__main">
+    <div class="page__content">
+        <article class="page__post">
+    <div class="post__cover">
+        <img src="/2020/10/25/adabelief/opt.jpg" alt="AdaBelief-更稳定的优化器">
+    </div>
+
+    <header class="post__info">
+        <h1 class="post__title">AdaBelief-更稳定的优化器</h1>
+
+        <div class="post__mark">
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-write"></i>
+                <ul class="mark__list clearfix">
+                    
+                        
+                            <li class="mark__item">
+                                <a target="_blank" rel="noopener" href="https://github.com/xv44586">小蛋子</a>
+                            </li>
+                        
+                    
+                </ul>
+            </div>
+            
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-time"></i>
+                <ul class="mark__list clearfix">
+                    <li class="mark__item"><span>2020-10-25</span></li>
+                </ul>
+            </div>
+
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-tab"></i>
+                <ul class="mark__list clearfix">
+                    
+                        <li class="mark__item">
+                            <a href="/tags/Optimizer/">Optimizer</a>
+                        </li>
+                    
+                </ul>
+            </div>
+
+            
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-eye"></i>
+                <ul class="mark__list clearfix">
+                    <li id="busuanzi_container_page_pv" class="mark__item"><span id="busuanzi_value_page_pv"></span>次</li>
+                </ul>
+            </div>
+            
+        </div>
+    </header>
+
+    <div class="post__content">
+        <div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#warmup">warmup</a></li>
+<li><a href="#xiu-gai-adam">修改Adam</a></li>
+<li><a href="#you-dian">优点</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#guan-yu-tou-tu">关于头图</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+对<code>Adam</code> 进行改进的算法有很多，今天介绍一篇改动很小改动小效果不错的-<code>AdaBelief</code>。
+
+<h1><span id="warmup">warmup</span><a href="#warmup" class="header-anchor"></a></h1><p>在bert中第一次见到warmup的使用，而warmup的作用是让训练更稳定，最后收敛的更好。而warmup有效的一个原因是减缓训练初期模型对mini-batch的提前过拟合，同时，在训练初期，由于loss较大，模型还没得到多少训练，不同step 之间的梯度方差较大，而此时如果使用较大的步长更新，则会朝错误的方向走一大步，而随后的模型不断得到训练，对应的梯度不断减小，同时一般我们会采用不断衰减的学习率，这些都导致随着模型的训练，更新的步长不断变小，而前期朝错误方向的一大步更新可能需要后期很多步的更新才能弥补，有时候可能甚至无法弥补，这就导致模型最后收敛在一个不怎么好的局部最优点，而如果在前期时抑制可能出现的大步更新，保持模型保持“小步走”，则可以避免模型在错误方向上的大步更新，而由模型的不断训练调整会正确的轨道。<br>所以一个重要的点是梯度更新方差大时（不同time step），我们需要谨慎行事，防止出现大错步，而方差小时，我们可以大胆一些，因为此时方向上基本一致，所以可以大踏步的往前走。</p>
+<h1><span id="xiu-gai-adam">修改Adam</span><a href="#xiu-gai-adam" class="header-anchor"></a></h1><p>现在让我们来回顾一下Adam更新公式：</p>
+<p>$$<br>\theta_t &#x3D; \theta_{t-1} - \alpha \frac{m_t}{\sqrt{v_t}}<br>$$</p>
+<p>其中$m_t$是对$g_t$的预测，$v_t$是对$g_t^2$的预测，对应的更新方向为$\frac{m_t}{\sqrt{v_t}}$.<br>$m_t$除了是对$g_t$的预测外，还可以看做是最近一段时间内（大概为$\frac{1}{1-\alpha}$）梯度的均值,而为了表征当前梯度$g_t$所处区域的方差，我们可以使用$belief &#x3D; \left | g_t - m_t\right |$,即当前梯度距最近一段区域梯度均值的距离。在结合Adam的更新公式，我们可以用$s_t &#x3D; (g_t - m_t) ^ 2$ 来代替$v_t$,即在方差大的区域更新时减小步长，而在方差小的区域，快步大走，最后的更新公式为：</p>
+<p>$$<br>\theta_t &#x3D; \theta_{t-1} - \alpha \frac{m_t}{\sqrt{s_t}}<br>$$</p>
+<p>此时的更新方向为$\frac{m_t}{\sqrt{s_t}}$.<br>这就是<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2010.07468.pdf">AdaBelief Optimizer</a>的核心思想。具体的更新流程与Adam只需要修改一小部分即可：<br><img src="/2020/10/25/adabelief/opt.jpg"></p>
+<h1><span id="you-dian">优点</span><a href="#you-dian" class="header-anchor"></a></h1><p>作者在论文中提到AdaBelief能媲美Adam的收敛速度，同时达到SGD的准确率。我做了几个实验，由于是在小数据集上fine-tuning，所以可能不如在大数据集上从头训练效果明显。不过依然可以得到：<br>1.<em>loss上相对Adam更平稳</em><br>2.<em>收敛上比Adam稍快</em><br>3.<em>性能上比Adam更好</em></p>
+<p>loss 对比图<br><img src="/2020/10/25/adabelief/loss.png"></p>
+<p>accuracy对比图<br><img src="/2020/10/25/adabelief/acc.png"></p>
+<p>实验代码：<a target="_blank" rel="noopener" href="https://github.com/xv44586/toolkit4nlp/blob/master/examples/classification_adabelief.py">classification_adabelief</a></p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor"></a></h1><p>本文介绍一个最新的优化器AdaBelief，并从与论文不同角度解释其主要作用，在实际工作中可以尝试使用AdaBelief，也许能得到比Adam收敛更快性能更好的结果。</p>
+<h1><span id="guan-yu-tou-tu">关于头图</span><a href="#guan-yu-tou-tu" class="header-anchor"></a></h1><p>算法改进对比图</p>
+
+
+
+        <div class="content-footer-sponsor">
+            <h1>
+                <span id="sponsor">Buy me a coffee</span>
+            </h1>
+            <p>如果觉得这篇文章不错，对你有帮助，欢迎打赏一杯蜜雪冰城。</p>
+            <!-- 图片剧中显示
+            <img src="/img/sponsor.JPG" alt="logo" title="sponsor" style="display:block;margin:0 auto;">
+            -->
+            <img src="/img/sponsor.JPG" alt="logo" title="sponsor">
+        </div>
+
+        <div class="post__prevs">
+            <div class="post__prev">
+                
+                <a href="/2020/10/19/triangle/" title="一切三段成三角形"><i class="iconfont icon-prev"></i>一切三段成三角形</a>
+                
+            </div>
+            <div class="post__prev post__prev--right">
+                
+                <a href="/2020/10/25/pet/" title="PET-文本分类的又一种妙解">PET-文本分类的又一种妙解<i class="iconfont icon-next"></i></a>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+        <script src="https://giscus.app/client.js"
+        data-repo="xv44586/giscus"
+        data-repo-id="R_kgDOIC6Ipg"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOIC6Ips4CRkmo"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="light"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+    </script>
+    </div>
+
+    <aside class="page__sidebar">
+    <!--  -->
+
+    <form id="page-search-from" class="page__search-from" action="/search/">
+        <label class="search-form__item">
+            <input class="input" type="text" name="search" placeholder="Search...">
+            <i class="iconfont icon-search"></i>
+        </label>
+    </form>
+
+    
+        <div class="sidebar__block">
+            <h3 class="block__title">简介</h3>
+            <p class="block__text">NLP | Machine Learning | Developer</p>
+        </div>
+    
+
+    <div class="sidebar__block">
+        <h3 class="block__title">文章分类</h3>
+        <ul class="block-list"><li class="block-list-item"><a class="block-list-link" href="/categories/Programming/">Programming</a><span class="block-list-count">4</span></li><li class="block-list-item"><a class="block-list-link" href="/categories/NLP/">NLP</a><span class="block-list-count">33</span></li><li class="block-list-item"><a class="block-list-link" href="/categories/Math/">Math</a><span class="block-list-count">5</span></li><li class="block-list-item"><a class="block-list-link" href="/categories/MachineLearning/">MachineLearning</a><span class="block-list-count">8</span></li><li class="block-list-item"><a class="block-list-link" href="/categories/Life/">Life</a><span class="block-list-count">7</span></li></ul>
+    </div>
+    
+    <div class="sidebar__block">
+        <h3 class="block__title">最新文章</h3>
+        
+        <ul class="block-list latest-post-list">
+            
+                    <li class="latest-post-item">
+                        <a href="/2026/01/01/test-minimal/" title="simple test">
+                            <div class="item__cover">
+                                <img src="/img/default_cover.jpeg" alt="simple test" />
+                            </div>
+                            <div class="item__info">
+                                <h3 class="item__title">simple test</h3>
+                                <span class="item__text">2026-01-01</span>
+                            </div>
+                        </a>
+                    </li>
+                
+                    <li class="latest-post-item">
+                        <a href="/2025/12/31/goodbye-2025/" title="再见 2025，你好 2026">
+                            <div class="item__cover">
+                                <img src="/2025/12/31/goodbye-2025/2025-09-甘孜-红海子.jpeg" alt="再见 2025，你好 2026" />
+                            </div>
+                            <div class="item__info">
+                                <h3 class="item__title">再见 2025，你好 2026</h3>
+                                <span class="item__text">2025-12-31</span>
+                            </div>
+                        </a>
+                    </li>
+                
+                    <li class="latest-post-item">
+                        <a href="/2023/03/25/gpt4/" title="GPT-4 yes!! but">
+                            <div class="item__cover">
+                                <img src="/2023/03/25/gpt4/bg.jpeg" alt="GPT-4 yes!! but" />
+                            </div>
+                            <div class="item__info">
+                                <h3 class="item__title">GPT-4 yes!! but</h3>
+                                <span class="item__text">2023-03-25</span>
+                            </div>
+                        </a>
+                    </li>
+                
+                    <li class="latest-post-item">
+                        <a href="/2023/03/10/llm-inf/" title="LLM Inference串讲">
+                            <div class="item__cover">
+                                <img src="/2023/03/10/llm-inf/sd.PNG" alt="LLM Inference串讲" />
+                            </div>
+                            <div class="item__info">
+                                <h3 class="item__title">LLM Inference串讲</h3>
+                                <span class="item__text">2023-03-10</span>
+                            </div>
+                        </a>
+                    </li>
+                
+        </ul>
+    
+    </div>
+
+    <div class="sidebar__block">
+        <h3 class="block__title">文章标签</h3>
+        
+        <ul class="block-list tag-list clearfix">
+            
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Annual-Summary/">Annual Summary</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/BERT/">BERT</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/BPE/">BPE</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Bagging/">Bagging</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Boosting/">Boosting</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/CCF/">CCF</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/CRF/">CRF</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/CUDA/">CUDA</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/ChatGPT/">ChatGPT</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Classification/">Classification</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Competition/">Competition</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Deep-Learning/">Deep Learning</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Distillation/">Distillation</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/EDA/">EDA</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/FastBERT/">FastBERT</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Few-shot/">Few-shot</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/GPT-3/">GPT-3</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/GPT-4/">GPT-4</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/GPU/">GPU</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Game/">Game</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Glove/">Glove</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Hexo/">Hexo</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/In-context-learning/">In-context learning</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Inference/">Inference</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/LLM/">LLM</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/LR/">LR</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Language-Model/">Language Model</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Life/">Life</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Loss/">Loss</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/MarkDown/">MarkDown</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Math/">Math</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Matrix/">Matrix</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/NLG/">NLG</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Optimizer/">Optimizer</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Python/">Python</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/QA/">QA</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/R-Drop/">R-Drop</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Random-Forest/">Random Forest</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Segmentation/">Segmentation</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/SimCSE/">SimCSE</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Statistics/">Statistics</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Survey/">Survey</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/T5/">T5</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/UniLM/">UniLM</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Unigram/">Unigram</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/WordPiece/">WordPiece</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Words-Distance/">Words Distance</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/Xgboost/">Xgboost</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/debug/">debug</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/faster-decoder/">faster decoder</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/fine-tuning/">fine-tuning</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/horovod/">horovod</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/multi-task/">multi-task</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/nohup/">nohup</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/npm/">npm</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/simbert/">simbert</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/skipgram/">skipgram</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/speed-up/">speed-up</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/swift/">swift</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/tensorflow-gpu/">tensorflow-gpu</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/word2vec/">word2vec</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/%E4%BF%A1%E6%81%AF%E7%86%B5/">信息熵</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/%E6%96%B0%E8%AF%8D%E5%8F%91%E7%8E%B0/">新词发现</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/%E6%A0%B7%E6%9C%AC%E4%B8%8D%E5%9D%87%E8%A1%A1/">样本不均衡</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/%E8%A3%85%E6%9C%BA/">装机</a>
+                    </li>  
+                
+                    <li class="tag-item">
+                        <a class="tag-link" href="/tags/%E9%A2%86%E5%9F%9F%E8%AF%8D%E6%8C%96%E6%8E%98/">领域词挖掘</a>
+                    </li>  
+                
+        </ul>
+    
+    </div>
+
+    <!-- <div class="sidebar__block">
+        <h3 class="block__title">友情链接</h3>
+        <ul class="block-list">
+            
+        </ul>
+    </div> -->
+</aside>
+</main>
+
+
+        
+            <!-- 页脚 -->
+<footer class="page__footer">
+    <section class="footer__top">
+        <div class="page__container footer__container">
+            
+            <div class="footer-top__item footer-top__item--2">
+                <h3 class="item__title">关于</h3>
+                <div class="item__content">
+                    <p class="item__text">本站是基于 Hexo 搭建的静态资源博客，主要用于分享日常学习、生活及工作的一些心得总结。</p>
+                    <ul class="footer__contact-info">
+                        <li class="contact-info__item">
+                            <i class="iconfont icon-address"></i>
+                            <span>Beijing, China</span>
+                        </li>
+                        <li class="contact-info__item">
+                            <i class="iconfont icon-email2"></i>
+                            <span>xv44586@gmail.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            
+            
+            
+            
+            
+                
+                    <div class="footer-top__item">
+                        <h3 class="item__title">友情链接</h3>
+                        <div class="item__content">
+                            <ul class="footer-top__list">
+                                
+                                    <li class="list-item">
+                                        <a href="http://www.matrix67.com/" title="Matrix67" target="_blank">Matrix67</a>
+                                    </li>
+                                
+                                    <li class="list-item">
+                                        <a href="https://spaces.ac.cn/" title="Spaces" target="_blank">科学空间</a>
+                                    </li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                
+            
+        </div>
+    </section>
+    <section class="footer__bottom">
+        <div class="page__container footer__container">
+            <p class="footer__copyright">©
+                <a href="https://github.com/Mrminfive/hexo-theme-skapp" target="_blank">Skapp</a> 2017 powered by
+                <a href="http://hexo.io/" target="_blank">Hexo</a>, made by 
+                <a href="https://github.com/Mrminfive" target="_blank">minfive</a>. modified by
+                <a href="https://github.com/xv44586" target="_blank">小蛋子</a>
+            </p>
+            <ul class="footer__social-network clearfix">
+                
+                
+                    <li class="social-network__item">
+                        <a href="https://github.com/xv44586" target="_blank" title="github">
+                            <i class="iconfont icon-github"></i>
+                        </a>
+                    </li>
+                
+                    <li class="social-network__item">
+                        <a href="xv44586@gmail.com" target="_blank" title="email">
+                            <i class="iconfont icon-email"></i>
+                        </a>
+                    </li>
+                
+                
+            </ul>
+        </div>
+    </section>
+</footer>
+        
+
+        
+            <!-- 返回顶部 -->
+<div id="back-top" class="back-top back-top--hidden js-hidden">
+    <i class="iconfont icon-top"></i>
+</div>
+        
+    </div>
+
+    <!-- build:js /js/common.js -->
+        <script type="text/javascript" src="/js/common/utils.js"></script>
+        <script type="text/javascript" src="/js/common/pack.js"></script>
+        <script type="text/javascript" src="/js/common/animation.js"></script>
+        <script type="text/javascript" src="/js/layout/loading.js"></script>
+        <script type="text/javascript" src="/js/layout/header.js"></script>
+        <script type="text/javascript" src="/js/layout/back-top.js"></script>
+        <script type="text/javascript" src="/js/layout/post.js"></script>
+    <!-- endbuild -->
+
+    
+    
+<script src="/js/page/post.js"></script>
+
+
+    
+    
+    
+
+
+
+    <!-- 不蒜子统计 -->
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+     
+
+  
+
+  
+  
+
+  
+    
+    
+              
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+                processEscapes: true,
+                skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+            });
+        </script>
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+                for (i=0; i < all.length; i += 1) {
+                all[i].SourceElement().parentNode.className += ' has-jax';
+                }
+            });
+        </script>      
+        <script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>    
+    
+    
+  
+
+
+
+
+
+
+
+
+
+    
+</body>
+</html>
